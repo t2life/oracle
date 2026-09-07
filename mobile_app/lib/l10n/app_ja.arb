@@ -1,0 +1,282 @@
+{
+  "@@locale": "ja",
+  "appTitle": "日本神話オラクルロンカード",
+  "back": "戻る",
+  "retry": "再試行",
+  "offlineBanner": "オフラインモードで動作中（サーバー未接続）",
+  "skipLabel": "スキップ",
+  "splashTagline": "神託が、あなたを待っています",
+  "menuTooltip": "メニュー",
+  "cancelLabel": "キャンセル",
+  "aboutOracleTitle": "託宣とは",
+  "aboutOracleBody1": "託宣（たくせん）とは、神仏がその意思を人に告げることをいいます。本アプリの日本神話オラクルロンカードは、日本の神々の姿を宿したカードを通して、あなたの内側にある答えに気づくための「きっかけ」をお届けします。",
+  "aboutOracleBody2": "占いの結果は、未来を断定するものではありません。カードが示すのは、いま向き合うとよいテーマや、心の向け方のヒントです。受け取ったメッセージを、ご自身の人生をより良くするための一つの視点としてお使いください。",
+  "aboutOracleBody3": "静かな気持ちで、相談したいテーマを思い浮かべながらカードを引いてみてください。あなたにとって意味のある一枚が、きっと訪れます。",
+  "aboutCardsTitle": "カードメッセージについて",
+  "aboutCardsBody1": "各カードには、日本神話に登場する神々の「基本的な意味」と「キーワード」が込められています。同じカードでも、選んだテーマ（恋愛・仕事・金運・健康・潜在意識・ハイヤーセルフ）によって、受け取れるメッセージは変わります。",
+  "aboutCardsBody2": "メッセージは、神々の物語と象徴に基づいて構成されています。前向きな言葉も、注意をうながす言葉も、すべてはあなたの歩みを支えるためのものです。",
+  "aboutCardsBody3": "本アプリのメッセージは、セルフケア・内省・気づきの補助を目的としています。医療・法律・投資などの専門的な判断が必要な場合は、必ず各分野の専門家にご相談ください。",
+  "nicknameTitle": "ニックネーム",
+  "nicknamePrompt": "アプリ内で表示されるお名前を決めてください。",
+  "nicknameLabel": "ニックネーム（1〜20文字）",
+  "nicknameSave": "決定する",
+  "nicknameEdit": "変更",
+  "historyDelete": "削除",
+  "historyDeleteTitle": "履歴を削除",
+  "historyDeleteConfirm": "この履歴を削除します。よろしいですか？",
+  "imageScrimLabel": "背景の暗さ（文字の読みやすさ調整）",
+  "soundOnTooltip": "効果音をオンにする",
+  "soundOffTooltip": "効果音をオフにする",
+  "tabReading": "占う",
+  "tabCards": "カード",
+  "planFree": "無料会員",
+  "planSubscription": "サブスク会員",
+  "planTicket": "チケット会員",
+  "planGuest": "ゲスト",
+  "planAdmin": "管理者",
+  "displayThemeLabel": "表示テーマ",
+  "themeDark": "ダーク",
+  "themeLight": "ライト",
+  "todaysOracle": "今日の託宣",
+  "preparingCards": "カードを準備しています…",
+  "shuffleGuide": "指でカードをかき混ぜてください",
+  "shuffleGuideRelease": "十分に混ざったら、指を離してください",
+  "shuffleReady": "カードが十分に混ざりました",
+  "pileTapHint": "直感で1つの山を選んでください",
+  "spreadTapHint": "心に響く1枚をタップしてください",
+  "onboardingTitle": "ようこそ",
+  "onboardingSummary": "世界観のご案内と、ご利用にあたっての注意事項です。",
+  "onboardingItem1": "託宣・リーディングの流れと無料でご利用いただける範囲のご紹介",
+  "onboardingItem2": "初回リーディング前のトーンと内容のご案内",
+  "onboardingItem3": "通知許諾の前に、その価値をご説明します",
+  "continueLabel": "はじめる",
+  "homeTitle": "ホーム",
+  "welcomeUser": "ようこそ {userId} さん",
+  "@welcomeUser": {
+    "placeholders": {
+      "userId": {"type": "String"}
+    }
+  },
+  "planAndTickets": "プラン: {plan} / チケット: {tickets}",
+  "@planAndTickets": {
+    "placeholders": {
+      "plan": {"type": "String"},
+      "tickets": {"type": "int"}
+    }
+  },
+  "startReadingTitle": "今日の託宣・リーディングを始める",
+  "startReadingSubtitle": "デッキとテーマを選択してセッションを開始",
+  "announcementsTitle": "お知らせ",
+  "noAnnouncements": "お知らせはありません",
+  "cardLibraryTitle": "カード一覧",
+  "cardLibrarySubtitle": "カード辞典を検索・閲覧",
+  "ronRoomTitle": "ロンの部屋",
+  "ronRoomSubtitle": "配信予定・アーカイブ・限定企画",
+  "historyTitle": "履歴",
+  "historySavedCount": "保存済み {count} 件",
+  "@historySavedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "myPageTitle": "マイページ",
+  "myPageSubtitle": "プランとアカウント設定",
+  "shopLabel": "ショップ",
+  "consultationLabel": "鑑定相談",
+  "deckSelectionTitle": "デッキ選択",
+  "deckPrompt": "使用するデッキを選択してください。",
+  "deckSortOrder": "表示順: {order}",
+  "@deckSortOrder": {
+    "placeholders": {
+      "order": {"type": "int"}
+    }
+  },
+  "proceedToThemeSelection": "テーマ選択へ進む",
+  "themeSelectionTitle": "テーマ選択",
+  "themePrompt": "相談したいテーマを1つ選択してください。",
+  "proceedToShuffle": "シャッフルへ進む",
+  "shuffleTitle": "シャッフル",
+  "deckAndTheme": "デッキ: {deck} / テーマ: {theme}",
+  "@deckAndTheme": {
+    "placeholders": {
+      "deck": {"type": "String"},
+      "theme": {"type": "String"}
+    }
+  },
+  "sessionIdLabel": "セッションID: {id}",
+  "@sessionIdLabel": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "sessionNotStarted": "未開始",
+  "startSession": "セッション開始",
+  "completeShuffleLabel": "シャッフル完了",
+  "pilesNotCreated": "まだ山は生成されていません。",
+  "pileSizesLabel": "山サイズ: {sizes}",
+  "@pileSizesLabel": {
+    "placeholders": {
+      "sizes": {"type": "String"}
+    }
+  },
+  "pileSelectionTitle": "山選択",
+  "noPileInfo": "山情報がありません。シャッフル画面で完了してください。",
+  "backToShuffle": "シャッフルへ戻る",
+  "choosePilePrompt": "3つの山から1つ選んでください。",
+  "pileLabel": "山 {index}",
+  "@pileLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "pileCountLabel": "枚数: {count}",
+  "@pileCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardSpreadTitle": "カード選択",
+  "selectedPileLabel": "選択中の山: {pile}",
+  "@selectedPileLabel": {
+    "placeholders": {
+      "pile": {"type": "String"}
+    }
+  },
+  "notSelected": "未選択",
+  "pileSizeLabel": "山の枚数: {size}",
+  "@pileSizeLabel": {
+    "placeholders": {
+      "size": {"type": "int"}
+    }
+  },
+  "completePileFirst": "先に山選択を完了してください。",
+  "cardNumberLabel": "カード番号",
+  "nthCard": "{n} 番目",
+  "@nthCard": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "revealCard": "カードを公開する",
+  "readingResultTitle": "託宣・リーディング結果",
+  "noResult": "結果がありません。カードを公開してください。",
+  "refetchResult": "結果を再取得",
+  "themeAndDeck": "テーマ: {theme} / デッキ: {deck}",
+  "@themeAndDeck": {
+    "placeholders": {
+      "theme": {"type": "String"},
+      "deck": {"type": "String"}
+    }
+  },
+  "saveToHistory": "履歴に保存",
+  "deepReading": "ディープリーディング",
+  "backToHome": "ホームへ戻る",
+  "historyScreenTitle": "履歴",
+  "planAndSavedCount": "プラン: {plan} / 保存件数: {count}",
+  "@planAndSavedCount": {
+    "placeholders": {
+      "plan": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "noHistory": "履歴はまだありません。",
+  "upgradePlan": "プランをアップグレード",
+  "cardLibraryScreenTitle": "カード一覧",
+  "searchCardsLabel": "カード名・キーワードで検索",
+  "allDecks": "すべて",
+  "noCards": "表示できるカードがありません。検索条件を見直してください。",
+  "announcementsScreenTitle": "お知らせ",
+  "noAnnouncementsAvailable": "現在表示できるお知らせはありません。",
+  "ronRoomScreenTitle": "ロンの部屋",
+  "ronRoomHeadline": "RON'S ROOM",
+  "ronRoomDescription": "世界観・配信・限定告知をまとめて受け取れる公式ハブです。",
+  "streamSchedule": "配信予定",
+  "noStreams": "現在表示できる配信予定はありません。",
+  "archivesAndLinks": "アーカイブ・配信導線",
+  "noStreamLinks": "表示できる配信リンクがありません。",
+  "limitedBannerTitle": "限定企画バナー",
+  "limitedBannerBody": "次回の限定配信企画は準備中です。",
+  "shopScreenTitle": "ショップ",
+  "shopDescription": "公式ショップや関連商品の外部ページへ遷移できます。",
+  "noShopLinks": "現在表示できるショップリンクはありません。",
+  "consultationScreenTitle": "鑑定相談",
+  "consultationDescription": "オンライン鑑定・メール鑑定の申込導線です。",
+  "noConsultationLinks": "現在表示できる鑑定リンクはありません。",
+  "myPageScreenTitle": "マイページ",
+  "visitCountLabel": "訪問回数: {count}",
+  "@visitCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planLabel": "プラン: {plan}",
+  "@planLabel": {
+    "placeholders": {
+      "plan": {"type": "String"}
+    }
+  },
+  "ticketBalanceLabel": "チケット残数: {count}",
+  "@ticketBalanceLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "restoreTicket20": "購入復元 (ticket_20)",
+  "syncNotificationToken": "通知トークン同期",
+  "goToPaywall": "プラン購入画面へ",
+  "goToInquiry": "お問い合わせ",
+  "languageLabel": "言語",
+  "languageSystem": "システム設定に従う",
+  "languageJa": "日本語",
+  "languageEn": "English",
+  "languageZh": "中文（简体）",
+  "paywallScreenTitle": "プラン購入",
+  "currentPlanAndTickets": "現在のプラン: {plan} / チケット: {tickets}",
+  "@currentPlanAndTickets": {
+    "placeholders": {
+      "plan": {"type": "String"},
+      "tickets": {"type": "int"}
+    }
+  },
+  "productLine": "{planType} / {price}円 / チケット{tickets}枚",
+  "@productLine": {
+    "placeholders": {
+      "planType": {"type": "String"},
+      "price": {"type": "int"},
+      "tickets": {"type": "int"}
+    }
+  },
+  "restorePurchase": "購入を復元する",
+  "inquiryScreenTitle": "お問い合わせ",
+  "categoryLabel": "カテゴリ",
+  "categoryGeneral": "一般",
+  "categoryBilling": "課金",
+  "categoryBug": "不具合",
+  "emailOptionalLabel": "メールアドレス（任意）",
+  "inquiryBodyLabel": "お問い合わせ内容",
+  "sendLabel": "送信する",
+  "invalidLinkFormat": "リンク形式が正しくありません。",
+  "cannotOpenLink": "外部リンクを開けませんでした。",
+  "msgSessionStarted": "セッションを開始しました。",
+  "msgShuffleCompleted": "シャッフルを完了しました。",
+  "msgPileSelected": "山を選択しました。",
+  "msgCardRevealed": "カードを公開しました。",
+  "msgHistorySaved": "履歴を保存しました。",
+  "msgPremiumUnlocked": "有料機能解放版: サブスクリプション特典を有効化しました。",
+  "msgOfflineMode": "オフラインモードで動作中です（サーバー未接続）。",
+  "msgSelectDeckTheme": "デッキとテーマを選択してください。",
+  "msgSessionNotStarted": "セッションが開始されていません。",
+  "msgOfflineFeatureUnavailable": "オフラインのためこの機能は利用できません。",
+  "msgFreeDailyLimit": "無料プランは1日1回までです。",
+  "msgPaidOnlyDraw": "3枚引きは有料プランで利用できます。",
+  "msgTicketShortage": "チケット残高が不足しています。",
+  "msgPurchaseRestored": "購入復元を反映しました。",
+  "msgHistoryDeleted": "履歴を削除しました。",
+  "msgNicknameSaved": "ニックネームを保存しました。",
+  "msgCommError": "通信エラーが発生しました (status: {status})",
+  "@msgCommError": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  }
+}

@@ -1,0 +1,67 @@
+name: backend-ci
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: oracle
+          POSTGRES_PASSWORD: oracle
+          POSTGRES_DB: oracle_app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U oracle -d oracle_app"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: |
+          PYTHONPATH=src python -m pytest -q
+
+      - name: Run smoke test
+        run: |
+          PYTHONPATH=src python scripts/smoke_test.py
+
+      - name: Init persistence (hybrid)
+        env:
+          ORACLE_PERSISTENCE_BACKEND: hybrid
+          ORACLE_POSTGRES_ENABLED: "true"
+          ORACLE_POSTGRES_DSN: postgresql+psycopg://oracle:oracle@localhost:5432/oracle_app
+          ORACLE_REDIS_ENABLED: "true"
+          ORACLE_REDIS_URL: redis://localhost:6379/0
+        run: |
+          PYTHONPATH=src python scripts/init_persistence.py

@@ -1,0 +1,28 @@
+{
+  "folders": [
+	{
+		"path": "."
+	}
+],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "chat.tools.terminal.autoApprove": {
+      "/^c:/Users/81907/Desktop/オラクルカード/system/\\.venv/Scripts/python\\.exe -m pytest -q$/": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/^c:/Users/81907/Desktop/オラクルカード/system/\\.venv/Scripts/python\\.exe scripts/smoke_test\\.py$/": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/^git rev-parse --is-inside-work-tree 2>\\$null; if \\(\\$LASTEXITCODE -ne 0\\) \\{ Write-Host \"not a git repository\" \\}$/": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/^\\.\\\\\\.venv\\\\Scripts\\\\python\\.exe scripts/init_persistence\\.py$/": {
+        "approve": true,
+        "matchCommandLine": true
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# 配布物・ビルド生成物
+dist/
+build/
+
+# Node / Next.js（admin_app・docs配下の依存も含む）
+node_modules/
+.next/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/mobile_app/android/.gradle/
+**/mobile_app/android/local.properties
+*.iml
+
+# エディタ
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ログ・DB実体（アプリ生成物）
+*.log
+db/*.sqlite3
+db/*.db
