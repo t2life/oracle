@@ -4,17 +4,38 @@ import '../../../core/audio/sound_service.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../card_library/presentation/card_library_screen.dart';
+import '../../consultation/presentation/consultation_screen.dart';
 import '../../deck_selection/presentation/deck_selection_screen.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../my_page/presentation/my_page_screen.dart';
-import '../../ron_room/presentation/ron_room_screen.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
+import '../../shop/presentation/shop_screen.dart';
 
-/// アプリの主画面シェル（2026-09-06 ネストNavigator化）。
-/// - 下部ナビゲーションバーは**全画面で常時最前面**（フロー/二次画面はシェル内の
-///   ネストNavigatorへpushされるため下部ナビが隠れない＝重なり・見切れを根絶）。
-/// - AppBarはネスト内の各画面が自前で持つ。シェルはAppBarを持たない。
+/// 下部タブの切替を、ネストNavigator内の子孫（ホームのオーブ等）へ公開するスコープ。
+/// [MainShell] がNavigatorの上位に提供する。子孫は `ShellScope.of(context)?.selectTab(i)`。
+class ShellScope extends InheritedWidget {
+  const ShellScope({
+    super.key,
+    required this.selectTab,
+    required super.child,
+  });
+
+  /// 指定インデックスの下部タブへ切替える。
+  final ValueChanged<int> selectTab;
+
+  static ShellScope? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ShellScope>();
+
+  @override
+  bool updateShouldNotify(ShellScope oldWidget) =>
+      selectTab != oldWidget.selectTab;
+}
+
+/// アプリの主画面シェル（2026-09-08 ダッシュボード画像ナビ＋タブ再編）。
+/// - 下部ナビは `ダッシュボード.png`（ホーム/カード/ショップ/鑑定/マイページ）を全画面で常時表示。
+/// - 占う＝ホーム中央オーブ、ロンの部屋＝≡メニューへ移動。
+/// - フロー/二次画面はネストNavigatorへpushされ、下部ナビは隠れない。
 /// - Androidの戻るキーはネスト内スタックを優先pop（ルートで初めてアプリ終了）。
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -26,14 +47,24 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   static const List<String> _tabRoots = [
     '/home',
-    '/deck-selection',
     '/card-library',
-    '/ron-room',
+    '/shop',
+    '/consultation',
     '/my-page',
   ];
 
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
   int _index = 0;
+
+  /// 指定タブへ切替（効果音は鳴らさない＝呼び出し側の責務）。
+  /// タブ切替はネストのルートを差し替える（案A: フローは破棄＝一方通行の儀式性を維持）。
+  void _switchTo(int value) {
+    setState(() => _index = value);
+    _navKey.currentState?.pushNamedAndRemoveUntil(
+      _tabRoots[value],
+      (route) => false,
+    );
+  }
 
   void _onSelectTab(int value) {
     SoundService.instance.play(OracleSound.tap);
@@ -41,19 +72,12 @@ class _MainShellState extends State<MainShell> {
       // 同じタブ再タップ＝そのタブのルートまで戻す（占いフロー等を離脱）
       _navKey.currentState?.popUntil((route) => route.isFirst);
     } else {
-      setState(() => _index = value);
-      // タブ切替はネストのルートを差し替える（案A: フローは破棄＝一方通行の儀式性を維持）
-      _navKey.currentState?.pushNamedAndRemoveUntil(
-        _tabRoots[value],
-        (route) => false,
-      );
+      _switchTo(value);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -66,47 +90,23 @@ class _MainShellState extends State<MainShell> {
         }
       },
       child: Scaffold(
-        body: Navigator(
-          key: _navKey,
-          initialRoute: _tabRoots[0],
-          onGenerateRoute: (settings) {
-            final builder = _shellTabBuilder(settings.name) ?? buildShellChild;
-            return MaterialPageRoute<void>(
-              settings: settings,
-              builder: builder,
-            );
-          },
+        body: ShellScope(
+          selectTab: _switchTo,
+          child: Navigator(
+            key: _navKey,
+            initialRoute: _tabRoots[0],
+            onGenerateRoute: (settings) {
+              final builder = _shellTabBuilder(settings.name) ?? buildShellChild;
+              return MaterialPageRoute<void>(
+                settings: settings,
+                builder: builder,
+              );
+            },
+          ),
         ),
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: _index,
-          onDestinationSelected: _onSelectTab,
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home),
-              label: l10n.homeTitle,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.auto_awesome_outlined),
-              selectedIcon: const Icon(Icons.auto_awesome),
-              label: l10n.tabReading,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.style_outlined),
-              selectedIcon: const Icon(Icons.style),
-              label: l10n.tabCards,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.live_tv_outlined),
-              selectedIcon: const Icon(Icons.live_tv),
-              label: l10n.ronRoomTitle,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline),
-              selectedIcon: const Icon(Icons.person),
-              label: l10n.myPageTitle,
-            ),
-          ],
+        bottomNavigationBar: _DashboardNav(
+          index: _index,
+          onSelect: _onSelectTab,
         ),
       ),
     );
@@ -120,39 +120,53 @@ WidgetBuilder? _shellTabBuilder(String? name) {
       return (_) => const _ShellTabScaffold(
             titleKey: _ShellTitle.home,
             body: HomeTab(),
-          );
-    case '/deck-selection':
-      return (_) => const _ShellTabScaffold(
-            titleKey: _ShellTitle.reading,
-            body: DeckSelectionBody(),
+            immersive: true,
           );
     case '/card-library':
       return (_) => const _ShellTabScaffold(
             titleKey: _ShellTitle.cards,
             body: CardLibraryTab(),
           );
-    case '/ron-room':
+    case '/shop':
       return (_) => const _ShellTabScaffold(
-            titleKey: _ShellTitle.ronRoom,
-            body: RonRoomTab(),
+            titleKey: _ShellTitle.shop,
+            body: ShopTab(),
+          );
+    case '/consultation':
+      return (_) => const _ShellTabScaffold(
+            titleKey: _ShellTitle.consultation,
+            body: ConsultationTab(),
           );
     case '/my-page':
       return (_) => const _ShellTabScaffold(
             titleKey: _ShellTitle.myPage,
             body: MyPageTab(),
           );
+    // 占うオーブから開始する託宣フロー（下部タブではないがネストへpushされる）。
+    case '/deck-selection':
+      return (_) => const _ShellTabScaffold(
+            titleKey: _ShellTitle.reading,
+            body: DeckSelectionBody(),
+          );
   }
   return null;
 }
 
-enum _ShellTitle { home, reading, cards, ronRoom, myPage }
+enum _ShellTitle { home, reading, cards, shop, consultation, myPage }
 
 /// タブのルート画面共通Scaffold（AppBar右端にスピーカー＋≡メニュー）。
 class _ShellTabScaffold extends StatelessWidget {
-  const _ShellTabScaffold({required this.titleKey, required this.body});
+  const _ShellTabScaffold({
+    required this.titleKey,
+    required this.body,
+    this.immersive = false,
+  });
 
   final _ShellTitle titleKey;
   final Widget body;
+
+  /// 没入表示（ホーム）：AppBarを持たず本文を上端まで敷く。操作はフローティングUIが担う。
+  final bool immersive;
 
   String _title(AppLocalizations l10n) {
     switch (titleKey) {
@@ -162,8 +176,10 @@ class _ShellTabScaffold extends StatelessWidget {
         return l10n.tabReading;
       case _ShellTitle.cards:
         return l10n.tabCards;
-      case _ShellTitle.ronRoom:
-        return l10n.ronRoomTitle;
+      case _ShellTitle.shop:
+        return l10n.shopScreenTitle;
+      case _ShellTitle.consultation:
+        return l10n.consultationScreenTitle;
       case _ShellTitle.myPage:
         return l10n.myPageTitle;
     }
@@ -172,6 +188,14 @@ class _ShellTabScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    if (immersive) {
+      // AppBarなし＝本文が上端（ステータスバー背後）まで没入。スピーカー/≡/LANGは
+      // 本文側のフローティングUIが担う。endDrawerは維持（≡から開く）。
+      return Scaffold(
+        endDrawer: const SecondaryMenuDrawer(),
+        body: body,
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -195,8 +219,63 @@ class _ShellTabScaffold extends StatelessWidget {
   }
 }
 
-/// ≡メニュー（二次導線）。⑦「託宣とは」「カードメッセージについて」を
-/// 「お知らせ」の上に配置。
+/// 下部ナビ（`ダッシュボード.png` ＋ 5等分のタップ判定）。
+/// タブ: ホーム(0)/カード(1)/ショップ(2)/鑑定(3)/マイページ(4)。
+class _DashboardNav extends StatelessWidget {
+  const _DashboardNav({required this.index, required this.onSelect});
+
+  final int index;
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final w = constraints.maxWidth;
+          final h = w * 371 / 1536; // 画像アスペクト比（nav_dashboard.png）
+          return SizedBox(
+            width: w,
+            height: h,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  'assets/home/nav_dashboard.png',
+                  fit: BoxFit.fill,
+                ),
+                Row(
+                  children: List<Widget>.generate(5, (i) {
+                    return Expanded(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => onSelect(i),
+                        child: i == index
+                            ? const DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: RadialGradient(
+                                    radius: 0.85,
+                                    colors: [Color(0x33FFFFFF), Color(0x00FFFFFF)],
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.expand(),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// ≡メニュー（二次導線）。「託宣とは」「カードメッセージについて」を「お知らせ」の上に。
+/// ロンの部屋はここから開く（下部ナビはショップ/鑑定に譲った）。
 class SecondaryMenuDrawer extends StatelessWidget {
   const SecondaryMenuDrawer({super.key});
 
@@ -243,19 +322,14 @@ class SecondaryMenuDrawer extends StatelessWidget {
             onTap: () => _push(context, '/announcements'),
           ),
           ListTile(
+            leading: const Icon(Icons.live_tv_outlined),
+            title: Text(l10n.ronRoomTitle),
+            onTap: () => _push(context, '/ron-room'),
+          ),
+          ListTile(
             leading: const Icon(Icons.history),
             title: Text(l10n.historyTitle),
             onTap: () => _push(context, '/history'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.shopping_bag_outlined),
-            title: Text(l10n.shopLabel),
-            onTap: () => _push(context, '/shop'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.support_agent_outlined),
-            title: Text(l10n.consultationLabel),
-            onTap: () => _push(context, '/consultation'),
           ),
           const Divider(),
           ListTile(

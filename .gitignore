@@ -33,3 +33,6 @@ Thumbs.db
 *.log
 db/*.sqlite3
 db/*.db
+
+# Flutter 生成ローカライズ（lib/l10n/*.arb から gen-l10n で生成）
+mobile_app/lib/l10n/app_localizations*.dart

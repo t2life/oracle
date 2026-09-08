@@ -3,9 +3,24 @@ import 'package:flutter/material.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared/external_link_helper.dart';
+import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
 
-/// ロンの部屋タブ（シェル内。Scaffold/AppBarはシェルが提供）。
+/// ロンの部屋（単独画面。≡メニューから開く＝戻るボタン付き）。
+class RonRoomScreen extends StatelessWidget {
+  const RonRoomScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      appBar: buildOracleAppBar(context, l10n.ronRoomScreenTitle),
+      body: const RonRoomTab(),
+    );
+  }
+}
+
+/// ロンの部屋タブ本体（Scaffold/AppBarは呼び出し側が提供）。
 class RonRoomTab extends StatefulWidget {
   const RonRoomTab({super.key});
 

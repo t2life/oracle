@@ -12,6 +12,7 @@ import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/paywall/presentation/paywall_screen.dart';
 import '../../features/pile_selection/presentation/pile_selection_screen.dart';
 import '../../features/reading_result/presentation/reading_result_screen.dart';
+import '../../features/ron_room/presentation/ron_room_screen.dart';
 import '../../features/shell/presentation/main_shell.dart';
 import '../../features/shop/presentation/shop_screen.dart';
 import '../../features/shuffle/presentation/shuffle_screen.dart';
@@ -90,6 +91,8 @@ Widget buildShellChild(BuildContext context) {
       return const AboutOracleScreen();
     case '/about-cards':
       return const AboutCardsScreen();
+    case '/ron-room':
+      return const RonRoomScreen();
     default:
       return const DeckSelectionScreen();
   }
