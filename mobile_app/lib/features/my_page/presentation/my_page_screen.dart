@@ -6,8 +6,8 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../core/state/app_state.dart';
 import '../../../core/state/app_state_scope.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../shared/oracle_card_visuals.dart';
 import '../../shared/plan_l10n.dart';
 import '../../shared/state_message_l10n.dart';
 
@@ -15,13 +15,16 @@ import '../../shared/state_message_l10n.dart';
 class MyPageTab extends StatelessWidget {
   const MyPageTab({super.key});
 
-  static const List<({String id, Color color})> _themeSwatches = [
-    (id: 'dark', color: Color(0xFF221C3A)),
-    (id: 'light', color: Color(0xFFF3EFE4)),
-    (id: 'pink', color: Color(0xFFEC6BA0)),
-    (id: 'skyblue', color: Color(0xFF4FB0E0)),
-    (id: 'lime', color: Color(0xFF9CCC65)),
-  ];
+  /// テーマ見本は配色ルール（`app_theme.dart` のパレット）から生成する＝色の二重定義を作らない。
+  /// 円の塗り＝背景色、縁＝アクセント色で「地色と操作色の組」を1粒で示す。
+  static List<({String id, Color fill, Color edge})> get _themeSwatches => [
+        for (final id in oracleThemeOrder)
+          (
+            id: id,
+            fill: paletteFor(id).background,
+            edge: paletteFor(id).accent,
+          ),
+      ];
 
   Future<void> _restorePurchase(BuildContext context) async {
     final state = OracleAppStateScope.of(context);
@@ -164,7 +167,7 @@ class _ThemeCard extends StatelessWidget {
   });
 
   final OracleAppState state;
-  final List<({String id, Color color})> swatches;
+  final List<({String id, Color fill, Color edge})> swatches;
   final VoidCallback onPickImage;
 
   @override
@@ -185,7 +188,8 @@ class _ThemeCard extends StatelessWidget {
               children: [
                 for (final swatch in swatches)
                   _SwatchDot(
-                    color: swatch.color,
+                    fill: swatch.fill,
+                    edge: swatch.edge,
                     selected: state.themePreference == swatch.id,
                     onTap: () => state.setThemePreference(swatch.id),
                   ),
@@ -199,7 +203,7 @@ class _ThemeCard extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: state.themePreference == 'image'
-                            ? kOracleGold
+                            ? Theme.of(context).colorScheme.primary
                             : Colors.grey.withValues(alpha: 0.5),
                         width: state.themePreference == 'image' ? 3 : 1,
                       ),
@@ -238,14 +242,17 @@ class _ThemeCard extends StatelessWidget {
   }
 }
 
+/// テーマ見本の粒（塗り＝背景色／縁＝アクセント色）。
 class _SwatchDot extends StatelessWidget {
   const _SwatchDot({
-    required this.color,
+    required this.fill,
+    required this.edge,
     required this.selected,
     required this.onTap,
   });
 
-  final Color color;
+  final Color fill;
+  final Color edge;
   final bool selected;
   final VoidCallback onTap;
 
@@ -257,16 +264,11 @@ class _SwatchDot extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: color,
+          color: fill,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: selected ? kOracleGold : Colors.grey.withValues(alpha: 0.5),
-            width: selected ? 3 : 1,
-          ),
+          border: Border.all(color: edge, width: selected ? 4 : 2),
         ),
-        child: selected
-            ? const Icon(Icons.check, size: 20, color: kOracleGold)
-            : null,
+        child: selected ? Icon(Icons.check, size: 20, color: edge) : null,
       ),
     );
   }

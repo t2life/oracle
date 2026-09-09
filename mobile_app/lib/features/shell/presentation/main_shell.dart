@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/audio/sound_service.dart';
 import '../../../core/routing/app_router.dart';
@@ -7,7 +8,9 @@ import '../../card_library/presentation/card_library_screen.dart';
 import '../../consultation/presentation/consultation_screen.dart';
 import '../../deck_selection/presentation/deck_selection_screen.dart';
 import '../../home/presentation/home_screen.dart';
+import '../../home/presentation/widgets/home_character_video.dart';
 import '../../my_page/presentation/my_page_screen.dart';
+import '../../shared/flow_exit_action.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shop/presentation/shop_screen.dart';
@@ -18,6 +21,15 @@ import '../../shop/presentation/shop_screen.dart';
 /// 24fps・768x1024のデコードが遷移アニメと競合して切替が遅れる）。
 final RouteObserver<PageRoute<dynamic>> shellRouteObserver =
     RouteObserver<PageRoute<dynamic>>();
+
+/// 下部ナビの「選択中セル」。タップ領域が失われる退行をテストで検出するための目印。
+const Key dashboardNavSelectedKey = Key('dashboard-nav-selected');
+
+/// ホームタブの位置（戻るキーの寄せ先）。
+const int _kHomeTabIndex = 0;
+
+/// ホームで戻るキーを押してから「もう一度で終了」を受け付ける猶予。
+const Duration _kExitConfirmWindow = Duration(seconds: 2);
 
 /// 下部タブの切替を、ネストNavigator内の子孫（ホームのオーブ等）へ公開するスコープ。
 /// [MainShell] がNavigatorの上位に提供する。子孫は `ShellScope.of(context)?.selectTab(i)`。
@@ -61,7 +73,10 @@ class _MainShellState extends State<MainShell> {
   ];
 
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
-  int _index = 0;
+  int _index = _kHomeTabIndex;
+
+  /// 直近に戻るキーを押した時刻（ホームでの2回押し終了の判定用）。
+  DateTime? _lastBackAt;
 
   /// 指定タブへ切替（効果音は鳴らさない＝呼び出し側の責務）。
   /// タブ切替はネストのルートを差し替える（案A: フローは破棄＝一方通行の儀式性を維持）。
@@ -79,14 +94,52 @@ class _MainShellState extends State<MainShell> {
     );
   }
 
+  /// ネスト内の画面生成（タブのルート → なければフロー/二次画面）。
+  Route<dynamic> _shellRoute(RouteSettings settings) {
+    final builder = _shellTabBuilder(settings.name) ?? buildShellChild;
+    return MaterialPageRoute<void>(settings: settings, builder: builder);
+  }
+
   void _onSelectTab(int value) {
     SoundService.instance.play(OracleSound.tap);
     if (value == _index) {
-      // 同じタブ再タップ＝そのタブのルートまで戻す（占いフロー等を離脱）
-      _navKey.currentState?.popUntil((route) => route.isFirst);
+      // 同じタブ再タップ＝そのタブのルートまで戻す（≡から開いた画面等を離脱）
+      final navigator = _navKey.currentState;
+      debugPrint('シェル: 同一タブ再タップ index=$value 戻り可=${navigator?.canPop()}');
+      navigator?.popUntil((route) => route.isFirst);
     } else {
       _switchTo(value);
     }
+  }
+
+  /// Androidの戻るキーの扱い（2026-09-09 A案）。
+  /// ①ネスト内に戻り先があれば戻す →②ホーム以外のタブならホームタブへ →
+  /// ③ホームでは「もう一度押すと終了」を出し、2秒以内の再押下でアプリを終了する。
+  /// （従来は③が無く、戻るキーが何も起こさずアプリも終了できなかった）
+  void _handleSystemBack(BuildContext context) {
+    final navigator = _navKey.currentState;
+    if (navigator != null && navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+    if (_index != _kHomeTabIndex) {
+      _switchTo(_kHomeTabIndex);
+      return;
+    }
+    final now = DateTime.now();
+    final last = _lastBackAt;
+    if (last == null || now.difference(last) > _kExitConfirmWindow) {
+      _lastBackAt = now;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.exitAppConfirm),
+          duration: _kExitConfirmWindow,
+        ),
+      );
+      return;
+    }
+    SystemNavigator.pop();
   }
 
   @override
@@ -97,10 +150,7 @@ class _MainShellState extends State<MainShell> {
         if (didPop) {
           return;
         }
-        final navigator = _navKey.currentState;
-        if (navigator != null && navigator.canPop()) {
-          navigator.pop();
-        }
+        _handleSystemBack(context);
       },
       child: Scaffold(
         body: ShellScope(
@@ -109,13 +159,13 @@ class _MainShellState extends State<MainShell> {
             key: _navKey,
             observers: <NavigatorObserver>[shellRouteObserver],
             initialRoute: _tabRoots[0],
-            onGenerateRoute: (settings) {
-              final builder = _shellTabBuilder(settings.name) ?? buildShellChild;
-              return MaterialPageRoute<void>(
-                settings: settings,
-                builder: builder,
-              );
-            },
+            // 既定の初期ルート生成は '/home' をパス分割して '/' も積むため、
+            // 最下段が既定分岐（デッキ選択）になり、同一タブ再タップやAndroidの戻るで
+            // そこへ落ちていた（2026-09-09の不具合）。初期ルートは1本だけにする。
+            onGenerateInitialRoutes: (_, initialRoute) => <Route<dynamic>>[
+              _shellRoute(RouteSettings(name: initialRoute)),
+            ],
+            onGenerateRoute: _shellRoute,
           ),
         ),
         bottomNavigationBar: _DashboardNav(
@@ -207,6 +257,12 @@ class _ShellTabScaffold extends StatelessWidget {
       // 本文側のフローティングUIが担う。endDrawerは維持（≡から開く）。
       return Scaffold(
         endDrawer: const SecondaryMenuDrawer(),
+        // ドロワーを閉じた直後はキャラ動画の描画が止まる（実機確認）ため張り直す。
+        onEndDrawerChanged: (isOpen) {
+          if (!isOpen) {
+            requestHomeVideoRefresh();
+          }
+        },
         body: body,
       );
     }
@@ -215,6 +271,8 @@ class _ShellTabScaffold extends StatelessWidget {
         automaticallyImplyLeading: false,
         title: Text(_title(l10n)),
         actions: [
+          // 占いフローは一方通行のため、離脱導線をここに置く（iOSでも同じ）。
+          if (titleKey == _ShellTitle.reading) const FlowExitAction(),
           const SpeakerToggle(),
           Builder(
             builder: (context) => IconButton(
@@ -243,7 +301,11 @@ class _DashboardNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    // 素材の上端は透過しているため、絵柄と同じ濃紺を下地に敷く
+    // （敷かないと背後のScaffold地色＝テーマ色が白い帯として覗く）。
+    return ColoredBox(
+      color: kOracleDashboardBase,
+      child: SafeArea(
       top: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -265,14 +327,19 @@ class _DashboardNav extends StatelessWidget {
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () => onSelect(i),
+                        // 選択中のセルも必ず領域いっぱいに広げる。
+                        // 子を持たないDecoratedBoxは0x0になり、選択中タブだけ
+                        // タップ判定と発光が消えていた（2026-09-09の不具合）。
                         child: i == index
                             ? const DecoratedBox(
+                                key: dashboardNavSelectedKey,
                                 decoration: BoxDecoration(
                                   gradient: RadialGradient(
                                     radius: 0.85,
                                     colors: [Color(0x33FFFFFF), Color(0x00FFFFFF)],
                                   ),
                                 ),
+                                child: SizedBox.expand(),
                               )
                             : const SizedBox.expand(),
                       ),
@@ -283,6 +350,7 @@ class _DashboardNav extends StatelessWidget {
             ),
           );
         },
+      ),
       ),
     );
   }
@@ -369,7 +437,7 @@ class _DrawerTitle extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            const Icon(Icons.auto_awesome, color: kOracleGoldBright, size: 22),
+            Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

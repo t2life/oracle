@@ -189,7 +189,7 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: kOracleGold.withValues(alpha: 0.4),
+                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                               ),
                             ),
                             child: Text(

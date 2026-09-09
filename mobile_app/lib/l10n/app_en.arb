@@ -172,5 +172,7 @@
   "msgPurchaseRestored": "Purchase restored.",
   "msgHistoryDeleted": "History deleted.",
   "msgNicknameSaved": "Nickname saved.",
-  "msgCommError": "A communication error occurred (status: {status})"
+  "msgCommError": "A communication error occurred (status: {status})",
+  "exitAppConfirm": "Press back again to exit",
+  "cancelReadingFlow": "Quit"
 }

@@ -54,14 +54,20 @@
   "welcomeUser": "ようこそ {userId} さん",
   "@welcomeUser": {
     "placeholders": {
-      "userId": {"type": "String"}
+      "userId": {
+        "type": "String"
+      }
     }
   },
   "planAndTickets": "プラン: {plan} / チケット: {tickets}",
   "@planAndTickets": {
     "placeholders": {
-      "plan": {"type": "String"},
-      "tickets": {"type": "int"}
+      "plan": {
+        "type": "String"
+      },
+      "tickets": {
+        "type": "int"
+      }
     }
   },
   "startReadingTitle": "今日の託宣・リーディングを始める",
@@ -76,7 +82,9 @@
   "historySavedCount": "保存済み {count} 件",
   "@historySavedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "myPageTitle": "マイページ",
@@ -89,7 +97,9 @@
   "deckSortOrder": "表示順: {order}",
   "@deckSortOrder": {
     "placeholders": {
-      "order": {"type": "int"}
+      "order": {
+        "type": "int"
+      }
     }
   },
   "proceedToThemeSelection": "テーマ選択へ進む",
@@ -100,14 +110,20 @@
   "deckAndTheme": "デッキ: {deck} / テーマ: {theme}",
   "@deckAndTheme": {
     "placeholders": {
-      "deck": {"type": "String"},
-      "theme": {"type": "String"}
+      "deck": {
+        "type": "String"
+      },
+      "theme": {
+        "type": "String"
+      }
     }
   },
   "sessionIdLabel": "セッションID: {id}",
   "@sessionIdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "sessionNotStarted": "未開始",
@@ -117,7 +133,9 @@
   "pileSizesLabel": "山サイズ: {sizes}",
   "@pileSizesLabel": {
     "placeholders": {
-      "sizes": {"type": "String"}
+      "sizes": {
+        "type": "String"
+      }
     }
   },
   "pileSelectionTitle": "山選択",
@@ -127,27 +145,35 @@
   "pileLabel": "山 {index}",
   "@pileLabel": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "pileCountLabel": "枚数: {count}",
   "@pileCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cardSpreadTitle": "カード選択",
   "selectedPileLabel": "選択中の山: {pile}",
   "@selectedPileLabel": {
     "placeholders": {
-      "pile": {"type": "String"}
+      "pile": {
+        "type": "String"
+      }
     }
   },
   "notSelected": "未選択",
   "pileSizeLabel": "山の枚数: {size}",
   "@pileSizeLabel": {
     "placeholders": {
-      "size": {"type": "int"}
+      "size": {
+        "type": "int"
+      }
     }
   },
   "completePileFirst": "先に山選択を完了してください。",
@@ -155,7 +181,9 @@
   "nthCard": "{n} 番目",
   "@nthCard": {
     "placeholders": {
-      "n": {"type": "int"}
+      "n": {
+        "type": "int"
+      }
     }
   },
   "revealCard": "カードを公開する",
@@ -165,8 +193,12 @@
   "themeAndDeck": "テーマ: {theme} / デッキ: {deck}",
   "@themeAndDeck": {
     "placeholders": {
-      "theme": {"type": "String"},
-      "deck": {"type": "String"}
+      "theme": {
+        "type": "String"
+      },
+      "deck": {
+        "type": "String"
+      }
     }
   },
   "saveToHistory": "履歴に保存",
@@ -176,8 +208,12 @@
   "planAndSavedCount": "プラン: {plan} / 保存件数: {count}",
   "@planAndSavedCount": {
     "placeholders": {
-      "plan": {"type": "String"},
-      "count": {"type": "int"}
+      "plan": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noHistory": "履歴はまだありません。",
@@ -207,19 +243,25 @@
   "visitCountLabel": "訪問回数: {count}",
   "@visitCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "planLabel": "プラン: {plan}",
   "@planLabel": {
     "placeholders": {
-      "plan": {"type": "String"}
+      "plan": {
+        "type": "String"
+      }
     }
   },
   "ticketBalanceLabel": "チケット残数: {count}",
   "@ticketBalanceLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "restoreTicket20": "購入復元 (ticket_20)",
@@ -235,16 +277,26 @@
   "currentPlanAndTickets": "現在のプラン: {plan} / チケット: {tickets}",
   "@currentPlanAndTickets": {
     "placeholders": {
-      "plan": {"type": "String"},
-      "tickets": {"type": "int"}
+      "plan": {
+        "type": "String"
+      },
+      "tickets": {
+        "type": "int"
+      }
     }
   },
   "productLine": "{planType} / {price}円 / チケット{tickets}枚",
   "@productLine": {
     "placeholders": {
-      "planType": {"type": "String"},
-      "price": {"type": "int"},
-      "tickets": {"type": "int"}
+      "planType": {
+        "type": "String"
+      },
+      "price": {
+        "type": "int"
+      },
+      "tickets": {
+        "type": "int"
+      }
     }
   },
   "restorePurchase": "購入を復元する",
@@ -277,7 +329,11 @@
   "msgCommError": "通信エラーが発生しました (status: {status})",
   "@msgCommError": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
-  }
+  },
+  "exitAppConfirm": "もう一度押すと終了します",
+  "cancelReadingFlow": "やめる"
 }

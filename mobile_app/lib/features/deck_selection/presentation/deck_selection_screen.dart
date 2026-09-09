@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/audio/sound_service.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../shared/flow_exit_action.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
@@ -46,8 +47,8 @@ class DeckSelectionBody extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     side: BorderSide(
                       color: selected
-                          ? kOracleGold
-                          : kOracleGold.withValues(alpha: 0.22),
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.primary.withValues(alpha: 0.22),
                       width: selected ? 1.6 : 1,
                     ),
                   ),
@@ -59,7 +60,7 @@ class DeckSelectionBody extends StatelessWidget {
                     leading: OracleCardBack(width: 40, glow: selected),
                     title: Text(deck.nameFor(lang)),
                     trailing: selected
-                        ? const Icon(Icons.check_circle, color: kOracleGold)
+                        ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
                         : const Icon(Icons.radio_button_unchecked),
                     onTap: state.loading
                         ? null
@@ -97,7 +98,8 @@ class DeckSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: buildOracleAppBar(context, l10n.deckSelectionTitle),
+      appBar: buildOracleAppBar(context, l10n.deckSelectionTitle,
+          extraActions: const [FlowExitAction()]),
       body: const SafeArea(top: false, child: DeckSelectionBody()),
     );
   }

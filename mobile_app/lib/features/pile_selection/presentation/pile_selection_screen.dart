@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/audio/sound_service.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../shared/flow_exit_action.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
@@ -69,7 +70,8 @@ class _PileSelectionScreenState extends State<PileSelectionScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: buildOracleAppBar(context, l10n.pileSelectionTitle),
+      appBar: buildOracleAppBar(context, l10n.pileSelectionTitle,
+          extraActions: const [FlowExitAction()]),
       body: OracleStateBuilder(
         builder: (context, state) {
           final entries = state.pileSizes.entries.toList()

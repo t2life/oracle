@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/audio/sound_service.dart';
+import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared/oracle_card_visuals.dart';
 
@@ -58,7 +59,12 @@ class _SplashScreenState extends State<SplashScreen>
     }
     _finished = true;
     SoundService.instance.stopAmbience();
-    Navigator.of(context).pushReplacementNamed('/onboarding');
+    // オンボーディング（「ようこそ」）は2026-09-09に配線から外した。
+    // 初回のみニックネーム設定を挟み、設定済みなら直接シェルへ入る。
+    final state = OracleAppStateScope.of(context);
+    Navigator.of(context).pushReplacementNamed(
+      state.nicknameConfigured ? '/shell' : '/nickname',
+    );
   }
 
   double _phase(double begin, double end, {Curve curve = Curves.easeOutCubic}) {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/audio/sound_service.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../shared/oracle_card_visuals.dart';
 import '../../shared/state_message_l10n.dart';
 
 /// ニックネーム設定画面（④）。
@@ -67,9 +66,9 @@ class _NicknameScreenState extends State<NicknameScreen> {
             return ListView(
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
               children: [
-                const Center(
+                Center(
                   child: Icon(Icons.auto_awesome,
-                      color: kOracleGoldBright, size: 40),
+                      color: Theme.of(context).colorScheme.primary, size: 40),
                 ),
                 const SizedBox(height: 20),
                 Text(

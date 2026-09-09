@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../../core/audio/sound_service.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../shared/flow_exit_action.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
@@ -199,7 +200,8 @@ class _ShuffleScreenState extends State<ShuffleScreen>
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
     return Scaffold(
-      appBar: buildOracleAppBar(context, l10n.shuffleTitle),
+      appBar: buildOracleAppBar(context, l10n.shuffleTitle,
+          extraActions: const [FlowExitAction()]),
       body: OracleStateBuilder(
         builder: (context, state) {
           if (_phase == _ShufflePhase.preparing) {
@@ -338,9 +340,9 @@ class _ShuffleScreenState extends State<ShuffleScreen>
                       child: LinearProgressIndicator(
                         value: (_swipeDistance / _readyThreshold).clamp(0.0, 1.0),
                         minHeight: 6,
-                        color: kOracleGold,
+                        color: Theme.of(context).colorScheme.primary,
                         backgroundColor:
-                            kOracleGold.withValues(alpha: 0.15),
+                            Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                       ),
                     ),
                     const SizedBox(height: 12),

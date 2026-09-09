@@ -47,6 +47,8 @@ Route<dynamic> buildRoute(RouteSettings settings) {
   switch (settings.name) {
     case '/splash':
       return MaterialPageRoute<void>(builder: (_) => const SplashScreen());
+    // 「ようこそ」画面は2026-09-09に起動導線から外した（スプラッシュ→ニックネーム/シェル）。
+    // 画面と経路は再配線できるよう残すが、現在ここへ遷移する箇所は無い。
     case '/onboarding':
       return MaterialPageRoute<void>(builder: (_) => const OnboardingScreen());
     case '/nickname':

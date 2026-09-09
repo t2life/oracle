@@ -169,7 +169,9 @@ class OracleAppState extends ChangeNotifier {
     }
     _backend = _offlineBackend;
     _offlineMode = true;
-    _infoMessage = StateMessages.offlineMode;
+    // オフラインでも占い機能は内蔵エンジンで完結するため、状態そのものは通知しない。
+    // 実際に使えない機能（問い合わせ・通知登録）の画面側で理由を示す。
+    // 状態は [offlineMode] として保持し、各画面が必要に応じて参照する。
   }
 
   Future<void> _loadLanguagePreference() async {

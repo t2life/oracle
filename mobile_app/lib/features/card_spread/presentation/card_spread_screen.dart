@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../core/audio/sound_service.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../shared/flow_exit_action.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
@@ -72,7 +73,8 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
     return Scaffold(
-      appBar: buildOracleAppBar(context, l10n.cardSpreadTitle),
+      appBar: buildOracleAppBar(context, l10n.cardSpreadTitle,
+          extraActions: const [FlowExitAction()]),
       body: OracleStateBuilder(
         builder: (context, state) {
           final selectedPile = state.selectedPile;

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/audio/sound_service.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../shared/oracle_card_visuals.dart';
+import '../../shared/flow_exit_action.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
 
@@ -24,7 +24,8 @@ class ThemeSelectionScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
     return Scaffold(
-      appBar: buildOracleAppBar(context, l10n.themeSelectionTitle),
+      appBar: buildOracleAppBar(context, l10n.themeSelectionTitle,
+          extraActions: const [FlowExitAction()]),
       body: OracleStateBuilder(
         builder: (context, state) {
           if (state.themes.isEmpty && state.loading) {
@@ -72,12 +73,12 @@ class ThemeSelectionScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         color: selected
-                            ? kOracleGold.withValues(alpha: 0.16)
+                            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.16)
                             : Theme.of(context).colorScheme.surface,
                         border: Border.all(
                           color: selected
-                              ? kOracleGold
-                              : kOracleGold.withValues(alpha: 0.22),
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.primary.withValues(alpha: 0.22),
                           width: selected ? 1.6 : 1,
                         ),
                       ),
@@ -87,7 +88,7 @@ class ThemeSelectionScreen extends StatelessWidget {
                           Icon(
                             _themeIcons[index % _themeIcons.length],
                             color: selected
-                                ? kOracleGoldBright
+                                ? Theme.of(context).colorScheme.primary
                                 : Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(height: 8),

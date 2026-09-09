@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/state/app_state_scope.dart';
+import '../../../core/state/state_messages.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
@@ -69,6 +70,24 @@ class _InquiryScreenState extends State<InquiryScreen> {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Text(resolveStateMessage(context, state.infoMessage!)),
                 ),
+              // オフラインでは送信先へ届かないため、ここで理由を明示する
+              // （アプリ全体の状態表示は行わず、使えない機能の画面でのみ知らせる）。
+              if (state.offlineMode)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Card(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    child: ListTile(
+                      leading: const Icon(Icons.cloud_off),
+                      title: Text(
+                        resolveStateMessage(
+                          context,
+                          StateMessages.offlineFeatureUnavailable,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               DropdownButtonFormField<String>(
                 initialValue: _category,
                 decoration: InputDecoration(labelText: l10n.categoryLabel),
@@ -119,7 +138,8 @@ class _InquiryScreenState extends State<InquiryScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: state.loading ? null : _submit,
+                // オフラインでは送信できないためボタン自体を無効化する。
+                onPressed: (state.loading || state.offlineMode) ? null : _submit,
                 child: state.loading
                     ? const SizedBox(
                         width: 16,

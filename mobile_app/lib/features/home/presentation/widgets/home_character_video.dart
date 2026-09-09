@@ -3,6 +3,13 @@ import 'package:video_player/video_player.dart';
 
 import '../../../shell/presentation/main_shell.dart';
 
+/// ホームのキャラ動画へ「描画を張り直せ」と伝える合図。
+/// ≡ドロワーや言語ダイアログを閉じた直後に [requestHomeVideoRefresh] を呼ぶ。
+final ValueNotifier<int> homeVideoRefreshRequest = ValueNotifier<int>(0);
+
+/// モーダルを閉じた側から呼ぶ。値の変化だけが意味を持つ。
+void requestHomeVideoRefresh() => homeVideoRefreshRequest.value++;
+
 /// ホーム中央の「ロンさん浮遊」動画（寺院背景を合成済み）。
 /// 無音・ループ再生。初期化前と失敗時はポスター静止画にフォールバックする。
 ///
@@ -30,10 +37,12 @@ class _HomeCharacterVideoState extends State<HomeCharacterVideo>
   /// アプリが前面か（バックグラウンド中はfalse）。
   bool _appResumed = true;
 
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    homeVideoRefreshRequest.addListener(_refreshPlayback);
     _init();
   }
 
@@ -87,6 +96,32 @@ class _HomeCharacterVideoState extends State<HomeCharacterVideo>
     debugPrint('ホーム: キャラ動画を${shouldPlay ? "再開" : "一時停止"}');
   }
 
+  /// モーダル（≡ドロワー／言語ダイアログ）が閉じた後の描画復帰。
+  ///
+  /// 実機（Pixel Fold）で、モーダルを開閉すると**再生は続いている
+  /// （position は進む・isPlaying も true）のに映像が更新されなくなる**ことを確認した。
+  /// 状態からは検知できないため、閉じた合図を受けて `pause`→`play` で描画を張り直す
+  /// （アプリ復帰時と同じ手順。実測でこの手順なら必ず復帰する）。
+  Future<void> _refreshPlayback() async {
+    // 閉じる演出の途中で張り直すと再び止まるため、演出後にもう一度張り直す。
+    await _reattach();
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    await _reattach();
+  }
+
+  Future<void> _reattach() async {
+    final c = _controller;
+    if (c == null || !c.value.isInitialized || !mounted) {
+      return;
+    }
+    if (!(_routeVisible && _appResumed)) {
+      return;
+    }
+    await c.pause();
+    await c.play();
+    debugPrint('ホーム: キャラ動画の描画を張り直した');
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _appResumed = state == AppLifecycleState.resumed;
@@ -101,14 +136,16 @@ class _HomeCharacterVideoState extends State<HomeCharacterVideo>
   }
 
   /// 上の画面がpopされ、ホームへ戻った。
+  /// 復帰は `play()` だけでは描画が戻らない（実機確認）ため、張り直しを行う。
   @override
   void didPopNext() {
     _routeVisible = true;
-    _applyPlayback();
+    _refreshPlayback();
   }
 
   @override
   void dispose() {
+    homeVideoRefreshRequest.removeListener(_refreshPlayback);
     shellRouteObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();

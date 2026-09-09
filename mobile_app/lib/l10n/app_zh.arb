@@ -172,5 +172,7 @@
   "msgPurchaseRestored": "已恢复购买。",
   "msgHistoryDeleted": "已删除历史记录。",
   "msgNicknameSaved": "已保存昵称。",
-  "msgCommError": "发生通信错误 (status: {status})"
+  "msgCommError": "发生通信错误 (status: {status})",
+  "exitAppConfirm": "再按一次返回键退出",
+  "cancelReadingFlow": "退出"
 }

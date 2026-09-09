@@ -10,16 +10,26 @@ import '../../shared/state_message_l10n.dart';
 import '../../shell/presentation/main_shell.dart';
 import 'widgets/home_character_video.dart';
 
-// 宝石画像(768x1024)内のオーブ中心（実測・fractional）。
+// シーン空間。背景素材（ホーム画面8.png＝1536x2752）の1/2で、キャラ動画も同寸。
+// 2026-09-09の素材更新で 768x1024(3:4) から 9:16相当へ変更した。
 const double _kSceneW = 768;
-const double _kSceneH = 1024;
-const double _kOrbHit = 168; // タップ判定＆発光の直径（768空間）
-// 宝石リングがキャラの顔に被らないよう、中心基準で縮小＋下方へオフセットする。
-const double _kGemsScale = 0.80;
-// 82（初版）＋121（宝石1個の表示直径 168×0.80＝134.4 の90%）＝203。
-// キャラ側も同じ121pxを `assets/home/character_home.mp4` の再合成で下げてある
-// （生成手順: scripts/build_home_character_video.py --dy 121）。
-const double _kGemsDy = 203; // 768x1024空間でのpx
+const double _kSceneH = 1376;
+// 宝石＆パーティクル素材の原寸（シーンとは別のアスペクト＝引き伸ばさず配置する）。
+const double _kGemsW = 768;
+const double _kGemsH = 1024;
+// シーン内での宝石素材の表示倍率。0.80（初版）の110%＝0.88。
+const double _kGemsScale = 0.88;
+// リング中心のシーン座標。上端310（初版）＋202（宝石1個の表示直径134.4の1.5個ぶん）で
+// 承認された位置＝512＋(1024×0.80)/2。拡大しても中心は動かさない。
+const double _kGemsCenterY = 512 + _kGemsH * 0.80 / 2;
+const double _kOrbHit = 168; // タップ判定＆発光の直径（宝石素材の原寸空間）
+// 右上アイコンの表示寸法。素材は184x184の正方形へ統一済み（scripts/build_home_icons.py）。
+const double _kTopIconSize = 56;
+// 宝石素材の表示寸法・左端・上端（オーブ座標と画像配置で共有する）。
+const double _kGemsDrawW = _kGemsW * _kGemsScale;
+const double _kGemsDrawH = _kGemsH * _kGemsScale;
+const double _kGemsLeft = (_kSceneW - _kGemsDrawW) / 2;
+const double _kGemsTop = _kGemsCenterY - _kGemsDrawH / 2;
 
 /// ホームタブ（没入型）。背景合成済みのキャラ動画＋宝石＆パーティクル(screen合成)＋
 /// タップで発光する5オーブ＋右上のフローティング操作（スピーカー/≡/LANG）。
@@ -47,12 +57,10 @@ class _HomeScene extends StatelessWidget {
   void _push(BuildContext context, String route) =>
       Navigator.of(context).pushNamed(route);
 
-  /// 宝石リングと同じ変換（中心基準の縮小＋下方オフセット）でオーブ位置を合わせる。
+  /// 宝石素材の配置（左端・上端・表示寸法）と同じ基準でオーブ位置を合わせる。
   Widget _orbPositioned(_OrbSpec o) {
-    const cx0 = _kSceneW / 2;
-    const cy0 = _kSceneH / 2;
-    final cx = cx0 + (o.fx * _kSceneW - cx0) * _kGemsScale;
-    final cy = cy0 + (o.fy * _kSceneH - cy0) * _kGemsScale + _kGemsDy;
+    final cx = _kGemsLeft + o.fx * _kGemsDrawW;
+    final cy = _kGemsTop + o.fy * _kGemsDrawH;
     const hit = _kOrbHit * _kGemsScale;
     return Positioned(
       left: cx - hit / 2,
@@ -101,19 +109,17 @@ class _HomeScene extends StatelessWidget {
                   poster: 'assets/home/bg_temple.png',
                 ),
               ),
-              // 2) 宝石＆パーティクル（黒地に発光→screen合成）。顔に被らないよう縮小＋下げ。
-              Positioned.fill(
+              // 2) 宝石＆パーティクル（黒地に発光→screen合成）。素材の原寸比のまま配置する。
+              const Positioned(
+                left: _kGemsLeft,
+                top: _kGemsTop,
+                width: _kGemsDrawW,
+                height: _kGemsDrawH,
                 child: _BlendMask(
                   blendMode: BlendMode.screen,
-                  child: Transform.translate(
-                    offset: const Offset(0, _kGemsDy),
-                    child: Transform.scale(
-                      scale: _kGemsScale,
-                      child: Image.asset(
-                        'assets/home/gems_particles.png',
-                        fit: BoxFit.fill,
-                      ),
-                    ),
+                  child: Image(
+                    image: AssetImage('assets/home/gems_particles.png'),
+                    fit: BoxFit.fill,
                   ),
                 ),
               ),
@@ -275,7 +281,6 @@ class _HomeTopOverlay extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
         child: OracleStateBuilder(
           builder: (context, state) {
-            final l10n = AppLocalizations.of(context)!;
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -284,17 +289,6 @@ class _HomeTopOverlay extends StatelessWidget {
                   alignment: Alignment.topRight,
                   child: _TopIconBar(),
                 ),
-                if (state.offlineMode)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 240),
-                        child: _OfflinePill(text: l10n.offlineBanner),
-                      ),
-                    ),
-                  ),
                 if (state.errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -368,13 +362,20 @@ class _IconChip extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: SizedBox(
-          height: 44,
+          width: _kTopIconSize,
+          height: _kTopIconSize,
           child: Stack(
             alignment: Alignment.center,
             children: <Widget>[
               Opacity(
                 opacity: muted ? 0.5 : 1.0,
-                child: Image.asset(asset, height: 44, filterQuality: FilterQuality.medium),
+                child: Image.asset(
+                  asset,
+                  width: _kTopIconSize,
+                  height: _kTopIconSize,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.medium,
+                ),
               ),
               if (muted)
                 const Positioned.fill(child: CustomPaint(painter: _SlashPainter())),
@@ -437,43 +438,8 @@ void _showLanguageDialog(BuildContext context) {
         );
       }).toList(),
     ),
-  );
-}
-
-/// オフライン表示ピル。
-class _OfflinePill extends StatelessWidget {
-  const _OfflinePill({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .tertiaryContainer
-            .withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Icon(Icons.cloud_off, size: 16),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12.5),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    // ダイアログを閉じた直後はキャラ動画の描画が止まる（実機確認）ため張り直す。
+  ).whenComplete(requestHomeVideoRefresh);
 }
 
 /// ホームのエラーカード。無料1日1回上限のみCTAを「プラン購入」にする（⑨）。

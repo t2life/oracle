@@ -7,6 +7,11 @@ const Color kOracleGoldBright = Color(0xFFEFCF8B);
 const Color kOracleDeepIndigo = Color(0xFF221C3A);
 const Color kOracleMidnight = Color(0xFF141021);
 
+/// 下部ナビ（`nav_dashboard.png`）の地色。素材の下端から採取した濃紺。
+/// 素材は上端が透過しているため、この色を下地に敷かないと背後のScaffold地色
+/// （テーマ色。白系テーマでは白）が帯状に覗いてしまう。テーマではなく**絵柄側の色**。
+const Color kOracleDashboardBase = Color(0xFF0A1135);
+
 /// カード裏面（絵柄アセット導入までの正式プレースホルダ）。
 /// 金の二重枠＋中央の勾玉環＋星をCustomPaintで描画する。
 class OracleCardBack extends StatelessWidget {

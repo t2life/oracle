@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
 
 /// 静的説明ページ（⑦「託宣とは」「カードメッセージについて」）。
@@ -23,8 +22,8 @@ class StaticInfoScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
         children: [
-          const Center(
-            child: Icon(Icons.auto_awesome, color: kOracleGoldBright, size: 36),
+          Center(
+            child: Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary, size: 36),
           ),
           const SizedBox(height: 20),
           for (final paragraph in paragraphs) ...[
