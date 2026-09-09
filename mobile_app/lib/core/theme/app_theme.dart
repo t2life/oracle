@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 const Color _gold = Color(0xFFD9AC57);
 const Color _goldBright = Color(0xFFEFCF8B);
-const Color _midnight = Color(0xFF141021);
 const Color _surfaceDark = Color(0xFF1E1834);
 const Color _surfaceDarkHigh = Color(0xFF272044);
 const Color _inkOnDark = Color(0xFFF1EAD9);
@@ -66,10 +65,11 @@ ThemeData buildDarkAppTheme() {
 
   final base = ThemeData(useMaterial3: true, colorScheme: scheme);
   return base.copyWith(
-    scaffoldBackgroundColor: _midnight,
+    // 全画面共通の背景画像（app.dartの_AppBackground）を透かすため地色は透明。
+    scaffoldBackgroundColor: Colors.transparent,
     textTheme: _buildTextTheme(base.textTheme, _inkOnDark),
     appBarTheme: AppBarTheme(
-      backgroundColor: _midnight,
+      backgroundColor: Colors.transparent,
       foregroundColor: _inkOnDark,
       elevation: 0,
       centerTitle: false,
@@ -132,6 +132,8 @@ ThemeData buildDarkAppTheme() {
 }
 
 /// ライト系テーマの共通ビルダー（生成り〜淡色地＋アクセント色）。
+/// 地色は全画面共通の背景画像を透かすため透明。`scaffold` はAppBar等の
+/// 淡色トーンを決める基調色としてのみ用いる。
 ThemeData _buildLightVariant({
   required Color seed,
   required Color accent,
@@ -149,10 +151,10 @@ ThemeData _buildLightVariant({
   );
   const ink = Color(0xFF2A2620);
   return base.copyWith(
-    scaffoldBackgroundColor: scaffold,
+    scaffoldBackgroundColor: Colors.transparent,
     textTheme: _buildTextTheme(base.textTheme, ink),
     appBarTheme: AppBarTheme(
-      backgroundColor: scaffold,
+      backgroundColor: scaffold.withValues(alpha: 0.86),
       foregroundColor: ink,
       elevation: 0,
       titleTextStyle: _buildTextTheme(base.textTheme, ink).titleLarge,
@@ -214,7 +216,8 @@ ThemeData buildLimeAppTheme() {
 }
 
 /// テーマ設定コード→ThemeDataの解決。
-/// 'image'（ユーザー画像テーマ）はダーク基調＋透過scaffoldで背景画像を透かす。
+/// 全テーマともscaffoldは透過で、背景は全画面共通の背景層（app.dartの
+/// `_AppBackground`）が担う。'image' はユーザー画像、それ以外はホームと同じ寺院背景。
 ThemeData resolveAppTheme(String preference) {
   switch (preference) {
     case 'light':
@@ -226,10 +229,8 @@ ThemeData resolveAppTheme(String preference) {
     case 'lime':
       return buildLimeAppTheme();
     case 'image':
-      // 背景画像の上にダーク文字色で載せる（scaffoldは透過し画像を見せる）
-      return buildDarkAppTheme().copyWith(
-        scaffoldBackgroundColor: Colors.transparent,
-      );
+      // 背景画像の上に明色文字で載せる（ダーク基調を流用）
+      return buildDarkAppTheme();
     case 'dark':
     default:
       return buildDarkAppTheme();

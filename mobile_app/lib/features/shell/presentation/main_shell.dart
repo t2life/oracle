@@ -12,6 +12,13 @@ import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shop/presentation/shop_screen.dart';
 
+/// シェル内ネストNavigatorの画面遷移を購読するオブザーバ。
+/// ホームの動画（[HomeCharacterVideo]）が「別画面に覆われた／戻ってきた」を知り、
+/// 覆われている間の再生を止めるために使う（覆われたまま再生し続けると、
+/// 24fps・768x1024のデコードが遷移アニメと競合して切替が遅れる）。
+final RouteObserver<PageRoute<dynamic>> shellRouteObserver =
+    RouteObserver<PageRoute<dynamic>>();
+
 /// 下部タブの切替を、ネストNavigator内の子孫（ホームのオーブ等）へ公開するスコープ。
 /// [MainShell] がNavigatorの上位に提供する。子孫は `ShellScope.of(context)?.selectTab(i)`。
 class ShellScope extends InheritedWidget {
@@ -59,10 +66,16 @@ class _MainShellState extends State<MainShell> {
   /// 指定タブへ切替（効果音は鳴らさない＝呼び出し側の責務）。
   /// タブ切替はネストのルートを差し替える（案A: フローは破棄＝一方通行の儀式性を維持）。
   void _switchTo(int value) {
+    final startedAt = DateTime.now();
     setState(() => _index = value);
     _navKey.currentState?.pushNamedAndRemoveUntil(
       _tabRoots[value],
       (route) => false,
+    );
+    // 切替の所要時間（同期処理ぶん）を計測する。実機で遅延の切り分けに使う。
+    debugPrint(
+      'シェル: タブ切替 index=$value route=${_tabRoots[value]} '
+      '所要=${DateTime.now().difference(startedAt).inMilliseconds}ms',
     );
   }
 
@@ -94,6 +107,7 @@ class _MainShellState extends State<MainShell> {
           selectTab: _switchTo,
           child: Navigator(
             key: _navKey,
+            observers: <NavigatorObserver>[shellRouteObserver],
             initialRoute: _tabRoots[0],
             onGenerateRoute: (settings) {
               final builder = _shellTabBuilder(settings.name) ?? buildShellChild;
@@ -289,60 +303,83 @@ class SecondaryMenuDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF2A2350), kOracleMidnight],
+      // ステータスバーぶんだけ避け、以降は上端から項目を並べる。
+      // （旧実装のDrawerHeaderは高さ statusBar+161＋余白8 を占め、
+      //   最初の項目を約220px押し下げていた＝「下寄せ」に見える原因）
+      child: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const _DrawerTitle(),
+            ListTile(
+              leading: const Icon(Icons.menu_book_outlined),
+              title: Text(l10n.aboutOracleTitle),
+              onTap: () => _push(context, '/about-oracle'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.style_outlined),
+              title: Text(l10n.aboutCardsTitle),
+              onTap: () => _push(context, '/about-cards'),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.campaign_outlined),
+              title: Text(l10n.announcementsTitle),
+              onTap: () => _push(context, '/announcements'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.live_tv_outlined),
+              title: Text(l10n.ronRoomTitle),
+              onTap: () => _push(context, '/ron-room'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: Text(l10n.historyTitle),
+              onTap: () => _push(context, '/history'),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.workspace_premium_outlined),
+              title: Text(l10n.paywallScreenTitle),
+              onTap: () => _push(context, '/paywall'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.mail_outline),
+              title: Text(l10n.goToInquiry),
+              onTap: () => _push(context, '/inquiry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// ≡メニューの小見出し（旧DrawerHeaderの置換＝高さ56で上端に寄せる）。
+class _DrawerTitle extends StatelessWidget {
+  const _DrawerTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SizedBox(
+      height: 56,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            const Icon(Icons.auto_awesome, color: kOracleGoldBright, size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                l10n.appTitle,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Icon(Icons.auto_awesome, color: kOracleGoldBright, size: 32),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.menu_book_outlined),
-            title: Text(l10n.aboutOracleTitle),
-            onTap: () => _push(context, '/about-oracle'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.style_outlined),
-            title: Text(l10n.aboutCardsTitle),
-            onTap: () => _push(context, '/about-cards'),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.campaign_outlined),
-            title: Text(l10n.announcementsTitle),
-            onTap: () => _push(context, '/announcements'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.live_tv_outlined),
-            title: Text(l10n.ronRoomTitle),
-            onTap: () => _push(context, '/ron-room'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.history),
-            title: Text(l10n.historyTitle),
-            onTap: () => _push(context, '/history'),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.workspace_premium_outlined),
-            title: Text(l10n.paywallScreenTitle),
-            onTap: () => _push(context, '/paywall'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.mail_outline),
-            title: Text(l10n.goToInquiry),
-            onTap: () => _push(context, '/inquiry'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

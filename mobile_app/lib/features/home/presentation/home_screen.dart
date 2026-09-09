@@ -6,8 +6,6 @@ import '../../../core/state/app_state.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../core/state/state_messages.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../shared/oracle_card_visuals.dart';
-import '../../shared/plan_l10n.dart';
 import '../../shared/state_message_l10n.dart';
 import '../../shell/presentation/main_shell.dart';
 import 'widgets/home_character_video.dart';
@@ -18,7 +16,10 @@ const double _kSceneH = 1024;
 const double _kOrbHit = 168; // タップ判定＆発光の直径（768空間）
 // 宝石リングがキャラの顔に被らないよう、中心基準で縮小＋下方へオフセットする。
 const double _kGemsScale = 0.80;
-const double _kGemsDy = 82; // 768x1024空間でのpx
+// 82（初版）＋121（宝石1個の表示直径 168×0.80＝134.4 の90%）＝203。
+// キャラ側も同じ121pxを `assets/home/character_home.mp4` の再合成で下げてある
+// （生成手順: scripts/build_home_character_video.py --dy 121）。
+const double _kGemsDy = 203; // 768x1024空間でのpx
 
 /// ホームタブ（没入型）。背景合成済みのキャラ動画＋宝石＆パーティクル(screen合成)＋
 /// タップで発光する5オーブ＋右上のフローティング操作（スピーカー/≡/LANG）。
@@ -262,7 +263,7 @@ class _RenderBlendMask extends RenderProxyBox {
   }
 }
 
-/// 最前面：右上の操作アイコン（スピーカー/≡/LANG）＋左上の挨拶＋オフライン/⑨エラー。
+/// 最前面：右上の操作アイコン（≡/LANG/スピーカー）＋オフライン/⑨エラー。
 class _HomeTopOverlay extends StatelessWidget {
   const _HomeTopOverlay();
 
@@ -279,21 +280,9 @@ class _HomeTopOverlay extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: _GreetingPill(
-                          text: l10n.welcomeUser(state.displayName),
-                          plan: localizedPlanName(context, state.plan),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const _TopIconBar(),
-                  ],
+                const Align(
+                  alignment: Alignment.topRight,
+                  child: _TopIconBar(),
                 ),
                 if (state.offlineMode)
                   Padding(
@@ -321,24 +310,16 @@ class _HomeTopOverlay extends StatelessWidget {
 }
 
 /// 右上の操作アイコン群（実素材の≡/LANG＋生成したスピーカー）。
+/// 画面右上に縦並び＝上から ≡ メニュー → LANG → スピーカー。
 class _TopIconBar extends StatelessWidget {
   const _TopIconBar();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
-        // スピーカー（効果音ON/OFF。OFF時はスラッシュ表示）
-        ValueListenableBuilder<bool>(
-          valueListenable: SoundService.instance.enabled,
-          builder: (context, on, _) => _IconChip(
-            asset: 'assets/home/icon_speaker.png',
-            muted: !on,
-            onTap: () => SoundService.instance.toggle(),
-          ),
-        ),
-        const SizedBox(width: 8),
         // ≡ メニュー（endDrawer）
         Builder(
           builder: (ctx) => _IconChip(
@@ -349,7 +330,7 @@ class _TopIconBar extends StatelessWidget {
             },
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(height: 8),
         // LANG 言語切替
         _IconChip(
           asset: 'assets/home/icon_lang.png',
@@ -357,6 +338,16 @@ class _TopIconBar extends StatelessWidget {
             SoundService.instance.play(OracleSound.tap);
             _showLanguageDialog(context);
           },
+        ),
+        const SizedBox(height: 8),
+        // スピーカー（効果音ON/OFF。OFF時はスラッシュ表示）
+        ValueListenableBuilder<bool>(
+          valueListenable: SoundService.instance.enabled,
+          builder: (context, on, _) => _IconChip(
+            asset: 'assets/home/icon_speaker.png',
+            muted: !on,
+            onTap: () => SoundService.instance.toggle(),
+          ),
         ),
       ],
     );
@@ -447,52 +438,6 @@ void _showLanguageDialog(BuildContext context) {
       }).toList(),
     ),
   );
-}
-
-/// ニックネーム挨拶＋プランの小ピル（④ニックネーム表示の維持）。
-class _GreetingPill extends StatelessWidget {
-  const _GreetingPill({required this.text, required this.plan});
-
-  final String text;
-  final String plan;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.36),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kOracleGold.withValues(alpha: 0.4)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Icon(Icons.workspace_premium, size: 14, color: kOracleGoldBright),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text(
-              text,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            plan,
-            style: TextStyle(
-              color: kOracleGoldBright.withValues(alpha: 0.95),
-              fontSize: 11.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 /// オフライン表示ピル。
