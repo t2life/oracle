@@ -5,7 +5,14 @@ from uuid import uuid4
 
 from ..config import AppConfig
 from ..logging_utils import get_logger
-from ..models import HistoryItem, PlanType, ReadingResult, ReadingSession, SessionStatus
+from ..models import (
+    HistoryItem,
+    PlanType,
+    ReadingResult,
+    ReadingSession,
+    ResultCard,
+    SessionStatus,
+)
 from ..store import InMemoryStore
 from ..time_utils import date_key_jst, now_jst
 from .billing_service import BillingService
@@ -32,15 +39,44 @@ class ReadingService:
             piles[(index % 3) + 1].append(card_id)
         return piles
 
+    # 相談内容の上限（2026-09-10 承認: 3000文字まで）。
+    QUESTION_TEXT_MAX_LENGTH = 3000
+
+    def spread_or_raise(self, spread_id: str) -> dict:
+        """スプレッド定義（マスタ由来）を返す。未定義はエラー。"""
+        spread = self._interpretation_engine.spread_for(spread_id)
+        if spread is None:
+            raise ValueError("指定されたスプレッドが存在しません。")
+        return spread
+
+    def resolve_draw_count(self, spread: dict, requested: int | None) -> int:
+        """引く枚数を決める。フリー（枚数可変）のみ要求値を最小〜最大で受け付ける。"""
+        fixed = int(spread.get("card_count") or 0)
+        if fixed > 0:
+            return fixed
+        minimum = int(spread.get("min_cards") or 1)
+        maximum = int(spread.get("max_cards") or 1)
+        count = requested if requested is not None else minimum
+        if count < minimum or count > maximum:
+            raise ValueError(f"枚数は{minimum}〜{maximum}枚で指定してください。")
+        return count
+
     def start_session(
         self,
         user_id: str,
         theme_id: str,
         deck_id: str,
         draw_count: int,
+        spread_id: str = "daily",
+        question_text: str = "",
     ) -> ReadingSession:
-        if draw_count < 1 or draw_count > 3:
-            raise ValueError("draw_count は1から3の範囲で指定してください。")
+        spread = self.spread_or_raise(spread_id)
+        draw_count = self.resolve_draw_count(spread, draw_count)
+        question_text = (question_text or "").strip()
+        if len(question_text) > self.QUESTION_TEXT_MAX_LENGTH:
+            raise ValueError(
+                f"相談内容は{self.QUESTION_TEXT_MAX_LENGTH}文字以内で入力してください。"
+            )
 
         user = self._store.get_or_create_user(user_id)
         theme = self._store.get_theme(theme_id)
@@ -56,14 +92,15 @@ class ReadingService:
             if self._store.count_user_sessions_on_date(user_id, today_key) >= self._config.free_daily_draw_limit:
                 raise PermissionError("無料プランは1日1回までです。")
 
-        if not self._billing_service.can_use_draw_count(user, draw_count):
-            raise PermissionError("3枚引きは有料プランで利用できます。")
+        # 対象プランと必要チケットはスプレッド定義（マスタ）が決める。
+        if not self._billing_service.can_use_spread(user, spread):
+            raise PermissionError("このリーディングは有料プランで利用できます。")
 
         cards = self._store.list_cards_by_deck(deck_id)
         if len(cards) < draw_count * 3:
             raise ValueError("デッキ内のカード数が不足しています。")
 
-        self._billing_service.consume_for_session(user, draw_count)
+        self._billing_service.consume_for_spread(user, spread)
 
         ordered_ids = [card.card_id for card in cards]
         rng = random.Random()
@@ -79,15 +116,20 @@ class ReadingService:
             started_at=now_jst(),
             status=SessionStatus.STARTED,
             precomputed_card_ids=ordered_ids,
+            spread_id=spread_id,
+            question_text=question_text,
         )
         self._store.create_session(session)
         self._logger.info(
-            "セッション開始: session_id=%s user_id=%s theme=%s deck=%s draw=%s",
+            "セッション開始: session_id=%s user_id=%s theme=%s deck=%s "
+            "spread=%s draw=%s 相談内容=%s文字",
             session.session_id,
             user_id,
             theme_id,
             deck_id,
+            spread_id,
             draw_count,
+            len(question_text),
         )
         return session
 
@@ -134,7 +176,13 @@ class ReadingService:
         self._logger.debug("山選択: session_id=%s pile=%s", session_id, pile_index)
         return session
 
-    def select_card(self, session_id: str, card_index: int) -> ReadingResult:
+    def select_card(self, session_id: str, card_index: int) -> ReadingResult | None:
+        """カードを1枚確定する。
+
+        必要枚数（スプレッド定義）に達するまでは None を返し、
+        達した時点で結果を生成する。1枚のスプレッド（本日の託宣）は
+        従来どおり1回の呼び出しで結果が返る。
+        """
         session = self._store.get_session(session_id)
         if session is None:
             raise ValueError("セッションが存在しません。")
@@ -150,19 +198,35 @@ class ReadingService:
             raise ValueError("カード番号が不正です。")
 
         card_id = pile[card_index - 1]
+        if card_id in session.selected_card_ids:
+            raise ValueError("同じカードは選べません。")
         card = self._store.get_card(card_id)
         if card is None:
             raise ValueError("カード情報が見つかりません。")
 
+        session.selected_card_ids.append(card_id)
+        if len(session.selected_card_ids) < session.draw_count:
+            self._logger.info(
+                "カード確定（途中）: session_id=%s %s/%s枚",
+                session_id,
+                len(session.selected_card_ids),
+                session.draw_count,
+            )
+            return None
+
+        # 1枚目を単数フィールドの代表とする（履歴・管理画面・永続化層の互換）。
+        card = self._store.get_card(session.selected_card_ids[0]) or card
         interpretation = card.meanings_by_theme.get(session.theme_id, card.default_meaning)
         # カードDB搭載カード（日本神話デッキ）は解釈合成エンジンで託宣文を構成する。
         # DB非搭載カードはエンジンがfallback_textをそのまま返す（fail-soft）。
-        interpretation = self._interpretation_engine.compose_ja(
-            card_id=card.card_id,
+        interpretation = self._interpretation_engine.compose_reading(
+            card_ids=list(session.selected_card_ids),
             theme_id=session.theme_id,
             date_key=date_key_jst(now_jst()),
             session_id=session.session_id,
             fallback_text=interpretation,
+            spread_id=session.spread_id,
+            question_text=session.question_text,
         )
         interpretation_en = card.meanings_by_theme_en.get(
             session.theme_id, card.default_meaning_en
@@ -197,12 +261,53 @@ class ReadingService:
             keywords_zh=card.keywords_zh,
             interpretation_text_zh=interpretation_zh,
             caution_text_zh=caution_text_zh,
+            spread_id=session.spread_id,
+            question_text=session.question_text,
+            cards=self._build_result_cards(session),
+            combination_text=(
+                self._interpretation_engine.compose_combination(
+                    session.selected_card_ids[0], session.selected_card_ids[-1]
+                )
+                if len(session.selected_card_ids) >= 2
+                else None
+            ),
         )
         self._store.save_result(result)
         session.selected_card_id = card.card_id
         session.status = SessionStatus.CARD_OPENED
-        self._logger.info("カード確定: session_id=%s card_id=%s", session_id, card.card_id)
+        self._logger.info(
+            "カード確定: session_id=%s spread=%s cards=%s",
+            session_id,
+            session.spread_id,
+            ",".join(session.selected_card_ids),
+        )
         return result
+
+    def _build_result_cards(self, session: ReadingSession) -> list[ResultCard]:
+        """確定順のカードへ、スプレッドの位置（名称・意味）を割り当てる。"""
+        positions = self._interpretation_engine.positions_for(
+            session.spread_id, len(session.selected_card_ids)
+        )
+        result_cards: list[ResultCard] = []
+        for index, card_id in enumerate(session.selected_card_ids):
+            card = self._store.get_card(card_id)
+            if card is None:
+                continue
+            position = positions[index] if index < len(positions) else {}
+            result_cards.append(
+                ResultCard(
+                    card_id=card.card_id,
+                    card_name=card.name_ja,
+                    keywords=card.keywords,
+                    position_index=int(position.get("index", index + 1)),
+                    position_name=str(position.get("name", "")),
+                    position_meaning=str(position.get("meaning", "")),
+                    reading=card.reading,
+                    attribute=card.attribute,
+                    element=card.element,
+                )
+            )
+        return result_cards
 
     def get_result(self, session_id: str) -> ReadingResult:
         result = self._store.get_result(session_id)

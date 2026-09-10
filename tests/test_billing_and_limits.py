@@ -95,19 +95,34 @@ def test_ticket_plan_consumes_tickets(app, client):
     assert verify.status_code == 200
     assert verify.json()["tickets"] == 20
 
+    # 2026-09-10: 消費枚数はスプレッド定義（マスタ）が決める。
+    # リーディング（3枚引き）は一律5枚消費・本日の託宣は0枚。
     start = client.post(
         "/reading/start",
         json={
             "user_id": user_id,
             "theme_id": "money",
             "deck_id": "japanese_mythology",
-            "draw_count": 3,
+            "spread_id": "three",
         },
     )
     assert start.status_code == 200
 
     user = app.state.container.store.get_or_create_user(user_id)
-    assert user.tickets == 17
+    assert user.tickets == 15
+
+    daily = client.post(
+        "/reading/start",
+        json={
+            "user_id": user_id,
+            "theme_id": "money",
+            "deck_id": "japanese_mythology",
+            "spread_id": "daily",
+        },
+    )
+    assert daily.status_code == 200
+    user = app.state.container.store.get_or_create_user(user_id)
+    assert user.tickets == 15
 
 
 def test_free_history_keeps_latest_three(app, client):

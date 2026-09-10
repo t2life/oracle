@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import threading
-from datetime import timedelta
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from .config import AppConfig
@@ -32,6 +32,7 @@ from .models import (
 	ReadingSession,
 	Theme,
 	User,
+	TransferCode,
 )
 from .time_utils import date_key_jst, now_jst
 
@@ -64,6 +65,8 @@ class InMemoryStore:
 		self._admin_sessions: dict[str, AdminSession] = {}
 		self._analytics_events: list[AnalyticsEvent] = []
 		self._audit_logs: list[AuditLog] = []
+		# 機種変更の引継ぎコード（使い捨て・期限あり）
+		self._transfer_codes: dict[str, TransferCode] = {}
 		self._seed_master_data()
 
 	def _seed_master_data(self) -> None:
@@ -196,11 +199,13 @@ class InMemoryStore:
 		)
 		self._announcements[announcement.announcement_id] = announcement
 
+		# 2026-09-10 承認: チケットの金額は税抜だったため税込（×1.1）へ統一する。
+		# 画面は「金額（税込）」と出すだけなので、マスタ側を税込にしないと表示が嘘になる。
 		self._products["ticket_trial_30"] = Product(
 			product_code="ticket_trial_30",
 			title="初回お試し30枚",
 			plan_type=PlanType.TICKET,
-			price_jpy=300,
+			price_jpy=330,
 			ticket_amount=30,
 			is_subscription=False,
 		)
@@ -208,7 +213,7 @@ class InMemoryStore:
 			product_code="ticket_20",
 			title="チケット20枚",
 			plan_type=PlanType.TICKET,
-			price_jpy=500,
+			price_jpy=550,
 			ticket_amount=20,
 			is_subscription=False,
 		)
@@ -216,7 +221,7 @@ class InMemoryStore:
 			product_code="ticket_50",
 			title="チケット50枚",
 			plan_type=PlanType.TICKET,
-			price_jpy=1000,
+			price_jpy=1100,
 			ticket_amount=50,
 			is_subscription=False,
 		)
@@ -224,48 +229,37 @@ class InMemoryStore:
 			product_code="ticket_120",
 			title="チケット120枚",
 			plan_type=PlanType.TICKET,
-			price_jpy=2000,
+			price_jpy=2200,
 			ticket_amount=120,
 			is_subscription=False,
 		)
+		# 2026-09-10 承認: 表示は「月額有料プラン550円（税込）」。マスタの価格も税込へ統一する。
+		# product_code は既存の購入・復元レシートが参照するため変更しない（末尾の500は旧称）。
 		self._products[self._config.pricing.subscription_product_code] = Product(
 			product_code=self._config.pricing.subscription_product_code,
-			title="サブスクリプション月額",
+			title="月額有料プラン",
 			plan_type=PlanType.SUBSCRIPTION,
-			price_jpy=500,
+			price_jpy=550,
 			ticket_amount=0,
 			is_subscription=True,
 		)
 
-		for idx, url in enumerate(self._config.links.shop_links, start=1):
-			link_id = f"shop_{idx:03d}"
-			self._external_links[link_id] = ExternalLink(
-				link_id=link_id,
-				category="shop",
-				title=f"ショップ導線 {idx}",
-				url=url,
-				is_active=True,
-			)
-
-		for idx, url in enumerate(self._config.links.consultation_links, start=1):
-			link_id = f"consult_{idx:03d}"
-			self._external_links[link_id] = ExternalLink(
-				link_id=link_id,
-				category="consultation",
-				title=f"鑑定導線 {idx}",
-				url=url,
-				is_active=True,
-			)
-
-		for idx, url in enumerate(self._config.links.live_links, start=1):
-			link_id = f"live_{idx:03d}"
-			self._external_links[link_id] = ExternalLink(
-				link_id=link_id,
-				category="live",
-				title=f"ロンの部屋導線 {idx}",
-				url=url,
-				is_active=True,
-			)
+		# 2026-09-10 承認: 導線の名称はマスタ（config）が持つ。連番の内部名
+		# （旧「ショップ導線 1」）はそのまま画面に出ていたため対で持たせる。
+		for prefix, category, entries in (
+			("shop", "shop", self._config.links.shop_links),
+			("consult", "consultation", self._config.links.consultation_links),
+			("live", "live", self._config.links.live_links),
+		):
+			for idx, (title, url) in enumerate(entries, start=1):
+				link_id = f"{prefix}_{idx:03d}"
+				self._external_links[link_id] = ExternalLink(
+					link_id=link_id,
+					category=category,
+					title=title,
+					url=url,
+					is_active=True,
+				)
 
 		self._live_events["live_001"] = LiveEvent(
 			live_event_id="live_001",
@@ -374,6 +368,10 @@ class InMemoryStore:
 				keywords_zh=[],
 				default_meaning_zh=f"{name_ja}提示你从容接纳现状，用心准备好下一步。",
 				meanings_by_theme_zh=meanings_zh,
+				# 読み・属性分類・エレメントは44柱.xlsx由来（card_content.jsonが正本）
+				reading=entry.get("reading", ""),
+				attribute=entry.get("attribute", ""),
+				element=entry.get("element", ""),
 			)
 			self._cards[card.card_id] = card
 			self._cards_by_deck[deck_id].append(card.card_id)
@@ -420,6 +418,26 @@ class InMemoryStore:
 		key = f"{provider.value}:{provider_user_id}"
 		with self._lock:
 			return self._auth_accounts.get(key)
+
+	def save_transfer_code(self, transfer_code: TransferCode) -> TransferCode:
+		"""引継ぎコードを保存する。同じユーザーの未使用コードは1本だけ残す
+		（発行し直したら前のコードは無効＝紛失時にすぐ締められる）。"""
+		with self._lock:
+			for code, existing in list(self._transfer_codes.items()):
+				if existing.user_id == transfer_code.user_id and existing.used_at is None:
+					del self._transfer_codes[code]
+			self._transfer_codes[transfer_code.code] = transfer_code
+			return transfer_code
+
+	def get_transfer_code(self, code: str) -> TransferCode | None:
+		with self._lock:
+			return self._transfer_codes.get(code)
+
+	def mark_transfer_code_used(self, code: str, used_at: datetime) -> None:
+		with self._lock:
+			entry = self._transfer_codes.get(code)
+			if entry is not None:
+				entry.used_at = used_at
 
 	def add_auth_account(
 		self,

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import secrets
+from datetime import timedelta
 from uuid import uuid4
 
 from ..config import AppConfig
 from ..logging_utils import get_logger
-from ..models import AuthProvider, Profile, User
+from ..models import AuthProvider, Profile, TransferCode, User
 from ..store import InMemoryStore
 from ..time_utils import now_jst
 
@@ -86,3 +88,61 @@ class AuthService:
         )
         self._logger.info("認証新規作成: provider=%s user_id=%s", provider.value, user.user_id)
         return user
+
+    # ---- 機種変更の引継ぎ ----
+    def issue_transfer_code(self, user_id: str) -> TransferCode:
+        """引継ぎコードを発行する。
+
+        いま使っているアカウント（user_id）を新しい端末へ引き渡すための
+        使い捨ての鍵。発行し直すと前のコードは無効になる（紛失時の締め直し）。
+        """
+        rules = self._config.transfer_codes
+        user = self._store.get_or_create_user(user_id)
+        code = "".join(
+            secrets.choice(rules.alphabet) for _ in range(rules.length)
+        )
+        issued_at = now_jst()
+        transfer_code = TransferCode(
+            code=code,
+            user_id=user.user_id,
+            issued_at=issued_at,
+            expires_at=issued_at + timedelta(hours=rules.valid_hours),
+        )
+        self._store.save_transfer_code(transfer_code)
+        self._logger.info(
+            "引継ぎコード発行: user_id=%s 期限=%s", user.user_id, transfer_code.expires_at
+        )
+        return transfer_code
+
+    def redeem_transfer_code(self, code: str) -> User:
+        """引継ぎコードを使って、発行元のアカウントへ切り替える。
+
+        使い捨て＝一度使ったコードは二度と通らない。
+        期限切れ・未知のコードは同じ文言で断る（存在するコードかどうかを
+        入力側に教えない＝総当たりの手がかりを与えない）。
+        """
+        normalized = self.normalize_transfer_code(code)
+        entry = self._store.get_transfer_code(normalized)
+        now = now_jst()
+        if entry is None or entry.used_at is not None or entry.expires_at < now:
+            raise ValueError("引継ぎコードが正しくないか、有効期限が切れています。")
+
+        self._store.mark_transfer_code_used(normalized, now)
+        user = self._store.get_or_create_user(entry.user_id)
+        user.visit_count += 1
+        user.updated_at = now
+        self._store.update_user(user)
+        self._logger.info("引継ぎ完了: user_id=%s", user.user_id)
+        return user
+
+    @staticmethod
+    def normalize_transfer_code(code: str) -> str:
+        """入力されたコードを照合用の形へ揃える（区切りと空白を落として大文字化）。"""
+        return "".join(
+            char for char in (code or "").upper() if char.isalnum()
+        )
+
+    def format_transfer_code(self, code: str) -> str:
+        """表示用に4文字ごとへ区切る（手入力の取り違えを減らす）。"""
+        size = self._config.transfer_codes.group_size
+        return "-".join(code[i : i + size] for i in range(0, len(code), size))

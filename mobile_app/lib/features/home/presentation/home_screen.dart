@@ -81,7 +81,7 @@ class _HomeScene extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final orbs = <_OrbSpec>[
       _OrbSpec(0.501, 0.171, const Color(0xFFEFCF8B), l10n.tabReading,
-          () => _push(context, '/deck-selection')),
+          () => _push(context, '/reading-kind')),
       _OrbSpec(0.169, 0.359, const Color(0xFF48D17A), l10n.historyTitle,
           () => _push(context, '/history')),
       _OrbSpec(0.846, 0.370, const Color(0xFFFF5A5A), l10n.ticketLabel,

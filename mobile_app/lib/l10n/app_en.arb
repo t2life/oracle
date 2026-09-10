@@ -30,7 +30,7 @@
   "tabReading": "Reading",
   "tabCards": "Cards",
   "planFree": "Free",
-  "planSubscription": "Subscriber",
+  "planSubscription": "Monthly plan",
   "planTicket": "Ticket member",
   "planGuest": "Guest",
   "planAdmin": "Admin",
@@ -174,5 +174,114 @@
   "msgNicknameSaved": "Nickname saved.",
   "msgCommError": "A communication error occurred (status: {status})",
   "exitAppConfirm": "Press back again to exit",
-  "cancelReadingFlow": "Quit"
+  "cancelReadingFlow": "Quit",
+  "currentPlanFree": "Free plan / Tickets: {tickets}",
+  "currentPlanPaid": "{plan} / Tickets: {tickets}",
+  "subscriptionOfferTitle": "Monthly plan {price} JPY (tax incl.)",
+  "subscriptionOfferBody": "All features are available.",
+  "ticketPriceLine": "{price} JPY (tax incl.)",
+  "readingKindTitle": "Reading",
+  "readingKindPrompt": "Which reading would you like?",
+  "oracleKindTitle": "Daily oracle",
+  "oracleKindBody": "Receive today's guidance from a single card.",
+  "readingKindLabel": "Reading",
+  "readingKindBody": "Read several cards around what you want to ask.",
+  "spreadSelectionTitle": "Reading type",
+  "spreadPrompt": "Choose how many cards to draw.",
+  "spreadCardsLabel": "{count} cards",
+  "@spreadCardsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spreadFreeLabel": "Free (choose the number)",
+  "freeDrawCountLabel": "Cards to draw",
+  "ticketsRequiredLabel": "Tickets required: {count}",
+  "@ticketsRequiredLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ticketsFreeLabel": "Free",
+  "oracleDailyLimitNote": "Free plan: once a day",
+  "subscriptionUnlimitedNote": "No tickets needed on the monthly plan",
+  "proceedToDeckSelection": "Continue to deck selection",
+  "proceedToSpreadSelection": "Continue to reading type",
+  "openPlans": "View plans",
+  "questionLabel": "Your question",
+  "questionHint": "Describe what is on your mind.",
+  "questionCounter": "{used} / {max} characters",
+  "@questionCounter": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "questionRequired": "Please enter your question.",
+  "themeDropdownLabel": "Theme",
+  "themeAndQuestionPrompt": "Pick a theme and write your question.",
+  "cardProgressLabel": "Card {current} of {total}",
+  "@cardProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "positionLabel": "{index}. {name}",
+  "@positionLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cardAttributeLabel": "Attribute",
+  "cardElementLabel": "Element",
+  "allFeaturesUnlocked": "Your paid plan already unlocks every feature.",
+  "msgTransferCompleted": "Your account has been transferred.",
+  "transferCodeTitle": "Device transfer code",
+  "transferCodeIssueTitle": "Issue a code for this device",
+  "transferCodeIssueGuide": "Use this code to move your current account to a new device. Enter it on the new device.",
+  "transferCodeIssueButton": "Issue transfer code",
+  "transferCodeReissueButton": "Issue a new code",
+  "transferCodeReissueNote": "Issuing a new code invalidates the previous one.",
+  "transferCodeExpiresAt": "Valid until: {date}",
+  "@transferCodeExpiresAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "transferCodeCopy": "Copy code",
+  "transferCodeCopied": "Code copied.",
+  "transferCodeRedeemTitle": "Transfer to this device",
+  "transferCodeRedeemGuide": "Enter the code issued on your previous device. This device's content will be replaced by the source account.",
+  "transferCodeLabel": "Transfer code",
+  "transferCodeRedeemButton": "Transfer",
+  "transferCodeSingleUseNote": "Each code can be used only once.",
+  "rateApp": "Rate this app",
+  "shareApp": "Share this app",
+  "developerApps": "Apps by App2Craft",
+  "legalInfoTitle": "Terms and information",
+  "termsOfService": "Terms of service",
+  "privacyPolicy": "Privacy policy",
+  "commercialTransactions": "Commercial transactions notice",
+  "comingSoon": "Coming soon",
+  "appProviderLabel": "Provider"
 }

@@ -13,6 +13,11 @@ import '../../shared/state_message_l10n.dart';
 
 /// カード展開（U-08）。仕様書9.8章の本来形＝横一列展開・左右スクロール・
 /// タップで1枚確定。確定カードは3Dフリップ演出で表面へ返る。
+///
+/// 2026-09-10 の複数枚リーディング対応:
+/// 必要枚数（スプレッド定義）に達するまで結果は返らないため、
+/// 「n枚目 / 全N枚」の進捗を出し、確定済みの位置は選べないようにする
+/// （同じカードは選べない＝サーバー側のルールと同じことを画面でも守る）。
 class CardSpreadScreen extends StatefulWidget {
   const CardSpreadScreen({super.key});
 
@@ -33,6 +38,9 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
 
   bool _revealing = false;
 
+  /// 確定済みのカード位置（1始まり）。同じ位置＝同じカードなので再選択させない。
+  final Set<int> _chosen = <int>{};
+
   @override
   void dispose() {
     _entrance.dispose();
@@ -48,6 +56,9 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
     if (state.loading) {
       return;
     }
+    if (_chosen.contains(cardIndex)) {
+      return;
+    }
     setState(() => _revealing = true);
     state.selectCardIndex(cardIndex);
     SoundService.instance.play(OracleSound.flip);
@@ -57,8 +68,16 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
     if (!mounted) {
       return;
     }
-    if (state.errorMessage != null || state.latestResult == null) {
+    if (state.errorMessage != null) {
       setState(() => _revealing = false);
+      return;
+    }
+    if (state.latestResult == null) {
+      // まだ必要枚数に達していない＝この位置を確定済みにして選択を続ける。
+      setState(() {
+        _chosen.add(cardIndex);
+        _revealing = false;
+      });
       return;
     }
     await _flip.forward();
@@ -101,6 +120,7 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
           }
 
           final result = state.latestResult;
+          final totalCards = state.plannedDrawCount;
 
           return Stack(
             children: [
@@ -108,10 +128,26 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 22, 20, 4),
-                    child: Text(
-                      l10n.spreadTapHint,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      textAlign: TextAlign.center,
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.spreadTapHint,
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                        // 複数枚のときだけ進捗を出す（1枚引きの表示は従来のまま）。
+                        if (totalCards > 1) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.cardProgressLabel(
+                              state.selectedCardCount + 1,
+                              totalCards,
+                            ),
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                   if (state.errorMessage != null)
@@ -157,10 +193,17 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
                                       horizontal: 5,
                                     ),
                                     child: Center(
-                                      child: GestureDetector(
-                                        onTap: () => _reveal(index + 1),
-                                        child: const OracleCardBack(width: 96),
-                                      ),
+                                      child: _chosen.contains(index + 1)
+                                          ? const Opacity(
+                                              opacity: 0.3,
+                                              child: OracleCardBack(width: 96),
+                                            )
+                                          : GestureDetector(
+                                              onTap: () => _reveal(index + 1),
+                                              child: const OracleCardBack(
+                                                width: 96,
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -203,6 +246,11 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
                                           ..rotateY(math.pi),
                                         child: OracleCardFace(
                                           cardName: result.cardNameFor(lang),
+                                          reading: lang == 'ja'
+                                              ? (result.cards.isNotEmpty
+                                                  ? result.cards.first.reading
+                                                  : result.reading)
+                                              : '',
                                           width: 170,
                                         ),
                                       ),

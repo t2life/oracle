@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -13,6 +14,11 @@ from oracle_app.config import AppConfig  # noqa: E402
 from oracle_app.store import InMemoryStore  # noqa: E402
 
 OUTPUT_PATH = ROOT_DIR / "mobile_app" / "assets" / "master_data.json"
+# 解釈素材（44柱＋文脈/トーン/接続/ポジション/スプレッド）の単一真実源と、その同梱先。
+CARD_CONTENT_PATH = SRC_DIR / "oracle_app" / "data" / "card_content.json"
+INTERPRETATION_OUTPUT_PATH = (
+    ROOT_DIR / "mobile_app" / "assets" / "interpretation_content.json"
+)
 
 
 def main() -> None:
@@ -64,6 +70,10 @@ def main() -> None:
                     "default_meaning": card.default_meaning,
                     "default_meaning_en": card.default_meaning_en,
                     "default_meaning_zh": card.default_meaning_zh,
+                    # 神名のルビ・属性分類・エレメント（オフラインでも同じ情報を出す）
+                    "reading": card.reading,
+                    "attribute": card.attribute,
+                    "element": card.element,
                     # オフラインで選択可能なのは可視テーマのみのため、可視分だけ持つ
                     "meanings_by_theme": {
                         tid: card.meanings_by_theme[tid] for tid in visible_theme_ids
@@ -169,6 +179,15 @@ def main() -> None:
     print(
         f"テーマ{len(themes)}件 / デッキ{len(decks)}件 / カード{len(cards)}件 / "
         f"商品{len(products)}件"
+    )
+
+    # 解釈素材（DB由来）をモバイルへ同梱する。
+    # オフライン時もサーバーと同じ手順で託宣文を組み立てるために必要
+    # （同梱しないと、オフラインではテーマ別解釈がそのまま表示される）。
+    shutil.copyfile(CARD_CONTENT_PATH, INTERPRETATION_OUTPUT_PATH)
+    content_kb = INTERPRETATION_OUTPUT_PATH.stat().st_size / 1024
+    print(
+        f"解釈素材を同梱しました: {INTERPRETATION_OUTPUT_PATH} ({content_kb:.0f} KB)"
     )
 
 

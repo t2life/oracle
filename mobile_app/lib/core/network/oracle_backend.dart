@@ -23,6 +23,12 @@ abstract interface class OracleBackend {
     required String historyId,
   });
 
+  /// 機種変更の引継ぎコードを発行する（`code` / `formatted_code` / `expires_at`）。
+  Future<Map<String, dynamic>> issueTransferCode({required String userId});
+
+  /// 引継ぎコードを使って発行元アカウントへ切り替える（プロフィールを返す）。
+  Future<Map<String, dynamic>> redeemTransferCode({required String code});
+
   Future<List<dynamic>> getThemes();
 
   Future<List<dynamic>> getDecks();
@@ -35,11 +41,16 @@ abstract interface class OracleBackend {
 
   Future<List<dynamic>> getHistory({required String userId});
 
+  /// スプレッド定義の一覧。[userId] を渡すと実行可否（プラン・チケット残数）も返る。
+  Future<List<dynamic>> getSpreads({String? userId});
+
   Future<Map<String, dynamic>> startReading({
     required String userId,
     required String themeId,
     required String deckId,
     int drawCount = 1,
+    String spreadId = 'daily',
+    String questionText = '',
   });
 
   Future<Map<String, dynamic>> completeShuffle({
@@ -54,7 +65,8 @@ abstract interface class OracleBackend {
     required int pileIndex,
   });
 
-  Future<Map<String, dynamic>> selectCard({
+  /// カードを1枚確定する。必要枚数に達するまでは null（＝継続）を返す。
+  Future<Map<String, dynamic>?> selectCard({
     required String sessionId,
     required int cardIndex,
   });

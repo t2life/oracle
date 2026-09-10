@@ -147,6 +147,10 @@ def test_reading_result_response_key_set_fixed(client):
         "interpretation_text_zh",
         "caution_text_zh",
         "combination_text",
+        # 2026-09-10 承認のリーディング拡張（スプレッド・相談内容・複数枚）
+        "spread_id",
+        "question_text",
+        "cards",
     }
     assert result["interpretation_text_en"]
     assert result["interpretation_text_zh"]

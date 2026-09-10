@@ -5,19 +5,23 @@ import '../../features/card_spread/presentation/card_spread_screen.dart';
 import '../../features/consultation/presentation/consultation_screen.dart';
 import '../../features/deck_selection/presentation/deck_selection_screen.dart';
 import '../../features/history/presentation/history_screen.dart';
+import '../../features/info/presentation/legal_info_screen.dart';
 import '../../features/info/presentation/static_info_screen.dart';
 import '../../features/inquiry/presentation/inquiry_screen.dart';
 import '../../features/nickname/presentation/nickname_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/paywall/presentation/paywall_screen.dart';
 import '../../features/pile_selection/presentation/pile_selection_screen.dart';
+import '../../features/reading_kind/presentation/reading_kind_screen.dart';
 import '../../features/reading_result/presentation/reading_result_screen.dart';
 import '../../features/ron_room/presentation/ron_room_screen.dart';
 import '../../features/shell/presentation/main_shell.dart';
 import '../../features/shop/presentation/shop_screen.dart';
 import '../../features/shuffle/presentation/shuffle_screen.dart';
+import '../../features/spread_selection/presentation/spread_selection_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/theme_selection/presentation/theme_selection_screen.dart';
+import '../../features/transfer_code/presentation/transfer_code_screen.dart';
 
 enum AppRoute {
   splash('/splash'),
@@ -25,7 +29,9 @@ enum AppRoute {
   nickname('/nickname'),
   shell('/shell'),
   home('/home'),
+  readingKind('/reading-kind'),
   deckSelection('/deck-selection'),
+  spreadSelection('/spread-selection'),
   themeSelection('/theme-selection'),
   shuffle('/shuffle'),
   pileSelection('/pile-selection'),
@@ -36,7 +42,9 @@ enum AppRoute {
   consultation('/consultation'),
   shop('/shop'),
   paywall('/paywall'),
-  inquiry('/inquiry');
+  inquiry('/inquiry'),
+  transferCode('/transfer-code'),
+  legalInfo('/legal-info');
 
   const AppRoute(this.path);
 
@@ -67,6 +75,10 @@ Route<dynamic> buildRoute(RouteSettings settings) {
 Widget buildShellChild(BuildContext context) {
   final name = ModalRoute.of(context)?.settings.name;
   switch (name) {
+    case '/reading-kind':
+      return const ReadingKindScreen();
+    case '/spread-selection':
+      return const SpreadSelectionScreen();
     case '/theme-selection':
       return const ThemeSelectionScreen();
     case '/shuffle':
@@ -89,6 +101,10 @@ Widget buildShellChild(BuildContext context) {
       return const PaywallScreen();
     case '/inquiry':
       return const InquiryScreen();
+    case '/transfer-code':
+      return const TransferCodeScreen();
+    case '/legal-info':
+      return const LegalInfoScreen();
     case '/about-oracle':
       return const AboutOracleScreen();
     case '/about-cards':

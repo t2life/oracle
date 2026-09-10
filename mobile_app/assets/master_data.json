@@ -101,6 +101,9 @@
    "default_meaning": "宇宙の中心・根源・無限の可能性",
    "default_meaning_en": "天之御中主神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天之御中主神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アメノミナカヌシ",
+   "attribute": "別天神/創造神",
+   "element": "エーテル",
    "meanings_by_theme": {
     "subconscious": "心身の中心軸を整える。宇宙意識との統合。瞑想で根源とつながる。",
     "higher_self": "心身の中心軸を整える。宇宙意識との統合。瞑想で根源とつながる。",
@@ -143,6 +146,9 @@
    "default_meaning": "創造・生命力・始まりのエネルギー",
    "default_meaning_en": "高御産巣日神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "高御産巣日神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "タカミムスビ",
+   "attribute": "別天神/創造神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "創造的な生命エネルギーが高まる。新しい健康習慣の開始。活力が湧く。",
     "higher_self": "創造的な生命エネルギーが高まる。新しい健康習慣の開始。活力が湧く。",
@@ -185,6 +191,9 @@
    "default_meaning": "育成・癒し・母性的な創造力",
    "default_meaning_en": "神産巣日神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "神産巣日神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "カミムスビ",
+   "attribute": "別天神/創造神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "癒しのエネルギー。育成と回復。女性特有の健康ケア。優しい養生。",
     "higher_self": "癒しのエネルギー。育成と回復。女性特有の健康ケア。優しい養生。",
@@ -227,6 +236,9 @@
    "default_meaning": "太陽・光明・統治・繁栄",
    "default_meaning_en": "天照大御神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天照大御神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アマテラスオオミカミ",
+   "attribute": "三貴神/天津神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "光に満ちた健康状態。明るく前向きな精神。日光浴や明るさが癒す。",
     "higher_self": "光に満ちた健康状態。明るく前向きな精神。日光浴や明るさが癒す。",
@@ -269,6 +281,9 @@
    "default_meaning": "月・リズム・周期・内省",
    "default_meaning_en": "月読命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "月読命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ツクヨミ",
+   "attribute": "三貴神/天津神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "睡眠リズムを整える。女性ホルモンバランス。内省と休息の時間が必要。",
     "higher_self": "睡眠リズムを整える。女性ホルモンバランス。内省と休息の時間が必要。",
@@ -311,6 +326,9 @@
    "default_meaning": "嵐・破壊と再生・変革の力",
    "default_meaning_en": "須佐之男命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "須佐之男命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "スサノオ",
+   "attribute": "三貴神/天津神",
+   "element": "風",
    "meanings_by_theme": {
     "subconscious": "浄化の嵐。激しいデトックス。古いパターンの破壊と心身の再生。",
     "higher_self": "浄化の嵐。激しいデトックス。古いパターンの破壊と心身の再生。",
@@ -353,6 +371,9 @@
    "default_meaning": "父性・創造・行動力・積極性",
    "default_meaning_en": "伊邪那岐命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "伊邪那岐命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "イザナギ",
+   "attribute": "国生み/原初神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "能動的な健康管理。運動やアクティブな養生法。決断して行動する。",
     "higher_self": "能動的な健康管理。運動やアクティブな養生法。決断して行動する。",
@@ -395,6 +416,9 @@
    "default_meaning": "母性・豊穣・生と死の循環",
    "default_meaning_en": "伊邪那美命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "伊邪那美命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "イザナミ",
+   "attribute": "国生み/原初神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "深い休息と回復。生と死のサイクル。母なる大地のような癒し。",
     "higher_self": "深い休息と回復。生と死のサイクル。母なる大地のような癒し。",
@@ -437,6 +461,9 @@
    "default_meaning": "天の永続性・不変の真理",
    "default_meaning_en": "天之常立神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天之常立神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アメノトコタチ",
+   "attribute": "別天神",
+   "element": "エーテル",
    "meanings_by_theme": {
     "subconscious": "不変の真理に基づく健康法。揺るがない精神の安定。永続的な習慣。",
     "higher_self": "不変の真理に基づく健康法。揺るがない精神の安定。永続的な習慣。",
@@ -479,6 +506,9 @@
    "default_meaning": "大地の永続性・基盤・土台",
    "default_meaning_en": "国之常立神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "国之常立神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "クニノトコタチ",
+   "attribute": "神世七代",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "地に足ついた健康管理。基礎体力の強化。安定した精神状態。",
     "higher_self": "地に足ついた健康管理。基礎体力の強化。安定した精神状態。",
@@ -521,6 +551,9 @@
    "default_meaning": "豊かな雲・恵みの雨・浄化",
    "default_meaning_en": "豊雲野神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "豊雲野神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "トヨクモノ",
+   "attribute": "神世七代",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "適度な水分補給。浄化の雨のようなデトックス。恵みの栄養。",
     "higher_self": "適度な水分補給。浄化の雨のようなデトックス。恵みの栄養。",
@@ -563,6 +596,9 @@
    "default_meaning": "泥土・物質化・現実化の力",
    "default_meaning_en": "宇比地邇神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "宇比地邇神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ウヒヂニ",
+   "attribute": "神世七代",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "抽象的な不調を具体化。症状を現実的に把握。形にして対処。",
     "higher_self": "抽象的な不調を具体化。症状を現実的に把握。形にして対処。",
@@ -605,6 +641,9 @@
    "default_meaning": "杭・定着・目標設定",
    "default_meaning_en": "角杙神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "角杙神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ツノグイ",
+   "attribute": "神世七代",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "健康目標を明確に設定。定着した良い習慣。固定した養生法。",
     "higher_self": "健康目標を明確に設定。定着した良い習慣。固定した養生法。",
@@ -647,6 +686,9 @@
    "default_meaning": "国造り・縁結び・豊穣・商売繁盛",
    "default_meaning_en": "大国主神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "大国主神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "オオクニヌシ",
+   "attribute": "国津神/国造り",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "縁ある治療法との出会い。良医との縁。調和的な健康状態。",
     "higher_self": "縁ある治療法との出会い。良医との縁。調和的な健康状態。",
@@ -689,6 +731,9 @@
    "default_meaning": "託宣・神託・知恵・判断",
    "default_meaning_en": "事代主神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "事代主神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "コトシロヌシ",
+   "attribute": "国津神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "直感に従った健康判断。体の声を聞く。正しい選択の時。",
     "higher_self": "直感に従った健康判断。体の声を聞く。正しい選択の時。",
@@ -731,6 +776,9 @@
    "default_meaning": "知恵・医療・温泉・小さな力の偉大さ",
    "default_meaning_en": "少名毘古那神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "少名毘古那神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "スクナビコナ",
+   "attribute": "国津神",
+   "element": "風",
    "meanings_by_theme": {
     "subconscious": "温泉療法。医療技術の活用。小さなケアの積み重ね。知恵ある治療。",
     "higher_self": "温泉療法。医療技術の活用。小さなケアの積み重ね。知恵ある治療。",
@@ -773,6 +821,9 @@
    "default_meaning": "雷・武力・勝利・決断力",
    "default_meaning_en": "建御雷之男神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "建御雷之男神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "タケミカヅチ",
+   "attribute": "天津神/武神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "病気に打ち勝つ。強い意志力。決断して治療に臨む。突破力。",
     "higher_self": "病気に打ち勝つ。強い意志力。決断して治療に臨む。突破力。",
@@ -815,6 +866,9 @@
    "default_meaning": "剣・武力・浄化・切り開く力",
    "default_meaning_en": "経津主神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "経津主神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "フツヌシ",
+   "attribute": "天津神/武神",
+   "element": "風",
    "meanings_by_theme": {
     "subconscious": "不要なものを切り離す。断食や手術。明確な分離と浄化。",
     "higher_self": "不要なものを切り離す。断食や手術。明確な分離と浄化。",
@@ -857,6 +911,9 @@
    "default_meaning": "言霊・祝詞・コミュニケーション",
    "default_meaning_en": "天児屋根命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天児屋根命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アメノコヤネ",
+   "attribute": "天津神",
+   "element": "風",
    "meanings_by_theme": {
     "subconscious": "言霊による癒し。アファメーション。祈りと言葉の力。コミュニケーション療法。",
     "higher_self": "言霊による癒し。アファメーション。祈りと言葉の力。コミュニケーション療法。",
@@ -899,6 +956,9 @@
    "default_meaning": "神事・儀式・調和・秩序",
    "default_meaning_en": "布刀玉命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布刀玉命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "フトダマ",
+   "attribute": "天津神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "儀式的な健康法。規則正しい生活。秩序と調和ある養生。",
     "higher_self": "儀式的な健康法。規則正しい生活。秩序と調和ある養生。",
@@ -941,6 +1001,9 @@
    "default_meaning": "芸能・喜び・陽気さ・表現力",
    "default_meaning_en": "天宇受売命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天宇受売命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アメノウズメ",
+   "attribute": "天津神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "笑いと喜びが癒す。表現療法。楽しい運動。ダンスやアートセラピー。",
     "higher_self": "笑いと喜びが癒す。表現療法。楽しい運動。ダンスやアートセラピー。",
@@ -983,6 +1046,9 @@
    "default_meaning": "力・開扉・障害除去・行動力",
    "default_meaning_en": "天手力男神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天手力男神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アメノタヂカラヲ",
+   "attribute": "天津神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "筋力強化。障害を力で乗り越える。積極的なリハビリ。運動療法。",
     "higher_self": "筋力強化。障害を力で乗り越える。積極的なリハビリ。運動療法。",
@@ -1025,6 +1091,9 @@
    "default_meaning": "知恵・思考・戦略・問題解決",
    "default_meaning_en": "思金神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "思金神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "オモイカネ",
+   "attribute": "天津神",
+   "element": "風",
    "meanings_by_theme": {
     "subconscious": "知恵ある健康管理。戦略的養生。情報を集めて計画的に。",
     "higher_self": "知恵ある健康管理。戦略的養生。情報を集めて計画的に。",
@@ -1067,6 +1136,9 @@
    "default_meaning": "永遠の命・不変・忍耐・堅固さ",
    "default_meaning_en": "石長比売 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "石長比売提示你从容接纳现状，用心准备好下一步。",
+   "reading": "イワナガヒメ",
+   "attribute": "国津神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "長寿と永続的健康。時間をかけた体質改善。忍耐強い養生。",
     "higher_self": "長寿と永続的健康。時間をかけた体質改善。忍耐強い養生。",
@@ -1109,6 +1181,9 @@
    "default_meaning": "桜の花・美・儚さ・浄化の炎",
    "default_meaning_en": "木花之佐久夜毘売 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "木花之佐久夜毘売提示你从容接纳现状，用心准备好下一步。",
+   "reading": "コノハナサクヤヒメ",
+   "attribute": "国津神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "美容と浄化。短期集中ケア。火の浄化。炎症の癒し。",
     "higher_self": "美容と浄化。短期集中ケア。火の浄化。炎症の癒し。",
@@ -1151,6 +1226,9 @@
    "default_meaning": "導き・先導・道開き・案内",
    "default_meaning_en": "猿田毘古神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "猿田毘古神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "サルタヒコ",
+   "attribute": "国津神/道の神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "正しい治療法への導き。健康への道案内。良い方向性。",
     "higher_self": "正しい治療法への導き。健康への道案内。良い方向性。",
@@ -1193,6 +1271,9 @@
    "default_meaning": "芸能・交渉・和解・笑い",
    "default_meaning_en": "天之鈿女命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天之鈿女命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アメノウズメ",
+   "attribute": "天津神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "笑顔と明るさで回復。和やかな療養。魅力的に健康に。",
     "higher_self": "笑顔と明るさで回復。和やかな療養。魅力的に健康に。",
@@ -1235,6 +1316,9 @@
    "default_meaning": "玉作り・美・洗練・技術",
    "default_meaning_en": "玉祖命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "玉祖命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "タマノオヤ",
+   "attribute": "天津神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "美しく洗練された健康法。質の高いケア。価値ある養生。",
     "higher_self": "美しく洗練された健康法。質の高いケア。価値ある養生。",
@@ -1277,6 +1361,9 @@
    "default_meaning": "鏡作り・反映・真実・技術",
    "default_meaning_en": "石凝姥命 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "石凝姥命提示你从容接纳现状，用心准备好下一步。",
+   "reading": "イシコリドメ",
+   "attribute": "天津神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "真実の健康状態を映す。正確な診断。誠実な自己観察。",
     "higher_self": "真実の健康状態を映す。正確な診断。誠実な自己観察。",
@@ -1319,6 +1406,9 @@
    "default_meaning": "山・自然・豊穣・安定",
    "default_meaning_en": "大山津見神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "大山津見神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "オオヤマツミ",
+   "attribute": "国津神/自然神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "自然療法。山の恵み。安定した健康。守られた状態。",
     "higher_self": "自然療法。山の恵み。安定した健康。守られた状態。",
@@ -1361,6 +1451,9 @@
    "default_meaning": "海・深淵・感情・潜在意識",
    "default_meaning_en": "綿津見神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "綿津見神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ワタツミ",
+   "attribute": "国津神/自然神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "深い感情の癒し。潜在意識の浄化。海の癒し。深層心理療法。",
     "higher_self": "深い感情の癒し。潜在意識の浄化。海の癒し。深層心理療法。",
@@ -1403,6 +1496,9 @@
    "default_meaning": "河口・流れ・境界・変化",
    "default_meaning_en": "速秋津日子神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "速秋津日子神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ハヤアキツヒコ",
+   "attribute": "自然神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "健康状態の転換期。流れに任せる。境界を越えて新しい段階へ。",
     "higher_self": "健康状態の転換期。流れに任せる。境界を越えて新しい段階へ。",
@@ -1445,6 +1541,9 @@
    "default_meaning": "家・保護・安全・居場所",
    "default_meaning_en": "大屋毘古神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "大屋毘古神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "オオヤビコ",
+   "attribute": "住居神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "安全な療養環境。家での静養。保護された空間での回復。",
     "higher_self": "安全な療養環境。家での静養。保護された空間での回復。",
@@ -1487,6 +1586,9 @@
    "default_meaning": "火・情熱・破壊・変容のエネルギー",
    "default_meaning_en": "火之迦具土神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "火之迦具土神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ヒノカグツチ",
+   "attribute": "自然神",
+   "element": "火",
    "meanings_by_theme": {
     "subconscious": "激しい浄化。発熱による免疫活性。燃やして再生。情熱的エネルギー。",
     "higher_self": "激しい浄化。発熱による免疫活性。燃やして再生。情熱的エネルギー。",
@@ -1529,6 +1631,9 @@
    "default_meaning": "水・浄化・流れ・適応力",
    "default_meaning_en": "水波能売神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "水波能売神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ミズハノメ",
+   "attribute": "自然神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "水の浄化。柔軟な対応。適応力。流れるような自然な癒し。",
     "higher_self": "水の浄化。柔軟な対応。適応力。流れるような自然な癒し。",
@@ -1571,6 +1676,9 @@
    "default_meaning": "鉱山・鉱物・物質的豊かさ・技術",
    "default_meaning_en": "金山毘古神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "金山毘古神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "カナヤマビコ",
+   "attribute": "産業神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "ミネラル補給。精錬された栄養。価値ある健康投資。技術的治療。",
     "higher_self": "ミネラル補給。精錬された栄養。価値ある健康投資。技術的治療。",
@@ -1613,6 +1721,9 @@
    "default_meaning": "年・豊作・収穫・蓄積",
    "default_meaning_en": "大年神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "大年神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "オオトシ",
+   "attribute": "穀物神",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "健康の収穫期。これまでの養生が実る。蓄積された体力。",
     "higher_self": "健康の収穫期。これまでの養生が実る。蓄積された体力。",
@@ -1655,6 +1766,9 @@
    "default_meaning": "穀物・豊穣・商売繁盛・富",
    "default_meaning_en": "宇迦之御魂神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "宇迦之御魂神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ウカノミタマ",
+   "attribute": "穀物神/稲荷",
+   "element": "地",
    "meanings_by_theme": {
     "subconscious": "豊かな栄養。食養生。繁栄する健康状態。富と健康の両立。",
     "higher_self": "豊かな栄養。食養生。繁栄する健康状態。富と健康の両立。",
@@ -1697,6 +1811,9 @@
    "default_meaning": "仲裁・和解・縁結び・調停",
    "default_meaning_en": "菊理媛神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "菊理媛神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ククリヒメ",
+   "attribute": "国津神/仲裁神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "心身の調和。仲裁と統合。分裂した自己の結び直し。",
     "higher_self": "心身の調和。仲裁と統合。分裂した自己の結び直し。",
@@ -1739,6 +1856,9 @@
    "default_meaning": "祓い・浄化・罪穢れの除去・流す力",
    "default_meaning_en": "瀬織津姫 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "瀬織津姫提示你从容接纳现状，用心准备好下一步。",
+   "reading": "セオリツヒメ",
+   "attribute": "祓戸神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "罪悪感や穢れの浄化。心の重荷を流す。クリアな精神状態。",
     "higher_self": "罪悪感や穢れの浄化。心の重荷を流す。クリアな精神状態。",
@@ -1781,6 +1901,9 @@
    "default_meaning": "口・言葉の浄化・飲み込む力",
    "default_meaning_en": "速開都比売 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "速開都比売提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ハヤアキツヒメ",
+   "attribute": "祓戸神",
+   "element": "風",
    "meanings_by_theme": {
     "subconscious": "ネガティブな感情を飲み込んで浄化。受容と変換。許しの癒し。",
     "higher_self": "ネガティブな感情を飲み込んで浄化。受容と変換。許しの癒し。",
@@ -1823,6 +1946,9 @@
    "default_meaning": "息吹・生命力・浄化の風・拡散",
    "default_meaning_en": "気吹戸主 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "気吹戸主提示你从容接纳现状，用心准备好下一步。",
+   "reading": "イブキドヌシ",
+   "attribute": "祓戸神",
+   "element": "風",
    "meanings_by_theme": {
     "subconscious": "深い呼吸。生命の息吹。新鮮な空気。拡散と循環。",
     "higher_self": "深い呼吸。生命の息吹。新鮮な空気。拡散と循環。",
@@ -1865,6 +1991,9 @@
    "default_meaning": "流し去る・除去・完全浄化",
    "default_meaning_en": "速佐須良比売 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "速佐須良比売提示你从容接纳现状，用心准备好下一步。",
+   "reading": "ハヤサスラヒメ",
+   "attribute": "祓戸神",
+   "element": "水",
    "meanings_by_theme": {
     "subconscious": "完全な浄化と刷新。過去を流し去る。新しい健康状態へのリスタート。",
     "higher_self": "完全な浄化と刷新。過去を流し去る。新しい健康状態へのリスタート。",
@@ -1907,6 +2036,9 @@
    "default_meaning": "神の御影・守護・見守り・加護",
    "default_meaning_en": "天之御影神 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "天之御影神提示你从容接纳现状，用心准备好下一步。",
+   "reading": "アメノミカゲ",
+   "attribute": "天津神",
+   "element": "エーテル",
    "meanings_by_theme": {
     "subconscious": "神の加護による健康。見守られている安心感。守護と癒し。",
     "higher_self": "神の加護による健康。見守られている安心感。守護と癒し。",
@@ -1956,6 +2088,9 @@
    "default_meaning": "龍神デッキ 1は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 1 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 1提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 1は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 1は自分軸を守る判断を示します。",
@@ -2005,6 +2140,9 @@
    "default_meaning": "龍神デッキ 2は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 2 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 2提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 2は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 2は自分軸を守る判断を示します。",
@@ -2054,6 +2192,9 @@
    "default_meaning": "龍神デッキ 3は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 3 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 3提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 3は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 3は自分軸を守る判断を示します。",
@@ -2103,6 +2244,9 @@
    "default_meaning": "龍神デッキ 4は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 4 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 4提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 4は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 4は自分軸を守る判断を示します。",
@@ -2152,6 +2296,9 @@
    "default_meaning": "龍神デッキ 5は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 5 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 5提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 5は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 5は自分軸を守る判断を示します。",
@@ -2201,6 +2348,9 @@
    "default_meaning": "龍神デッキ 6は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 6 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 6提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 6は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 6は自分軸を守る判断を示します。",
@@ -2250,6 +2400,9 @@
    "default_meaning": "龍神デッキ 7は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 7 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 7提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 7は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 7は自分軸を守る判断を示します。",
@@ -2299,6 +2452,9 @@
    "default_meaning": "龍神デッキ 8は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 8 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 8提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 8は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 8は自分軸を守る判断を示します。",
@@ -2348,6 +2504,9 @@
    "default_meaning": "龍神デッキ 9は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 9 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 9提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 9は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 9は自分軸を守る判断を示します。",
@@ -2397,6 +2556,9 @@
    "default_meaning": "龍神デッキ 10は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 10 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 10提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 10は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 10は自分軸を守る判断を示します。",
@@ -2446,6 +2608,9 @@
    "default_meaning": "龍神デッキ 11は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 11 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 11提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 11は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 11は自分軸を守る判断を示します。",
@@ -2495,6 +2660,9 @@
    "default_meaning": "龍神デッキ 12は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 12 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 12提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 12は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 12は自分軸を守る判断を示します。",
@@ -2544,6 +2712,9 @@
    "default_meaning": "龍神デッキ 13は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 13 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 13提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 13は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 13は自分軸を守る判断を示します。",
@@ -2593,6 +2764,9 @@
    "default_meaning": "龍神デッキ 14は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 14 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 14提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 14は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 14は自分軸を守る判断を示します。",
@@ -2642,6 +2816,9 @@
    "default_meaning": "龍神デッキ 15は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 15 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 15提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 15は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 15は自分軸を守る判断を示します。",
@@ -2691,6 +2868,9 @@
    "default_meaning": "龍神デッキ 16は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 16 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 16提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 16は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 16は自分軸を守る判断を示します。",
@@ -2740,6 +2920,9 @@
    "default_meaning": "龍神デッキ 17は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 17 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 17提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 17は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 17は自分軸を守る判断を示します。",
@@ -2789,6 +2972,9 @@
    "default_meaning": "龍神デッキ 18は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 18 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 18提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 18は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 18は自分軸を守る判断を示します。",
@@ -2838,6 +3024,9 @@
    "default_meaning": "龍神デッキ 19は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 19 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 19提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 19は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 19は自分軸を守る判断を示します。",
@@ -2887,6 +3076,9 @@
    "default_meaning": "龍神デッキ 20は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 20 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 20提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 20は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 20は自分軸を守る判断を示します。",
@@ -2936,6 +3128,9 @@
    "default_meaning": "龍神デッキ 21は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 21 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 21提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 21は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 21は自分軸を守る判断を示します。",
@@ -2985,6 +3180,9 @@
    "default_meaning": "龍神デッキ 22は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 22 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 22提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 22は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 22は自分軸を守る判断を示します。",
@@ -3034,6 +3232,9 @@
    "default_meaning": "龍神デッキ 23は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 23 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 23提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 23は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 23は自分軸を守る判断を示します。",
@@ -3083,6 +3284,9 @@
    "default_meaning": "龍神デッキ 24は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 24 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 24提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 24は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 24は自分軸を守る判断を示します。",
@@ -3132,6 +3336,9 @@
    "default_meaning": "龍神デッキ 25は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 25 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 25提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 25は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 25は自分軸を守る判断を示します。",
@@ -3181,6 +3388,9 @@
    "default_meaning": "龍神デッキ 26は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 26 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 26提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 26は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 26は自分軸を守る判断を示します。",
@@ -3230,6 +3440,9 @@
    "default_meaning": "龍神デッキ 27は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 27 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 27提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 27は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 27は自分軸を守る判断を示します。",
@@ -3279,6 +3492,9 @@
    "default_meaning": "龍神デッキ 28は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 28 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 28提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 28は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 28は自分軸を守る判断を示します。",
@@ -3328,6 +3544,9 @@
    "default_meaning": "龍神デッキ 29は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 29 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 29提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 29は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 29は自分軸を守る判断を示します。",
@@ -3377,6 +3596,9 @@
    "default_meaning": "龍神デッキ 30は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 30 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 30提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 30は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 30は自分軸を守る判断を示します。",
@@ -3426,6 +3648,9 @@
    "default_meaning": "龍神デッキ 31は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 31 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 31提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 31は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 31は自分軸を守る判断を示します。",
@@ -3475,6 +3700,9 @@
    "default_meaning": "龍神デッキ 32は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Dragon God Deck 32 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "龙神牌组 32提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、龍神デッキ 32は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、龍神デッキ 32は自分軸を守る判断を示します。",
@@ -3524,6 +3752,9 @@
    "default_meaning": "ブライスドールデッキ 1は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 1 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 1提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 1は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 1は自分軸を守る判断を示します。",
@@ -3573,6 +3804,9 @@
    "default_meaning": "ブライスドールデッキ 2は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 2 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 2提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 2は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 2は自分軸を守る判断を示します。",
@@ -3622,6 +3856,9 @@
    "default_meaning": "ブライスドールデッキ 3は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 3 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 3提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 3は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 3は自分軸を守る判断を示します。",
@@ -3671,6 +3908,9 @@
    "default_meaning": "ブライスドールデッキ 4は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 4 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 4提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 4は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 4は自分軸を守る判断を示します。",
@@ -3720,6 +3960,9 @@
    "default_meaning": "ブライスドールデッキ 5は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 5 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 5提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 5は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 5は自分軸を守る判断を示します。",
@@ -3769,6 +4012,9 @@
    "default_meaning": "ブライスドールデッキ 6は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 6 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 6提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 6は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 6は自分軸を守る判断を示します。",
@@ -3818,6 +4064,9 @@
    "default_meaning": "ブライスドールデッキ 7は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 7 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 7提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 7は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 7は自分軸を守る判断を示します。",
@@ -3867,6 +4116,9 @@
    "default_meaning": "ブライスドールデッキ 8は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 8 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 8提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 8は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 8は自分軸を守る判断を示します。",
@@ -3916,6 +4168,9 @@
    "default_meaning": "ブライスドールデッキ 9は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 9 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 9提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 9は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 9は自分軸を守る判断を示します。",
@@ -3965,6 +4220,9 @@
    "default_meaning": "ブライスドールデッキ 10は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 10 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 10提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 10は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 10は自分軸を守る判断を示します。",
@@ -4014,6 +4272,9 @@
    "default_meaning": "ブライスドールデッキ 11は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 11 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 11提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 11は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 11は自分軸を守る判断を示します。",
@@ -4063,6 +4324,9 @@
    "default_meaning": "ブライスドールデッキ 12は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 12 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 12提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 12は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 12は自分軸を守る判断を示します。",
@@ -4112,6 +4376,9 @@
    "default_meaning": "ブライスドールデッキ 13は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 13 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 13提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 13は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 13は自分軸を守る判断を示します。",
@@ -4161,6 +4428,9 @@
    "default_meaning": "ブライスドールデッキ 14は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 14 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 14提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 14は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 14は自分軸を守る判断を示します。",
@@ -4210,6 +4480,9 @@
    "default_meaning": "ブライスドールデッキ 15は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 15 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 15提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 15は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 15は自分軸を守る判断を示します。",
@@ -4259,6 +4532,9 @@
    "default_meaning": "ブライスドールデッキ 16は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 16 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 16提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 16は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 16は自分軸を守る判断を示します。",
@@ -4308,6 +4584,9 @@
    "default_meaning": "ブライスドールデッキ 17は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 17 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 17提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 17は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 17は自分軸を守る判断を示します。",
@@ -4357,6 +4636,9 @@
    "default_meaning": "ブライスドールデッキ 18は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 18 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 18提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 18は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 18は自分軸を守る判断を示します。",
@@ -4406,6 +4688,9 @@
    "default_meaning": "ブライスドールデッキ 19は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 19 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 19提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 19は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 19は自分軸を守る判断を示します。",
@@ -4455,6 +4740,9 @@
    "default_meaning": "ブライスドールデッキ 20は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 20 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 20提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 20は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 20は自分軸を守る判断を示します。",
@@ -4504,6 +4792,9 @@
    "default_meaning": "ブライスドールデッキ 21は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 21 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 21提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 21は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 21は自分軸を守る判断を示します。",
@@ -4553,6 +4844,9 @@
    "default_meaning": "ブライスドールデッキ 22は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 22 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 22提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 22は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 22は自分軸を守る判断を示します。",
@@ -4602,6 +4896,9 @@
    "default_meaning": "ブライスドールデッキ 23は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 23 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 23提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 23は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 23は自分軸を守る判断を示します。",
@@ -4651,6 +4948,9 @@
    "default_meaning": "ブライスドールデッキ 24は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 24 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 24提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 24は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 24は自分軸を守る判断を示します。",
@@ -4700,6 +5000,9 @@
    "default_meaning": "ブライスドールデッキ 25は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 25 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 25提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 25は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 25は自分軸を守る判断を示します。",
@@ -4749,6 +5052,9 @@
    "default_meaning": "ブライスドールデッキ 26は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 26 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 26提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 26は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 26は自分軸を守る判断を示します。",
@@ -4798,6 +5104,9 @@
    "default_meaning": "ブライスドールデッキ 27は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 27 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 27提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 27は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 27は自分軸を守る判断を示します。",
@@ -4847,6 +5156,9 @@
    "default_meaning": "ブライスドールデッキ 28は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 28 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 28提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 28は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 28は自分軸を守る判断を示します。",
@@ -4896,6 +5208,9 @@
    "default_meaning": "ブライスドールデッキ 29は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 29 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 29提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 29は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 29は自分軸を守る判断を示します。",
@@ -4945,6 +5260,9 @@
    "default_meaning": "ブライスドールデッキ 30は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 30 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 30提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 30は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 30は自分軸を守る判断を示します。",
@@ -4994,6 +5312,9 @@
    "default_meaning": "ブライスドールデッキ 31は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 31 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 31提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 31は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 31は自分軸を守る判断を示します。",
@@ -5043,6 +5364,9 @@
    "default_meaning": "ブライスドールデッキ 32は、焦らず現状を受け止め、次の一歩を丁寧に整える合図です。",
    "default_meaning_en": "Blythe Doll Deck 32 is a sign to accept the present calmly and prepare your next step with care.",
    "default_meaning_zh": "布莱斯娃娃牌组 32提示你从容接纳现状，用心准备好下一步。",
+   "reading": "",
+   "attribute": "",
+   "element": "",
    "meanings_by_theme": {
     "subconscious": "潜在意識について、ブライスドールデッキ 32は自分軸を守る判断を示します。",
     "higher_self": "ハイヤーセルフについて、ブライスドールデッキ 32は自分軸を守る判断を示します。",
@@ -5074,7 +5398,7 @@
    "product_code": "ticket_trial_30",
    "title": "初回お試し30枚",
    "plan_type": "ticket",
-   "price_jpy": 300,
+   "price_jpy": 330,
    "ticket_amount": 30,
    "is_subscription": false
   },
@@ -5082,7 +5406,7 @@
    "product_code": "ticket_20",
    "title": "チケット20枚",
    "plan_type": "ticket",
-   "price_jpy": 500,
+   "price_jpy": 550,
    "ticket_amount": 20,
    "is_subscription": false
   },
@@ -5090,7 +5414,7 @@
    "product_code": "ticket_50",
    "title": "チケット50枚",
    "plan_type": "ticket",
-   "price_jpy": 1000,
+   "price_jpy": 1100,
    "ticket_amount": 50,
    "is_subscription": false
   },
@@ -5098,15 +5422,15 @@
    "product_code": "ticket_120",
    "title": "チケット120枚",
    "plan_type": "ticket",
-   "price_jpy": 2000,
+   "price_jpy": 2200,
    "ticket_amount": 120,
    "is_subscription": false
   },
   {
    "product_code": "subscription_monthly_500",
-   "title": "サブスクリプション月額",
+   "title": "月額有料プラン",
    "plan_type": "subscription",
-   "price_jpy": 500,
+   "price_jpy": 550,
    "ticket_amount": 0,
    "is_subscription": true
   }
@@ -5116,50 +5440,24 @@
    {
     "link_id": "shop_001",
     "category": "shop",
-    "title": "ショップ導線 1",
-    "url": "https://example.com/shop/omamori"
+    "title": "公式ショップ",
+    "url": "https://senju888.stores.jp/"
    },
    {
     "link_id": "shop_002",
     "category": "shop",
-    "title": "ショップ導線 2",
-    "url": "https://example.com/shop/charm"
+    "title": "Instagram",
+    "url": "https://www.instagram.com/hime_hukuoka/"
    },
    {
     "link_id": "shop_003",
     "category": "shop",
-    "title": "ショップ導線 3",
-    "url": "https://example.com/shop/oracle-deck"
+    "title": "Threads",
+    "url": "https://www.threads.com/@hime_hukuoka?xmt=AQG0Cjz-GijT44I0smyGQAxR-42dmSXK1CQ-TPNh4XmeXLU"
    }
   ],
-  "consultation": [
-   {
-    "link_id": "consult_001",
-    "category": "consultation",
-    "title": "鑑定導線 1",
-    "url": "https://example.com/consultation/online"
-   },
-   {
-    "link_id": "consult_002",
-    "category": "consultation",
-    "title": "鑑定導線 2",
-    "url": "https://example.com/consultation/mail"
-   }
-  ],
-  "live": [
-   {
-    "link_id": "live_001",
-    "category": "live",
-    "title": "ロンの部屋導線 1",
-    "url": "https://example.com/live/schedule"
-   },
-   {
-    "link_id": "live_002",
-    "category": "live",
-    "title": "ロンの部屋導線 2",
-    "url": "https://example.com/live/archive"
-   }
-  ]
+  "consultation": [],
+  "live": []
  },
  "announcements": [
   {

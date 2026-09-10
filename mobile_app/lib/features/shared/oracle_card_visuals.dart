@@ -132,10 +132,16 @@ class OracleCardFace extends StatelessWidget {
   const OracleCardFace({
     super.key,
     required this.cardName,
+    this.reading = '',
     this.width = 190,
   });
 
   final String cardName;
+
+  /// 神名のルビ（例: アメノミナカヌシ）。空なら神名だけを描く。
+  /// 括弧書きを神名と同じ行に混ぜると札面が窮屈になるため、下に小さく置く。
+  final String reading;
+
   final double width;
 
   @override
@@ -178,16 +184,32 @@ class OracleCardFace extends StatelessWidget {
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Text(
-                cardName,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'serif',
-                  fontSize: width * 0.115,
-                  height: 1.5,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFFF3EBD8),
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    cardName,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'serif',
+                      fontSize: width * 0.115,
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFF3EBD8),
+                    ),
+                  ),
+                  if (reading.isNotEmpty)
+                    Text(
+                      '（$reading）',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'serif',
+                        fontSize: width * 0.072,
+                        height: 1.4,
+                        color: const Color(0xFFD8CEB4),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

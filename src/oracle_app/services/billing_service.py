@@ -50,6 +50,50 @@ class BillingService:
         self._refresh_subscription_status(user)
         return self.is_paid_user(user)
 
+    # --- スプレッド定義（マスタ）に基づく判定（2026-09-10） -------------------
+    # 対象プラン・必要チケットはコードではなく `DB/…xlsx` の「スプレッド定義」が決める。
+    def can_use_spread(self, user: User, spread: dict) -> bool:
+        """対象プランに含まれるか。管理者は常に可。"""
+        self._refresh_subscription_status(user)
+        if user.plan == PlanType.ADMIN:
+            return True
+        allowed = [str(plan) for plan in spread.get("allowed_plans", [])]
+        if not allowed:
+            return True
+        plan_value = user.plan.value if hasattr(user.plan, "value") else str(user.plan)
+        if plan_value in allowed:
+            return True
+        # ゲストは無料プラン相当として扱う（既存の権限判定と同じ扱い）
+        return user.plan == PlanType.GUEST and "free" in allowed
+
+    def required_tickets_for(self, spread: dict) -> int:
+        return int(spread.get("required_tickets") or 0)
+
+    def has_enough_tickets(self, user: User, spread: dict) -> bool:
+        self._refresh_subscription_status(user)
+        if user.plan != PlanType.TICKET:
+            return True
+        return user.tickets >= self.required_tickets_for(spread)
+
+    def consume_for_spread(self, user: User, spread: dict) -> None:
+        """チケットプランのみ、スプレッド定義の必要枚数を消費する。"""
+        self._refresh_subscription_status(user)
+        required = self.required_tickets_for(spread)
+        if user.plan != PlanType.TICKET or required <= 0:
+            return
+        if user.tickets < required:
+            raise PermissionError("チケット残高が不足しています。")
+        user.tickets -= required
+        user.updated_at = now_jst()
+        self._store.update_user(user)
+        self._logger.debug(
+            "チケット消費: user_id=%s spread=%s 消費=%s 残高=%s",
+            user.user_id,
+            spread.get("spread_id"),
+            required,
+            user.tickets,
+        )
+
     def consume_for_session(self, user: User, draw_count: int) -> None:
         self._refresh_subscription_status(user)
         if user.plan == PlanType.TICKET:

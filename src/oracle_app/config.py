@@ -74,20 +74,42 @@ class PricingCatalog:
 
 
 @dataclass(frozen=True)
+class TransferCodeRules:
+    """機種変更の引継ぎコードの規則。
+
+    コードは利用者が新しい端末へ手で入力するため、
+    見間違えやすい文字（0/O・1/I/L）を使わず、4文字ごとに区切って表示する。
+    """
+
+    # 使用する文字（見間違えやすい 0 O 1 I L を除いた英数字）
+    alphabet: str = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
+    length: int = 12
+    group_size: int = 4
+    # 有効期間。機種変更は数日かかることがあるため既定は7日。
+    valid_hours: int = 24 * 7
+
+
+@dataclass(frozen=True)
 class ExternalLinkCatalog:
-    shop_links: tuple[str, ...] = (
-        "https://example.com/shop/omamori",
-        "https://example.com/shop/charm",
-        "https://example.com/shop/oracle-deck",
+    """外部導線のマスタ。各要素は (画面に出す名称, URL)。
+
+    2026-09-10 更新: ショップは実URLを登録した。鑑定・ロンの部屋は
+    公開先が未定のため空にしてある（各画面は空のとき「現在表示できる
+    リンクはありません」を出す実装になっている）。URLが決まったら
+    ここへ追記するだけでアプリ同梱マスタにも反映される。
+    """
+
+    shop_links: tuple[tuple[str, str], ...] = (
+        ("公式ショップ", "https://senju888.stores.jp/"),
+        ("Instagram", "https://www.instagram.com/hime_hukuoka/"),
+        (
+            "Threads",
+            "https://www.threads.com/@hime_hukuoka"
+            "?xmt=AQG0Cjz-GijT44I0smyGQAxR-42dmSXK1CQ-TPNh4XmeXLU",
+        ),
     )
-    consultation_links: tuple[str, ...] = (
-        "https://example.com/consultation/online",
-        "https://example.com/consultation/mail",
-    )
-    live_links: tuple[str, ...] = (
-        "https://example.com/live/schedule",
-        "https://example.com/live/archive",
-    )
+    consultation_links: tuple[tuple[str, str], ...] = ()
+    live_links: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -223,6 +245,7 @@ class AppConfig:
     inquiries: InquiryRules = field(default_factory=InquiryRules)
     pricing: PricingCatalog = field(default_factory=PricingCatalog)
     links: ExternalLinkCatalog = field(default_factory=ExternalLinkCatalog)
+    transfer_codes: TransferCodeRules = field(default_factory=TransferCodeRules)
     notifications: NotificationRules = field(default_factory=NotificationRules)
     analytics: AnalyticsRules = field(default_factory=AnalyticsRules)
     admin: AdminBootstrapConfig = field(default_factory=AdminBootstrapConfig)

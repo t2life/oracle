@@ -46,6 +46,23 @@ class ProfileUpdateRequest(ApiModel):
     display_name: str = Field(min_length=1, max_length=40)
 
 
+class TransferCodeIssueRequest(ApiModel):
+    user_id: str = Field(min_length=1, max_length=128)
+
+
+class TransferCodeResponse(ApiModel):
+    """発行した引継ぎコード。`code` は照合用、`formatted_code` は表示用。"""
+
+    code: str
+    formatted_code: str
+    expires_at: datetime
+
+
+class TransferCodeRedeemRequest(ApiModel):
+    # 区切りや小文字を含んだまま送ってよい（サーバー側で正規化する）
+    code: str = Field(min_length=1, max_length=64)
+
+
 class ThemeResponse(ApiModel):
     theme_id: str
     name_ja: str
@@ -70,13 +87,51 @@ class CardResponse(ApiModel):
     keywords_en: list[str] = Field(default_factory=list)
     name_zh: str = ""
     keywords_zh: list[str] = Field(default_factory=list)
+    # 神名のルビ・属性分類・エレメント（44柱.xlsx由来。非搭載デッキは空）
+    reading: str = ""
+    attribute: str = ""
+    element: str = ""
 
 
 class StartReadingRequest(ApiModel):
     user_id: str = Field(min_length=1, max_length=128)
     theme_id: str = Field(min_length=1, max_length=64)
     deck_id: str = Field(min_length=1, max_length=64)
-    draw_count: int = Field(default=1, ge=1, le=3)
+    # 枚数はスプレッド定義から導出する。フリー（枚数可変）のときだけ要求値を使う。
+    draw_count: int = Field(default=1, ge=1, le=7)
+    spread_id: str = Field(default="daily", max_length=32)
+    # 相談内容（任意・3000文字まで）。質問タイプ分類と結果の導入文に使う。
+    question_text: str = Field(default="", max_length=3000)
+
+
+class SpreadResponse(ApiModel):
+    """スプレッド定義（マスタ由来）。選択画面と残数の事前提示に使う。"""
+
+    spread_id: str
+    name_ja: str
+    kind: str
+    card_count: int
+    min_cards: int
+    max_cards: int
+    purpose: str
+    required_tickets: int
+    allowed_plans: list[str]
+    sort_order: int
+    # 現在のユーザーが実行できるか（プラン・チケット残数の事前判定）
+    available: bool = True
+    unavailable_reason: str | None = None
+
+
+class ResultCardResponse(ApiModel):
+    card_id: str
+    card_name: str
+    keywords: list[str]
+    position_index: int
+    position_name: str
+    position_meaning: str
+    reading: str = ""
+    attribute: str = ""
+    element: str = ""
 
 
 class StartReadingResponse(ApiModel):
@@ -129,6 +184,10 @@ class ReadingResultResponse(ApiModel):
     keywords_zh: list[str] = Field(default_factory=list)
     interpretation_text_zh: str = ""
     caution_text_zh: str | None = None
+    # 2026-09-10 複数枚リーディング。単数フィールドは1枚目を指す（後方互換）。
+    spread_id: str = "daily"
+    question_text: str = ""
+    cards: list[ResultCardResponse] = Field(default_factory=list)
     combination_text: str | None = None
 
 

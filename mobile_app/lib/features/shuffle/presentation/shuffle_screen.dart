@@ -265,8 +265,17 @@ class _ShuffleScreenState extends State<ShuffleScreen>
           final ready = _swipeDistance >= _readyThreshold;
           final gathering = _phase == _ShufflePhase.gathering;
 
+          // 案内ブロックは**カード表示域の上**に置く。下部だと操作中の手のひらで
+          // 隠れて読めない（2026-09-10のご指摘④）。
           return Column(
             children: [
+              _ShuffleGuide(
+                deckAndTheme: l10n.deckAndTheme(deckName, themeName),
+                progress: (_swipeDistance / _readyThreshold).clamp(0.0, 1.0),
+                message: gathering
+                    ? l10n.shuffleReady
+                    : (ready ? l10n.shuffleGuideRelease : l10n.shuffleGuide),
+              ),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
@@ -322,46 +331,62 @@ class _ShuffleScreenState extends State<ShuffleScreen>
                   },
                 ),
               ),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                child: Column(
-                  children: [
-                    Text(
-                      l10n.deckAndTheme(deckName, themeName),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: LinearProgressIndicator(
-                        value: (_swipeDistance / _readyThreshold).clamp(0.0, 1.0),
-                        minHeight: 6,
-                        color: Theme.of(context).colorScheme.primary,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      gathering
-                          ? l10n.shuffleReady
-                          : (ready ? l10n.shuffleGuideRelease : l10n.shuffleGuide),
-                      style: const TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// シャッフル画面の案内ブロック（デッキ/テーマ・進捗・操作案内）。
+/// 画面上部に固定する＝スワイプ操作中に手のひらで隠れないため。
+class _ShuffleGuide extends StatelessWidget {
+  const _ShuffleGuide({
+    required this.deckAndTheme,
+    required this.progress,
+    required this.message,
+  });
+
+  final String deckAndTheme;
+  final double progress;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+      child: Column(
+        children: [
+          Text(
+            deckAndTheme,
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              color: Theme.of(context).colorScheme.primary,
+              backgroundColor:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+            ),
+          ),
+        ],
       ),
     );
   }

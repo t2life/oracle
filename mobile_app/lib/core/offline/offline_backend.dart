@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../interpretation/interpretation_composer.dart';
 import '../network/api_client.dart' show ApiException;
 import '../network/oracle_backend.dart';
 import '../state/state_messages.dart';
@@ -54,6 +55,13 @@ class OfflineBackend implements OracleBackend {
       statusCode: statusCode,
       body: jsonEncode({'detail': detail}),
     );
+  }
+
+  /// JSTの日付キー（サーバーの date_key_jst と同じ規則＝同じ日は同じ文になる）。
+  String _dateKeyJst(DateTime now) {
+    final jst = now.toUtc().add(const Duration(hours: 9));
+    return '${jst.year}-${jst.month.toString().padLeft(2, '0')}-'
+        '${jst.day.toString().padLeft(2, '0')}';
   }
 
   String _todayKey() {
@@ -241,12 +249,63 @@ class OfflineBackend implements OracleBackend {
     return items;
   }
 
+  /// スプレッド定義（同梱の解釈素材＝マスタ由来）。サーバーの /reading/spreads と同じ形。
+  @override
+  Future<List<dynamic>> getSpreads({String? userId}) async {
+    final spreads = await InterpretationComposer.loadSpreads();
+    final plan = await _currentPlan();
+    final prefs = await _loadPrefs();
+    final tickets = prefs.getInt(_keyTickets) ?? 0;
+    // 本日の託宣（無料枠）の消化状況。startReading と同じ判定をここでも行い、
+    // 「選んでから弾かれる」を避ける（サーバーの /reading/spreads と同じ規則）。
+    final master = await _loadMaster();
+    final dailyLimit =
+        ((master['rules'] as Map<String, dynamic>)['free_daily_draw_limit']
+                as num)
+            .toInt();
+    final storedDate = prefs.getString(_keyDrawDate);
+    final todayCount =
+        storedDate == _todayKey() ? (prefs.getInt(_keyDrawCount) ?? 0) : 0;
+    final result = <Map<String, dynamic>>[];
+    for (final spread in spreads) {
+      final allowed =
+          (spread['allowed_plans'] as List<dynamic>? ?? const []).cast<String>();
+      final required = (spread['required_tickets'] as num?)?.toInt() ?? 0;
+      final isOracle = spread['kind'] == 'oracle';
+      var available = allowed.isEmpty || allowed.contains(plan);
+      String? reason;
+      if (!available) {
+        reason = StateMessages.paidOnlyDraw;
+      } else if (plan == 'ticket' && tickets < required) {
+        available = false;
+        reason = StateMessages.ticketShortage;
+      } else if (isOracle &&
+          (plan == 'free' || plan == 'guest') &&
+          todayCount >= dailyLimit) {
+        available = false;
+        reason = StateMessages.freeDailyLimit;
+      }
+      result.add({
+        ...spread,
+        'available': available,
+        'unavailable_reason': reason,
+      });
+    }
+    result.sort(
+      (a, b) => ((a['sort_order'] as num?)?.toInt() ?? 0)
+          .compareTo((b['sort_order'] as num?)?.toInt() ?? 0),
+    );
+    return result;
+  }
+
   @override
   Future<Map<String, dynamic>> startReading({
     required String userId,
     required String themeId,
     required String deckId,
     int drawCount = 1,
+    String spreadId = 'daily',
+    String questionText = '',
   }) async {
     final master = await _loadMaster();
     final prefs = await _loadPrefs();
@@ -268,22 +327,45 @@ class OfflineBackend implements OracleBackend {
     final storedDate = prefs.getString(_keyDrawDate);
     var todayCount = storedDate == today ? (prefs.getInt(_keyDrawCount) ?? 0) : 0;
 
+    // 枚数・対象プラン・必要チケットはスプレッド定義（マスタ）が決める＝サーバーと同一規則。
+    final spread = await InterpretationComposer.spreadFor(spreadId);
+    if (spread == null) {
+      _reject(400, '指定されたスプレッドが存在しません。');
+    }
+    final fixedCount = (spread['card_count'] as num?)?.toInt() ?? 0;
+    if (fixedCount > 0) {
+      drawCount = fixedCount;
+    } else {
+      final minimum = (spread['min_cards'] as num?)?.toInt() ?? 1;
+      final maximum = (spread['max_cards'] as num?)?.toInt() ?? 1;
+      if (drawCount < minimum || drawCount > maximum) {
+        _reject(400, '枚数は$minimum〜$maximum枚で指定してください。');
+      }
+    }
+    if (questionText.trim().length > 3000) {
+      _reject(400, '相談内容は3000文字以内で入力してください。');
+    }
+
+    final allowedPlans =
+        (spread['allowed_plans'] as List<dynamic>? ?? const []).cast<String>();
+    final requiredTickets = (spread['required_tickets'] as num?)?.toInt() ?? 0;
+
     if (plan == 'free' || plan == 'guest') {
       final limit = (rules['free_daily_draw_limit'] as num).toInt();
       if (todayCount >= limit) {
         _reject(403, StateMessages.freeDailyLimit);
       }
-      if (drawCount > 1) {
+      if (allowedPlans.isNotEmpty && !allowedPlans.contains('free')) {
         _reject(403, StateMessages.paidOnlyDraw);
       }
     }
 
-    if (plan == 'ticket') {
+    if (plan == 'ticket' && requiredTickets > 0) {
       final tickets = prefs.getInt(_keyTickets) ?? 0;
-      if (tickets < drawCount) {
+      if (tickets < requiredTickets) {
         _reject(403, StateMessages.ticketShortage);
       }
-      await prefs.setInt(_keyTickets, tickets - drawCount);
+      await prefs.setInt(_keyTickets, tickets - requiredTickets);
     }
 
     final deckCards = (master['cards'] as List<dynamic>)
@@ -307,6 +389,8 @@ class OfflineBackend implements OracleBackend {
       deckId: deckId,
       drawCount: drawCount,
       cardIds: cardIds,
+      spreadId: spreadId,
+      questionText: questionText.trim(),
     );
 
     await prefs.setString(_keyDrawDate, today);
@@ -374,7 +458,7 @@ class OfflineBackend implements OracleBackend {
   }
 
   @override
-  Future<Map<String, dynamic>> selectCard({
+  Future<Map<String, dynamic>?> selectCard({
     required String sessionId,
     required int cardIndex,
   }) async {
@@ -390,9 +474,20 @@ class OfflineBackend implements OracleBackend {
     }
 
     final cardId = pile[cardIndex - 1];
+    if (session.selectedCardIds.contains(cardId)) {
+      _reject(400, '同じカードは選べません。');
+    }
+    session.selectedCardIds.add(cardId);
+    // 必要枚数に達するまでは結果を作らない（サーバーと同じ状態機械）。
+    if (session.selectedCardIds.length < session.drawCount) {
+      return null;
+    }
+
+    // 単数フィールドは1枚目を指す（履歴・既存画面の互換）。
+    final firstCardId = session.selectedCardIds.first;
     final card = (master['cards'] as List<dynamic>)
         .map((raw) => raw as Map<String, dynamic>)
-        .firstWhere((item) => item['card_id'] == cardId);
+        .firstWhere((item) => item['card_id'] == firstCardId);
 
     String meaning(String mapKey, String defaultKey) {
       final meanings = card[mapKey] as Map<String, dynamic>? ?? const {};
@@ -401,6 +496,50 @@ class OfflineBackend implements OracleBackend {
     }
 
     final texts = master['texts'] as Map<String, dynamic>? ?? const {};
+    // 日本語の託宣文はサーバーと同じ3層合成で組み立てる（同梱の解釈素材を使用）。
+    // 素材が無い/カードが未登録の場合はテーマ別解釈をそのまま使う（fail-soft）。
+    final composer = await InterpretationComposer.load();
+    final baseMeaning = meaning('meanings_by_theme', 'default_meaning');
+    final interpretation = composer == null
+        ? baseMeaning
+        : composer.composeReading(
+            cardIds: List<String>.from(session.selectedCardIds),
+            themeId: session.themeId,
+            dateKey: _dateKeyJst(DateTime.now()),
+            sessionId: sessionId,
+            fallbackText: baseMeaning,
+            spreadId: session.spreadId,
+            questionText: session.questionText,
+          );
+    final positions = composer == null
+        ? const <Map<String, dynamic>>[]
+        : composer.positionsFor(session.spreadId, session.selectedCardIds.length);
+    final resultCards = <Map<String, dynamic>>[];
+    for (var index = 0; index < session.selectedCardIds.length; index++) {
+      final id = session.selectedCardIds[index];
+      final entry = (master['cards'] as List<dynamic>)
+          .map((raw) => raw as Map<String, dynamic>)
+          .firstWhere((item) => item['card_id'] == id);
+      final position =
+          index < positions.length ? positions[index] : const <String, dynamic>{};
+      resultCards.add({
+        'card_id': id,
+        'card_name': entry['name_ja'],
+        'keywords': entry['keywords'],
+        'position_index': position['index'] ?? index + 1,
+        'position_name': position['name'] ?? '',
+        'position_meaning': position['meaning'] ?? '',
+        'reading': entry['reading'] ?? '',
+        'attribute': entry['attribute'] ?? '',
+        'element': entry['element'] ?? '',
+      });
+    }
+    final combination = (composer == null || session.selectedCardIds.length < 2)
+        ? null
+        : composer.composeCombination(
+            session.selectedCardIds.first,
+            session.selectedCardIds.last,
+          );
     final result = <String, dynamic>{
       'session_id': sessionId,
       'user_id': session.userId,
@@ -409,7 +548,7 @@ class OfflineBackend implements OracleBackend {
       'card_id': cardId,
       'card_name': card['name_ja'],
       'keywords': card['keywords'],
-      'interpretation_text': meaning('meanings_by_theme', 'default_meaning'),
+      'interpretation_text': interpretation,
       'caution_text': texts['caution_ja'],
       'created_at': DateTime.now().toIso8601String(),
       'copied': false,
@@ -423,6 +562,10 @@ class OfflineBackend implements OracleBackend {
       'interpretation_text_zh':
           meaning('meanings_by_theme_zh', 'default_meaning_zh'),
       'caution_text_zh': texts['caution_zh'],
+      'spread_id': session.spreadId,
+      'question_text': session.questionText,
+      'cards': resultCards,
+      'combination_text': combination,
     };
     _results[sessionId] = result;
     return result;
@@ -539,6 +682,21 @@ class OfflineBackend implements OracleBackend {
     return {'message': StateMessages.offlineFeatureUnavailable};
   }
 
+  // 引継ぎはアカウントをサーバー側で付け替える操作のため、オフラインでは扱えない。
+  @override
+  Future<Map<String, dynamic>> issueTransferCode({
+    required String userId,
+  }) async {
+    _reject(400, StateMessages.offlineFeatureUnavailable);
+  }
+
+  @override
+  Future<Map<String, dynamic>> redeemTransferCode({
+    required String code,
+  }) async {
+    _reject(400, StateMessages.offlineFeatureUnavailable);
+  }
+
   @override
   Future<Map<String, dynamic>> submitInquiry({
     required String userId,
@@ -599,6 +757,8 @@ class _OfflineSession {
     required this.deckId,
     required this.drawCount,
     required this.cardIds,
+    this.spreadId = 'daily',
+    this.questionText = '',
   });
 
   final String sessionId;
@@ -607,8 +767,13 @@ class _OfflineSession {
   final String deckId;
   final int drawCount;
   final List<String> cardIds;
+  final String spreadId;
+  final String questionText;
   final Map<int, List<String>> piles = {};
   int? chosenPile;
+
+  /// 確定順のカード（複数枚リーディング）。
+  final List<String> selectedCardIds = [];
 
   /// バックエンド reading_service._split_three_piles と同じラウンドロビン分配
   void splitIntoPiles() {

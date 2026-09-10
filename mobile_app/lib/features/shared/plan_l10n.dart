@@ -21,3 +21,12 @@ String localizedPlanName(BuildContext context, String plan) {
       return plan;
   }
 }
+
+/// そのプランで全機能が解放済みか（＝プラン購入画面で買うものが無いか）。
+///
+/// 月額有料プランと管理者は機能が開いているため購入項目を選ばせない。
+/// チケットプランは「機能の解放」ではなく回数の購入なので、ここには含めない。
+/// 判定を画面に散らすと「グレーにする条件」と「買える条件」がずれるため、
+/// 単一の定義をここに置く。
+bool planUnlocksAllFeatures(String plan) =>
+    plan == 'subscription' || plan == 'admin';

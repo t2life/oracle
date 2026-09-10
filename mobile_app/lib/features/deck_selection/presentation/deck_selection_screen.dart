@@ -73,14 +73,24 @@ class DeckSelectionBody extends StatelessWidget {
               },
             ),
             const SizedBox(height: 14),
+            // 本日の託宣はそのままテーマ選択へ。リーディングは枚数（スプレッド）を
+            // 先に決める（2026-09-10 承認の導線: デッキ→種別→テーマ＋相談内容）。
             FilledButton(
               onPressed: state.selectedDeckId == null
                   ? null
                   : () {
                       SoundService.instance.play(OracleSound.tap);
-                      Navigator.of(context).pushNamed('/theme-selection');
+                      Navigator.of(context).pushNamed(
+                        state.isOracleFlow
+                            ? '/theme-selection'
+                            : '/spread-selection',
+                      );
                     },
-              child: Text(l10n.proceedToThemeSelection),
+              child: Text(
+                state.isOracleFlow
+                    ? l10n.proceedToThemeSelection
+                    : l10n.proceedToSpreadSelection,
+              ),
             ),
           ],
         );

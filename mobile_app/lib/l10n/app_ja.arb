@@ -30,7 +30,7 @@
   "tabReading": "占う",
   "tabCards": "カード",
   "planFree": "無料会員",
-  "planSubscription": "サブスク会員",
+  "planSubscription": "月額有料プラン",
   "planTicket": "チケット会員",
   "planGuest": "ゲスト",
   "planAdmin": "管理者",
@@ -335,5 +335,145 @@
     }
   },
   "exitAppConfirm": "もう一度押すと終了します",
-  "cancelReadingFlow": "やめる"
+  "cancelReadingFlow": "やめる",
+  "currentPlanFree": "現在無料プラン　チケット残数：{tickets}枚",
+  "@currentPlanFree": {
+    "placeholders": {
+      "tickets": {
+        "type": "int"
+      }
+    }
+  },
+  "currentPlanPaid": "現在{plan}　チケット残数：{tickets}枚",
+  "@currentPlanPaid": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      },
+      "tickets": {
+        "type": "int"
+      }
+    }
+  },
+  "subscriptionOfferTitle": "月額有料プラン{price}円（税込）",
+  "subscriptionOfferBody": "全機能がご利用できます。",
+  "ticketPriceLine": "{price}円（税込）",
+  "@ticketPriceLine": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "@subscriptionOfferTitle": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "readingKindTitle": "占う",
+  "readingKindPrompt": "どちらで占いますか？",
+  "oracleKindTitle": "本日の託宣",
+  "oracleKindBody": "今日の指針をカード1枚で受け取ります。",
+  "readingKindLabel": "リーディング",
+  "readingKindBody": "相談内容に沿って複数枚で読み解きます。",
+  "spreadSelectionTitle": "リーディングの種別",
+  "spreadPrompt": "引く枚数を選んでください。",
+  "spreadCardsLabel": "{count}枚",
+  "@spreadCardsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spreadFreeLabel": "フリー（枚数を選ぶ）",
+  "freeDrawCountLabel": "引く枚数",
+  "ticketsRequiredLabel": "必要チケット：{count}枚",
+  "@ticketsRequiredLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ticketsFreeLabel": "無料",
+  "oracleDailyLimitNote": "無料プランは1日1回まで",
+  "subscriptionUnlimitedNote": "月額有料プランはチケット不要",
+  "proceedToDeckSelection": "デッキ選択へ進む",
+  "proceedToSpreadSelection": "リーディングの種別へ進む",
+  "openPlans": "プランを見る",
+  "questionLabel": "相談内容",
+  "questionHint": "気になっていることを具体的に書いてください。",
+  "questionCounter": "{used} / {max} 文字",
+  "@questionCounter": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "questionRequired": "相談内容を入力してください。",
+  "themeDropdownLabel": "テーマ",
+  "themeAndQuestionPrompt": "テーマを選び、相談内容を記入してください。",
+  "cardProgressLabel": "{current}枚目 / 全{total}枚",
+  "@cardProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "positionLabel": "{index}. {name}",
+  "@positionLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cardAttributeLabel": "属性",
+  "cardElementLabel": "エレメント",
+  "allFeaturesUnlocked": "有料プランのため、すべての機能が解放されています。",
+  "msgTransferCompleted": "アカウントを引き継ぎました。",
+  "transferCodeTitle": "機種引継ぎコード",
+  "transferCodeIssueTitle": "この端末のコードを発行する",
+  "transferCodeIssueGuide": "いま使っているアカウントを新しい端末へ引き継ぐためのコードです。新しい端末でこのコードを入力してください。",
+  "transferCodeIssueButton": "引継ぎコードを発行",
+  "transferCodeReissueButton": "発行し直す",
+  "transferCodeReissueNote": "発行し直すと、前のコードは使えなくなります。",
+  "transferCodeExpiresAt": "有効期限：{date}",
+  "@transferCodeExpiresAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "transferCodeCopy": "コードをコピー",
+  "transferCodeCopied": "コードをコピーしました。",
+  "transferCodeRedeemTitle": "この端末へ引き継ぐ",
+  "transferCodeRedeemGuide": "前の端末で発行したコードを入力してください。引き継ぐと、この端末の内容は引継ぎ元に置き換わります。",
+  "transferCodeLabel": "引継ぎコード",
+  "transferCodeRedeemButton": "引き継ぐ",
+  "transferCodeSingleUseNote": "コードは1回だけ使えます。",
+  "rateApp": "アプリを評価",
+  "shareApp": "アプリを共有",
+  "developerApps": "App2Craftのアプリ",
+  "legalInfoTitle": "規約・情報",
+  "termsOfService": "利用規約",
+  "privacyPolicy": "プライバシーポリシー",
+  "commercialTransactions": "特定商取引法に基づく表記",
+  "comingSoon": "準備中",
+  "appProviderLabel": "提供元"
 }

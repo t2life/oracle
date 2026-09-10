@@ -138,15 +138,72 @@ def main() -> None:
         for row in _rows(wbdb["感情トーン設定"])
     ]
 
+    # 質問タイプ分類は 2026-09-10 に判定用の列を追加した（状況判定1/2・優先度）。
+    # 旧レイアウトのxlsxでも動くよう、列が無い場合は既存列から埋める（fail-soft）。
+    def _cell(row: tuple, index: int) -> str:
+        return str(row[index] or "").strip() if len(row) > index else ""
+
     question_types = [
         {
             "pattern": str(row[0]).strip(),
-            "genre": str(row[1] or "").strip(),
-            "situation": str(row[2] or "").strip(),
-            "tone": str(row[3] or "").strip(),
+            "genre": _cell(row, 1),
+            "situation": _cell(row, 2),
+            "tone": _cell(row, 3),
+            # 相談内容の判定に使う語（読点区切り）と、複数候補に分解した状況
+            "keywords": _split_words(row[4] if len(row) > 4 else None),
+            "situations": [
+                value
+                for value in (_cell(row, 5) or _cell(row, 2), _cell(row, 6))
+                if value
+            ],
+            "priority": row[7] if len(row) > 7 and row[7] is not None else 999,
         }
         for row in _rows(wbdb["質問タイプ分類"])
     ]
+
+    spreads = [
+        {
+            "spread_id": str(row[0]).strip(),
+            "name_ja": _cell(row, 1),
+            "kind": _cell(row, 2),
+            "card_count": int(row[3] or 0),
+            "min_cards": int(row[4] or 1),
+            "max_cards": int(row[5] or 1),
+            "purpose": _cell(row, 6),
+            "required_tickets": int(row[7] or 0),
+            "allowed_plans": _split_words(row[8]),
+            "sort_order": int(row[9] or 0),
+        }
+        for row in _rows(wbdb["スプレッド定義"])
+    ]
+
+    positions: dict[str, list[dict[str, object]]] = {}
+    for row in _rows(wbdb["ポジション定義"]):
+        positions.setdefault(str(row[0]).strip(), []).append(
+            {
+                "index": int(row[1] or 0),
+                "name": _cell(row, 2),
+                "meaning": _cell(row, 3),
+                "role": _cell(row, 4),
+            }
+        )
+    for items in positions.values():
+        items.sort(key=lambda item: item["index"])
+
+    connectors = [
+        {
+            "tone": str(row[0]).strip(),
+            "opening": _cell(row, 1),
+            "linking": _cell(row, 2),
+            "closing": _cell(row, 3),
+        }
+        for row in _rows(wbdb["接続表現マスタ"])
+    ]
+
+    theme_genres = {
+        str(row[0]).strip(): _cell(row, 2)
+        for row in _rows(wbdb["テーマジャンル対応"])
+    }
 
     combination_rules = [
         {
@@ -167,6 +224,10 @@ def main() -> None:
         "tones": tones,
         "question_types": question_types,
         "combination_rules": combination_rules,
+        "spreads": spreads,
+        "positions": positions,
+        "connectors": connectors,
+        "theme_genres": theme_genres,
     }
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -177,7 +238,9 @@ def main() -> None:
     print(f"カードコンテンツを書き出しました: {OUTPUT_PATH} ({size_kb:.0f} KB)")
     print(
         f"カード{len(cards)}件 / 文脈{len(context_patterns)}件 / トーン{len(tones)}件 / "
-        f"質問タイプ{len(question_types)}件 / 組み合わせ{len(combination_rules)}件"
+        f"質問タイプ{len(question_types)}件 / 組み合わせ{len(combination_rules)}件 / "
+        f"スプレッド{len(spreads)}件 / ポジション{sum(len(v) for v in positions.values())}件 / "
+        f"接続表現{len(connectors)}件 / テーマ対応{len(theme_genres)}件"
     )
 
 

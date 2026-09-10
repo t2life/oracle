@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/audio/sound_service.dart';
+import '../../../core/models/domain_models.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared/oracle_card_visuals.dart';
@@ -9,6 +10,12 @@ import '../../shared/state_message_l10n.dart';
 
 /// リーディング結果（U-09）。カード表面→キーワード→解釈文の順に
 /// 段階的に浮かび上がる演出＋チャイム音。
+///
+/// 2026-09-10 の複数枚リーディング対応:
+/// 結果が複数枚のときは「どの位置のカードか」が読みの意味を決めるため、
+/// 相談内容と各ポジション（1.現状／2.課題…）を解釈文の前に並べる。
+/// ポジション名・ポジション別のカード名はマスタが日本語のみを持つため
+/// 日本語表記のまま出す（多言語カラムはマスタ側の追補課題）。
 class ReadingResultScreen extends StatefulWidget {
   const ReadingResultScreen({super.key});
 
@@ -100,7 +107,6 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
               break;
             }
           }
-          final caution = result.cautionFor(lang);
 
           return Stack(
             children: [
@@ -138,6 +144,12 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                             scale: 0.85 + 0.15 * cardIn,
                             child: OracleCardFace(
                               cardName: result.cardNameFor(lang),
+                              // ルビは日本語表示のときだけ（読み仮名は日本語話者向け）
+                              reading: lang == 'ja'
+                                  ? (result.cards.isNotEmpty
+                                      ? result.cards.first.reading
+                                      : result.reading)
+                                  : '',
                               width: 196,
                             ),
                           ),
@@ -155,6 +167,27 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                           ),
                         ),
                       ),
+                      // カード情報＝属性分類とエレメント（2026-09-10 ご指摘③）
+                      if (result.primaryAttribute.isNotEmpty ||
+                          result.primaryElement.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Opacity(
+                          opacity: metaIn,
+                          child: Text(
+                            _attributeLine(
+                              l10n,
+                              result.primaryAttribute,
+                              result.primaryElement,
+                            ),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color:
+                                  Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 14),
                       Opacity(
                         opacity: keywordsIn,
@@ -168,13 +201,46 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                               .toList(),
                         ),
                       ),
+                      // 相談内容（リーディングのみ。託宣は空）。
+                      if (result.questionText.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Opacity(
+                          opacity: keywordsIn,
+                          child: _SectionBox(
+                            title: l10n.questionLabel,
+                            child: Text(
+                              result.questionText,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                        ),
+                      ],
+                      // ポジション別の並び（複数枚のときだけ意味を持つ）。
+                      if (result.cards.length > 1) ...[
+                        const SizedBox(height: 16),
+                        Opacity(
+                          opacity: keywordsIn,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              for (final card in result.cards)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: _PositionCard(card: card),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 18),
                       Opacity(
                         opacity: textIn,
+                        // 結果文は読み物のため左寄せ（他の要素は中央寄せのまま）
                         child: Text(
                           result.interpretationFor(lang),
                           style: Theme.of(context).textTheme.bodyLarge,
-                          textAlign: TextAlign.center,
+                          textAlign: TextAlign.left,
                         ),
                       ),
                       // 組み合わせ解釈は日本語のみ提供。ja以外は段落自体を描画しない
@@ -195,22 +261,7 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                             child: Text(
                               result.combinationText!,
                               style: Theme.of(context).textTheme.bodyMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ],
-                      if (caution != null) ...[
-                        const SizedBox(height: 14),
-                        Opacity(
-                          opacity: tailIn,
-                          child: Text(
-                            caution,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color:
-                                  Theme.of(context).colorScheme.onSurfaceVariant,
+                              textAlign: TextAlign.left,
                             ),
                           ),
                         ),
@@ -236,7 +287,9 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                       const SizedBox(height: 20),
                       Opacity(
                         opacity: tailIn,
+                        // ボタンは3つとも画面全幅で統一（2026-09-10 ご指摘③）
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             FilledButton.icon(
                               icon: const Icon(Icons.bookmark_add_outlined),
@@ -270,6 +323,118 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// 「属性：別天神/創造神　エレメント：エーテル」の1行を作る。
+/// 片方しか無いマスタ行でも成立するように、空の側は落とす。
+String _attributeLine(AppLocalizations l10n, String attribute, String element) {
+  final parts = <String>[
+    if (attribute.isNotEmpty) '${l10n.cardAttributeLabel}：$attribute',
+    if (element.isNotEmpty) '${l10n.cardElementLabel}：$element',
+  ];
+  return parts.join('　');
+}
+
+/// 見出し付きの囲み（相談内容などの補足ブロック）。
+class _SectionBox extends StatelessWidget {
+  const _SectionBox({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12.5,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 6),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+/// ポジション1件（「1. 現状」＋カード名＋キーワード＋そのポジションの役割）。
+class _PositionCard extends StatelessWidget {
+  const _PositionCard({required this.card});
+
+  final ResultCardModel card;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.positionLabel(card.positionIndex, card.positionName),
+            style: TextStyle(fontSize: 12.5, color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            card.nameWithReading,
+            style: Theme.of(context).textTheme.titleMedium,
+            textAlign: TextAlign.left,
+          ),
+          if (card.attribute.isNotEmpty || card.element.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              _attributeLine(l10n, card.attribute, card.element),
+              style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+              textAlign: TextAlign.left,
+            ),
+          ],
+          if (card.positionMeaning.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              card.positionMeaning,
+              style: Theme.of(context).textTheme.bodySmall,
+              textAlign: TextAlign.left,
+            ),
+          ],
+          if (card.keywords.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: card.keywords
+                  .map(
+                    (keyword) => Chip(
+                      label: Text(keyword),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ],
       ),
     );
   }

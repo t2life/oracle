@@ -30,7 +30,7 @@
   "tabReading": "占卜",
   "tabCards": "卡牌",
   "planFree": "免费会员",
-  "planSubscription": "订阅会员",
+  "planSubscription": "月度付费方案",
   "planTicket": "点数券会员",
   "planGuest": "访客",
   "planAdmin": "管理员",
@@ -174,5 +174,114 @@
   "msgNicknameSaved": "已保存昵称。",
   "msgCommError": "发生通信错误 (status: {status})",
   "exitAppConfirm": "再按一次返回键退出",
-  "cancelReadingFlow": "退出"
+  "cancelReadingFlow": "退出",
+  "currentPlanFree": "当前为免费方案　剩余点券：{tickets}",
+  "currentPlanPaid": "当前{plan}　剩余点券：{tickets}",
+  "subscriptionOfferTitle": "月度付费方案 {price}日元（含税）",
+  "subscriptionOfferBody": "可使用全部功能。",
+  "ticketPriceLine": "{price}日元（含税）",
+  "readingKindTitle": "占卜",
+  "readingKindPrompt": "想要哪一种占卜？",
+  "oracleKindTitle": "今日神谕",
+  "oracleKindBody": "以一张牌接收今天的指引。",
+  "readingKindLabel": "解读",
+  "readingKindBody": "围绕咨询内容用多张牌深入解读。",
+  "spreadSelectionTitle": "解读类型",
+  "spreadPrompt": "请选择抽牌张数。",
+  "spreadCardsLabel": "{count}张",
+  "@spreadCardsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spreadFreeLabel": "自由（自选张数）",
+  "freeDrawCountLabel": "抽牌张数",
+  "ticketsRequiredLabel": "所需点券：{count}张",
+  "@ticketsRequiredLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ticketsFreeLabel": "免费",
+  "oracleDailyLimitNote": "免费方案每天1次",
+  "subscriptionUnlimitedNote": "月度付费方案无需点券",
+  "proceedToDeckSelection": "前往牌组选择",
+  "proceedToSpreadSelection": "前往解读类型",
+  "openPlans": "查看方案",
+  "questionLabel": "咨询内容",
+  "questionHint": "请具体写下您在意的事情。",
+  "questionCounter": "{used} / {max} 字",
+  "@questionCounter": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "questionRequired": "请输入咨询内容。",
+  "themeDropdownLabel": "主题",
+  "themeAndQuestionPrompt": "请选择主题并填写咨询内容。",
+  "cardProgressLabel": "第{current}张 / 共{total}张",
+  "@cardProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "positionLabel": "{index}. {name}",
+  "@positionLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cardAttributeLabel": "属性",
+  "cardElementLabel": "元素",
+  "allFeaturesUnlocked": "付费方案已解锁全部功能。",
+  "msgTransferCompleted": "已完成账号迁移。",
+  "transferCodeTitle": "换机迁移码",
+  "transferCodeIssueTitle": "为本机发行迁移码",
+  "transferCodeIssueGuide": "用于把当前账号迁移到新设备的代码。请在新设备上输入此代码。",
+  "transferCodeIssueButton": "发行迁移码",
+  "transferCodeReissueButton": "重新发行",
+  "transferCodeReissueNote": "重新发行后，之前的代码将失效。",
+  "transferCodeExpiresAt": "有效期至：{date}",
+  "@transferCodeExpiresAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "transferCodeCopy": "复制代码",
+  "transferCodeCopied": "已复制代码。",
+  "transferCodeRedeemTitle": "迁移到本机",
+  "transferCodeRedeemGuide": "请输入在旧设备上发行的代码。迁移后，本机内容将被迁移来源覆盖。",
+  "transferCodeLabel": "迁移码",
+  "transferCodeRedeemButton": "迁移",
+  "transferCodeSingleUseNote": "每个代码只能使用一次。",
+  "rateApp": "为应用评分",
+  "shareApp": "分享应用",
+  "developerApps": "App2Craft 的应用",
+  "legalInfoTitle": "条款与信息",
+  "termsOfService": "使用条款",
+  "privacyPolicy": "隐私政策",
+  "commercialTransactions": "特定商业交易法标示",
+  "comingSoon": "准备中",
+  "appProviderLabel": "提供方"
 }

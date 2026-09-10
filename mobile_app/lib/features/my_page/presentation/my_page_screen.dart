@@ -8,6 +8,7 @@ import '../../../core/state/app_state.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../shared/app_actions.dart';
 import '../../shared/plan_l10n.dart';
 import '../../shared/state_message_l10n.dart';
 
@@ -110,13 +111,47 @@ class MyPageTab extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             OutlinedButton(
-              onPressed: () => Navigator.of(context).pushNamed('/paywall'),
-              child: Text(l10n.goToPaywall),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton(
               onPressed: () => Navigator.of(context).pushNamed('/inquiry'),
               child: Text(l10n.goToInquiry),
+            ),
+            const SizedBox(height: 12),
+            // 2026-09-10 承認: 「プラン購入画面へ」を外し、アプリ本体まわりの
+            // 導線をここへ集約する（プラン購入は≡メニューではなく残数表示から辿る）。
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.star_outline),
+                    title: Text(l10n.rateApp),
+                    trailing: const Icon(Icons.open_in_new),
+                    onTap: () => openStoreListing(context),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.ios_share),
+                    title: Text(l10n.shareApp),
+                    onTap: () => shareApp(context),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.phonelink_setup_outlined),
+                    title: Text(l10n.transferCodeTitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () =>
+                        Navigator.of(context).pushNamed('/transfer-code'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.apps_outlined),
+                    title: Text(l10n.developerApps),
+                    trailing: const Icon(Icons.open_in_new),
+                    onTap: () => openDeveloperApps(context),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.description_outlined),
+                    title: Text(l10n.legalInfoTitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).pushNamed('/legal-info'),
+                  ),
+                ],
+              ),
             ),
           ],
         );

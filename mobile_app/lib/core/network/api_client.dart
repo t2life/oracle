@@ -94,6 +94,24 @@ class ApiClient implements OracleBackend {
   }
 
   @override
+  Future<Map<String, dynamic>> issueTransferCode({
+    required String userId,
+  }) async {
+    return await _postJson('/account/transfer-code', {
+      'user_id': userId,
+    }) as Map<String, dynamic>;
+  }
+
+  @override
+  Future<Map<String, dynamic>> redeemTransferCode({
+    required String code,
+  }) async {
+    return await _postJson('/account/transfer-code/redeem', {
+      'code': code,
+    }) as Map<String, dynamic>;
+  }
+
+  @override
   Future<List<dynamic>> getThemes() async {
     return await _getJson('/themes') as List<dynamic>;
   }
@@ -132,17 +150,27 @@ class ApiClient implements OracleBackend {
   }
 
   @override
+  Future<List<dynamic>> getSpreads({String? userId}) async {
+    final query = (userId == null || userId.isEmpty) ? '' : '?user_id=$userId';
+    return await _getJson('/reading/spreads$query') as List<dynamic>;
+  }
+
+  @override
   Future<Map<String, dynamic>> startReading({
     required String userId,
     required String themeId,
     required String deckId,
     int drawCount = 1,
+    String spreadId = 'daily',
+    String questionText = '',
   }) async {
     return await _postJson('/reading/start', {
       'user_id': userId,
       'theme_id': themeId,
       'deck_id': deckId,
       'draw_count': drawCount,
+      'spread_id': spreadId,
+      'question_text': questionText,
     }) as Map<String, dynamic>;
   }
 
@@ -173,14 +201,15 @@ class ApiClient implements OracleBackend {
   }
 
   @override
-  Future<Map<String, dynamic>> selectCard({
+  Future<Map<String, dynamic>?> selectCard({
     required String sessionId,
     required int cardIndex,
   }) async {
+    // 必要枚数に達するまではサーバーが null を返す（＝カード選択を継続）。
     return await _postJson('/reading/select-card', {
       'session_id': sessionId,
       'card_index': cardIndex,
-    }) as Map<String, dynamic>;
+    }) as Map<String, dynamic>?;
   }
 
   @override

@@ -47,6 +47,8 @@ String resolveStateMessage(BuildContext context, String raw) {
       return l10n.msgHistoryDeleted;
     case StateMessages.nicknameSaved:
       return l10n.msgNicknameSaved;
+    case StateMessages.transferCompleted:
+      return l10n.msgTransferCompleted;
     default:
       return raw;
   }

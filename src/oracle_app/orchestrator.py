@@ -37,6 +37,8 @@ class ServiceContainer:
     content_service: ContentService
     billing_service: BillingService
     reading_service: ReadingService
+    # スプレッド定義（マスタ）の参照用。APIの一覧提示が使う。
+    interpretation_engine: InterpretationEngine
     notification_service: NotificationService
     inquiry_service: InquiryService
     analytics_service: AnalyticsService
@@ -165,6 +167,7 @@ def build_service_container(config: AppConfig | None = None) -> ServiceContainer
     push_sender = _build_push_sender(resolved_config)
 
     auth_service = AuthService(store=store, config=resolved_config)
+    interpretation_engine = InterpretationEngine(load_card_content())
     billing_service = BillingService(
         store=store,
         config=resolved_config,
@@ -174,7 +177,7 @@ def build_service_container(config: AppConfig | None = None) -> ServiceContainer
         store=store,
         config=resolved_config,
         billing_service=billing_service,
-        interpretation_engine=InterpretationEngine(load_card_content()),
+        interpretation_engine=interpretation_engine,
     )
     content_service = ContentService(store=store)
     notification_service = NotificationService(store=store, push_sender=push_sender)
@@ -194,6 +197,7 @@ def build_service_container(config: AppConfig | None = None) -> ServiceContainer
         content_service=content_service,
         billing_service=billing_service,
         reading_service=reading_service,
+        interpretation_engine=interpretation_engine,
         notification_service=notification_service,
         inquiry_service=inquiry_service,
         analytics_service=analytics_service,

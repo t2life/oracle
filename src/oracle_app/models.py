@@ -104,6 +104,27 @@ class Card:
     keywords_zh: list[str] = field(default_factory=list)
     default_meaning_zh: str = ""
     meanings_by_theme_zh: dict[str, str] = field(default_factory=dict)
+    # 2026-09-10 承認: カード情報として神名のルビ・属性分類・エレメントを持つ。
+    # 出所は 44柱.xlsx の「44柱一覧」（読み／属性分類／エレメント列）。
+    # DB非搭載デッキでは空のまま＝画面側は空なら描画しない。
+    reading: str = ""
+    attribute: str = ""
+    element: str = ""
+
+
+@dataclass(slots=True)
+class TransferCode:
+    """機種変更の引継ぎコード。
+
+    発行元アカウント（user_id）を1回だけ新しい端末へ引き渡すための使い捨ての鍵。
+    使用済み（used_at あり）または期限切れのコードは受け付けない。
+    """
+
+    code: str
+    user_id: str
+    issued_at: datetime
+    expires_at: datetime
+    used_at: datetime | None = None
 
 
 @dataclass(slots=True)
@@ -120,6 +141,27 @@ class ReadingSession:
     selected_card_id: str | None = None
     precomputed_card_ids: list[str] = field(default_factory=list)
     piles: dict[int, list[str]] = field(default_factory=dict)
+    # 2026-09-10 リーディング拡張。既定は本日の託宣（1枚・相談内容なし）。
+    spread_id: str = "daily"
+    question_text: str = ""
+    # 複数枚リーディングで確定した順のカード。1枚目は selected_card_id と一致する。
+    selected_card_ids: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class ResultCard:
+    """複数枚リーディングの1枚ぶん（位置つき）。"""
+
+    card_id: str
+    card_name: str
+    keywords: list[str]
+    position_index: int
+    position_name: str
+    position_meaning: str
+    # 神名のルビ・属性分類・エレメント（カード情報として結果画面に出す）
+    reading: str = ""
+    attribute: str = ""
+    element: str = ""
 
 
 @dataclass(slots=True)
@@ -145,8 +187,13 @@ class ReadingResult:
     keywords_zh: list[str] = field(default_factory=list)
     interpretation_text_zh: str = ""
     caution_text_zh: str | None = None
-    # 組み合わせ解釈（日本語のみ・複数枚引きUI実装後に値が入るlatentフィールド）
+    # 組み合わせ解釈（日本語のみ）。2枚以上のリーディングで値が入る。
     combination_text: str | None = None
+    # 2026-09-10 複数枚リーディング。単数フィールド（card_id/card_name/keywords）は
+    # 1枚目を指し続ける（履歴・管理画面・永続化層の互換のため）。
+    spread_id: str = "daily"
+    question_text: str = ""
+    cards: list[ResultCard] = field(default_factory=list)
 
 
 @dataclass(slots=True)

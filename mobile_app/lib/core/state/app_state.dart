@@ -31,6 +31,9 @@ class OracleAppState extends ChangeNotifier {
   static const String _imageScrimPrefsKey = 'app_theme_image_scrim';
   static const String _nicknamePrefsKey = 'app_nickname';
   static const String _nicknameFlagPrefsKey = 'app_nickname_configured';
+  /// 端末に紐づくユーザーID。引継ぎコードでアカウントを移すため、
+  /// 初回起動で1つ作って以後は使い回す（旧ビルドは既定IDのまま引き継ぐ）。
+  static const String _userIdPrefsKey = 'app_user_id';
   static const List<String> supportedLanguagePreferences = [
     'system',
     'ja',
@@ -82,12 +85,27 @@ class OracleAppState extends ChangeNotifier {
   List<ExternalLinkModel> _liveLinks = const [];
   List<LiveEventModel> _liveEvents = const [];
 
+  List<SpreadModel> _spreads = const [];
+
   String? _selectedDeckId;
   String? _selectedThemeId;
+
+  /// 選択中のスプレッド（占う種別）。既定は本日の託宣。
+  String _selectedSpreadId = 'daily';
+
+  /// フリーリーディングで引く枚数（他のスプレッドでは使わない）。
+  int _freeDrawCount = 3;
+
+  /// 相談内容（リーディングのみ。託宣では常に空）。
+  String _questionText = '';
+
   String? _sessionId;
   Map<String, int> _pileSizes = const {};
   int? _selectedPile;
   int _selectedCardIndex = 1;
+
+  /// 複数枚リーディングで確定済みの枚数（結果が出ると0へ戻る）。
+  int _selectedCardCount = 0;
   ReadingResultModel? _latestResult;
 
   bool get initialized => _initialized;
@@ -130,12 +148,52 @@ class OracleAppState extends ChangeNotifier {
   List<ExternalLinkModel> get liveLinks => _liveLinks;
   List<LiveEventModel> get liveEvents => _liveEvents;
 
+  List<SpreadModel> get spreads => _spreads;
+
+  /// 本日の託宣のスプレッド（マスタに無ければ null）。
+  SpreadModel? get oracleSpread {
+    for (final spread in _spreads) {
+      if (spread.isOracle) {
+        return spread;
+      }
+    }
+    return null;
+  }
+
+  /// リーディングのスプレッド一覧（3枚・5枚・7枚・フリー）。
+  List<SpreadModel> get readingSpreads =>
+      _spreads.where((spread) => !spread.isOracle).toList();
+
+  /// 選択中のスプレッド定義。未取得時は null（画面は読込中を出す）。
+  SpreadModel? get selectedSpread {
+    for (final spread in _spreads) {
+      if (spread.spreadId == _selectedSpreadId) {
+        return spread;
+      }
+    }
+    return null;
+  }
+
+  String get selectedSpreadId => _selectedSpreadId;
+  int get freeDrawCount => _freeDrawCount;
+  String get questionText => _questionText;
+
+  /// いま進行中の導線が本日の託宣か（＝テーマ選択を現状維持にする分岐）。
+  bool get isOracleFlow => selectedSpread?.isOracle ?? (_selectedSpreadId == 'daily');
+
+  /// 今回引く枚数（フリーのみ利用者指定・他はスプレッド定義どおり）。
+  int get plannedDrawCount =>
+      selectedSpread?.drawCountFor(_freeDrawCount) ?? 1;
+
   String? get selectedDeckId => _selectedDeckId;
   String? get selectedThemeId => _selectedThemeId;
   String? get sessionId => _sessionId;
   Map<String, int> get pileSizes => _pileSizes;
   int? get selectedPile => _selectedPile;
   int get selectedCardIndex => _selectedCardIndex;
+
+  /// これまでに確定した枚数（カード選択画面の「n枚目」表示に使う）。
+  int get selectedCardCount => _selectedCardCount;
   ReadingResultModel? get latestResult => _latestResult;
 
   Future<void> initialize() async {
@@ -189,6 +247,17 @@ class OracleAppState extends ChangeNotifier {
       _imageScrim = prefs.getDouble(_imageScrimPrefsKey) ?? 0.55;
       _nickname = prefs.getString(_nicknamePrefsKey) ?? '';
       _nicknameConfigured = prefs.getBool(_nicknameFlagPrefsKey) ?? false;
+      final storedUserId = prefs.getString(_userIdPrefsKey);
+      if (storedUserId != null && storedUserId.isNotEmpty) {
+        _userId = storedUserId;
+      } else {
+        // 初回起動: 端末ごとに別のアカウントになるIDを1つ作って覚える。
+        // （固定IDのままだと全端末が同じアカウントになり引継ぎが成立しない）
+        _userId =
+            'device_${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}'
+            '_${identityHashCode(this).toRadixString(36)}';
+        await prefs.setString(_userIdPrefsKey, _userId);
+      }
     } catch (_) {
       // 表示設定の読込失敗は既定（system言語・ダークテーマ）で継続する
     }
@@ -439,6 +508,42 @@ class OracleAppState extends ChangeNotifier {
     }
   }
 
+  /// スプレッド定義を取得する（実行可否＝プラン・チケット残数の判定込み）。
+  /// 種別選択画面を開くたびに残数が変わり得るため既定で取り直す。
+  Future<void> loadSpreads({bool force = true}) async {
+    if (!force && _spreads.isNotEmpty) {
+      return;
+    }
+    await _runOperation(() async {
+      final raw = await _backend.getSpreads(userId: _userId);
+      _spreads = raw
+          .map((item) => SpreadModel.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }, clearInfo: false);
+  }
+
+  /// 占う種別を確定する（本日の託宣＝daily、リーディング＝スプレッド選択画面で確定）。
+  /// 託宣へ切り替えたときは相談内容を捨てる（託宣は相談内容を持たない仕様）。
+  void selectSpread(String spreadId) {
+    _selectedSpreadId = spreadId;
+    if (isOracleFlow) {
+      _questionText = '';
+    }
+    notifyListeners();
+  }
+
+  /// フリーリーディングの枚数（最小〜最大はスプレッド定義が決める）。
+  void setFreeDrawCount(int count) {
+    _freeDrawCount = count;
+    notifyListeners();
+  }
+
+  /// 相談内容。上限はサーバーと同じ3000文字（超過分は入力側で切る）。
+  void setQuestionText(String text) {
+    _questionText = text;
+    notifyListeners();
+  }
+
   void selectDeck(String deckId) {
     _selectedDeckId = deckId;
     notifyListeners();
@@ -454,7 +559,9 @@ class OracleAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> startReadingFlow({int drawCount = 1}) async {
+  /// リーディング（または本日の託宣）を開始する。
+  /// 枚数・課金条件はスプレッド定義が単一の真実源なので引数では受け取らない。
+  Future<void> startReadingFlow() async {
     await _runOperation(() async {
       if (_selectedDeckId == null || _selectedThemeId == null) {
         throw StateError(StateMessages.selectDeckTheme);
@@ -464,13 +571,16 @@ class OracleAppState extends ChangeNotifier {
         userId: _userId,
         themeId: _selectedThemeId!,
         deckId: _selectedDeckId!,
-        drawCount: drawCount,
+        drawCount: plannedDrawCount,
+        spreadId: _selectedSpreadId,
+        questionText: isOracleFlow ? '' : _questionText,
       );
 
       _sessionId = started['session_id'] as String;
       _pileSizes = const {};
       _selectedPile = null;
       _selectedCardIndex = 1;
+      _selectedCardCount = 0;
       _latestResult = null;
       _infoMessage = StateMessages.sessionStarted;
     });
@@ -529,7 +639,14 @@ class OracleAppState extends ChangeNotifier {
         sessionId: currentSessionId,
         cardIndex: _selectedCardIndex,
       );
+      if (result == null) {
+        // 複数枚リーディングで必要枚数に未達＝カード選択を続ける（結果はまだ出ない）。
+        _selectedCardCount += 1;
+        _infoMessage = StateMessages.cardRevealed;
+        return;
+      }
       _latestResult = ReadingResultModel.fromJson(result);
+      _selectedCardCount = 0;
       _infoMessage = StateMessages.cardRevealed;
     });
   }
@@ -562,18 +679,53 @@ class OracleAppState extends ChangeNotifier {
     });
   }
 
-  Future<void> restoreTicket20() async {
+  /// 商品を購入（現状はストア未接続のため既存の復元APIを流用する単一経路）。
+  /// プラン購入画面の各行から商品コードで呼ぶ。
+  Future<void> purchaseProduct(String productCode) async {
     await _runOperation(() async {
       final receiptId = 'mobile-restore-${DateTime.now().millisecondsSinceEpoch}';
       final restored = await _backend.restorePurchase(
         userId: _userId,
-        productCode: 'ticket_20',
+        productCode: productCode,
         restoreReceiptId: receiptId,
       );
       _plan = restored['plan'] as String;
       _tickets = restored['tickets'] as int;
       _infoMessage = restored['message'] as String;
     });
+  }
+
+  /// マイページ等から使う既存の入口（チケット20枚）。実体は [purchaseProduct]。
+  Future<void> restoreTicket20() => purchaseProduct('ticket_20');
+
+  /// 機種変更の引継ぎコードを発行する（表示用の整形済みコードと期限を返す）。
+  /// 失敗時は [errorMessage] に理由が入り null を返す。
+  Future<Map<String, dynamic>?> issueTransferCode() async {
+    Map<String, dynamic>? issued;
+    await _runOperation(() async {
+      issued = await _backend.issueTransferCode(userId: _userId);
+    });
+    return _errorMessage == null ? issued : null;
+  }
+
+  /// 引継ぎコードで、発行元アカウントへ切り替える。
+  /// 成功したらこの端末のユーザーIDを差し替えて保存し、データを読み直す。
+  Future<bool> redeemTransferCode(String code) async {
+    var moved = false;
+    await _runOperation(() async {
+      final response = await _backend.redeemTransferCode(code: code.trim());
+      final profile = UserProfileModel.fromJson(response);
+      _userId = profile.userId;
+      _plan = profile.plan;
+      _tickets = profile.tickets;
+      _visitCount = profile.visitCount;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userIdPrefsKey, _userId);
+      await _loadInitialData();
+      moved = true;
+      _infoMessage = StateMessages.transferCompleted;
+    });
+    return moved && _errorMessage == null;
   }
 
   Future<void> registerNotificationToken({required String token}) async {

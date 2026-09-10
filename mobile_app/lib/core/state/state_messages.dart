@@ -21,6 +21,7 @@ class StateMessages {
   static const String purchaseRestored = 'msg_purchase_restored';
   static const String historyDeleted = 'msg_history_deleted';
   static const String nicknameSaved = 'msg_nickname_saved';
+  static const String transferCompleted = 'msg_transfer_completed';
 
   static const String commErrorPrefix = 'msg_comm_error:';
 

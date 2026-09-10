@@ -146,7 +146,8 @@ def test_interpretation_engine_compose_deterministic():
     assert text_1 == text_2
     assert "{" not in text_1 and "}" not in text_1
     assert "天之御中主神" in text_1 or len(text_1) > 40
-    assert "行動提案" in text_1
+    # 2026-09-10 の文体層導入で見出しは「行動提案」→「アドバイス」へ変更
+    assert "アドバイス" in text_1
 
     unknown = engine.compose_ja(
         card_id="ryujin_card_001",

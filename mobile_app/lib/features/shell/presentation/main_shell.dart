@@ -13,6 +13,7 @@ import '../../my_page/presentation/my_page_screen.dart';
 import '../../shared/flow_exit_action.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
+import '../../shared/app_actions.dart';
 import '../../shop/presentation/shop_screen.dart';
 
 /// シェル内ネストNavigatorの画面遷移を購読するオブザーバ。
@@ -379,7 +380,8 @@ class SecondaryMenuDrawer extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const _DrawerTitle(),
+            // 2026-09-10 承認: 見出し行（アプリ名）は出さない。
+            // 最初の項目が上端に来る（旧DrawerHeaderの撤去と同じ狙い）。
             ListTile(
               leading: const Icon(Icons.menu_book_outlined),
               title: Text(l10n.aboutOracleTitle),
@@ -407,10 +409,30 @@ class SecondaryMenuDrawer extends StatelessWidget {
               onTap: () => _push(context, '/history'),
             ),
             const Divider(),
+            // 2026-09-10 承認: 「プラン購入」を外し、アプリ本体まわりの導線を置く。
             ListTile(
-              leading: const Icon(Icons.workspace_premium_outlined),
-              title: Text(l10n.paywallScreenTitle),
-              onTap: () => _push(context, '/paywall'),
+              leading: const Icon(Icons.star_outline),
+              title: Text(l10n.rateApp),
+              onTap: () {
+                Navigator.of(context).pop();
+                openStoreListing(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.ios_share),
+              title: Text(l10n.shareApp),
+              onTap: () {
+                Navigator.of(context).pop();
+                shareApp(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.apps_outlined),
+              title: Text(l10n.developerApps),
+              onTap: () {
+                Navigator.of(context).pop();
+                openDeveloperApps(context);
+              },
             ),
             ListTile(
               leading: const Icon(Icons.mail_outline),
@@ -424,31 +446,3 @@ class SecondaryMenuDrawer extends StatelessWidget {
   }
 }
 
-/// ≡メニューの小見出し（旧DrawerHeaderの置換＝高さ56で上端に寄せる）。
-class _DrawerTitle extends StatelessWidget {
-  const _DrawerTitle();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      height: 56,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary, size: 22),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                l10n.appTitle,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

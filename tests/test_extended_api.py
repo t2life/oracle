@@ -51,17 +51,25 @@ def test_provider_login_and_catalog_endpoints(client):
     assert products.status_code == 200
     assert any(product["product_code"] == "ticket_20" for product in products.json())
 
+    # 2026-09-10 承認: ショップは実URL3件。鑑定・ロンの部屋は公開先が未定のため0件
+    # （空でも各画面は「現在表示できるリンクはありません」を出す）。
     shop_links = client.get("/links/shop")
     assert shop_links.status_code == 200
-    assert len(shop_links.json()) >= 1
+    assert [link["url"] for link in shop_links.json()] == [
+        "https://senju888.stores.jp/",
+        "https://www.instagram.com/hime_hukuoka/",
+        "https://www.threads.com/@hime_hukuoka"
+        "?xmt=AQG0Cjz-GijT44I0smyGQAxR-42dmSXK1CQ-TPNh4XmeXLU",
+    ]
+    assert not any("example.com" in link["url"] for link in shop_links.json())
 
     consultation_links = client.get("/links/consultation")
     assert consultation_links.status_code == 200
-    assert len(consultation_links.json()) >= 1
+    assert consultation_links.json() == []
 
     live_links = client.get("/links/live")
     assert live_links.status_code == 200
-    assert len(live_links.json()) >= 1
+    assert live_links.json() == []
 
     live_events = client.get("/links/live-events")
     assert live_events.status_code == 200

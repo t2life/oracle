@@ -6,7 +6,7 @@ from fastapi import FastAPI, Header, HTTPException, Query
 
 from .config import AppConfig
 from .logging_utils import get_logger
-from .models import AuthProvider
+from .models import AuthProvider, PlanType
 from .orchestrator import ServiceContainer, build_service_container
 from .schemas import (
     AdminDashboardResponse,
@@ -44,17 +44,22 @@ from .schemas import (
     PushCampaignCreateRequest,
     PushCampaignResponse,
     ReadingResultResponse,
+    ResultCardResponse,
     SaveHistoryRequest,
+    SpreadResponse,
     SelectCardRequest,
     SelectPileRequest,
     StartReadingRequest,
     StartReadingResponse,
     ThemeAdminResponse,
     ThemeResponse,
+    TransferCodeIssueRequest,
+    TransferCodeRedeemRequest,
+    TransferCodeResponse,
     UserResponse,
     UserSummaryResponse,
 )
-from .time_utils import now_jst
+from .time_utils import date_key_jst, now_jst
 
 
 def _convert_error(exc: Exception) -> HTTPException:
@@ -99,7 +104,39 @@ def _map_result(result) -> ReadingResultResponse:
         interpretation_text_zh=result.interpretation_text_zh,
         caution_text_zh=result.caution_text_zh,
         combination_text=result.combination_text,
+        spread_id=getattr(result, "spread_id", "daily"),
+        question_text=getattr(result, "question_text", ""),
+        cards=[
+            ResultCardResponse(
+                card_id=item.card_id,
+                card_name=item.card_name,
+                keywords=item.keywords,
+                position_index=item.position_index,
+                position_name=item.position_name,
+                position_meaning=item.position_meaning,
+                reading=item.reading,
+                attribute=item.attribute,
+                element=item.element,
+            )
+            for item in getattr(result, "cards", [])
+        ],
     )
+
+
+def _oracle_daily_limit_reached(container, user, spread: dict) -> bool:
+    """本日の託宣（無料枠）を今日すでに使い切っているか。
+
+    判定規則は `ReadingService.start_session` と同一（無料・ゲストのみ対象）。
+    有料プランやリーディングのスプレッドでは常に False。
+    """
+    if spread.get("kind") != "oracle":
+        return False
+    if user.plan not in {PlanType.FREE, PlanType.GUEST}:
+        return False
+    used = container.store.count_user_sessions_on_date(
+        user.user_id, date_key_jst(now_jst())
+    )
+    return used >= container.config.free_daily_draw_limit
 
 
 def _map_announcement(announcement) -> AnnouncementResponse:
@@ -273,6 +310,45 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
         )
         return _map_user(container, user)
 
+    @app.post("/account/transfer-code", response_model=TransferCodeResponse)
+    def issue_transfer_code(req: TransferCodeIssueRequest) -> TransferCodeResponse:
+        """機種変更の引継ぎコードを発行する（発行し直すと前のコードは無効）。"""
+        try:
+            issued = container.auth_service.issue_transfer_code(req.user_id)
+        except Exception as exc:  # noqa: BLE001
+            raise _convert_error(exc) from exc
+        _audit_action(
+            container,
+            actor_type="user",
+            actor_id=req.user_id,
+            action="account.transfer_code.issue",
+            resource_type="account",
+            resource_id=req.user_id,
+        )
+        return TransferCodeResponse(
+            code=issued.code,
+            formatted_code=container.auth_service.format_transfer_code(issued.code),
+            expires_at=issued.expires_at,
+        )
+
+    @app.post("/account/transfer-code/redeem", response_model=UserResponse)
+    def redeem_transfer_code(req: TransferCodeRedeemRequest) -> UserResponse:
+        """引継ぎコードで、発行元のアカウントへ切り替える（コードは使い捨て）。"""
+        try:
+            user = container.auth_service.redeem_transfer_code(req.code)
+        except Exception as exc:  # noqa: BLE001
+            raise _convert_error(exc) from exc
+        user = container.billing_service.refresh_subscription_status(user)
+        _audit_action(
+            container,
+            actor_type="user",
+            actor_id=user.user_id,
+            action="account.transfer_code.redeem",
+            resource_type="account",
+            resource_id=user.user_id,
+        )
+        return _map_user(container, user)
+
     @app.post("/auth/apple", response_model=UserResponse)
     def login_with_apple(req: AuthProviderRequest) -> UserResponse:
         user = container.auth_service.login_with_provider(
@@ -357,6 +433,53 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
         return MessageResponse(message="ログアウトを受け付けました。")
 
     # ---- content ----
+    @app.get("/reading/spreads", response_model=list[SpreadResponse])
+    def list_spreads(user_id: str | None = None) -> list[SpreadResponse]:
+        """スプレッド定義の一覧。
+
+        `user_id` を渡すと、そのユーザーが実行できるか（プラン・チケット残数）を
+        `available` / `unavailable_reason` に載せて返す。
+        リーディング開始前に必要枚数と残数を提示するために使う。
+        """
+        engine = container.interpretation_engine
+        billing = container.billing_service
+        user = container.store.get_or_create_user(user_id) if user_id else None
+        responses: list[SpreadResponse] = []
+        for spread in sorted(
+            engine.spreads(), key=lambda item: item.get("sort_order", 0)
+        ):
+            available = True
+            reason: str | None = None
+            if user is not None:
+                if not billing.can_use_spread(user, spread):
+                    available = False
+                    reason = "このリーディングは有料プランで利用できます。"
+                elif not billing.has_enough_tickets(user, spread):
+                    available = False
+                    reason = "チケット残高が不足しています。"
+                elif _oracle_daily_limit_reached(container, user, spread):
+                    # 本日の託宣は無料プランでも1日1回。開始してから弾くのではなく、
+                    # 種別を選ぶ前に分かるようにする（start_session と同じ規則）。
+                    available = False
+                    reason = "本日の無料枠は使い切りました。"
+            responses.append(
+                SpreadResponse(
+                    spread_id=spread["spread_id"],
+                    name_ja=spread.get("name_ja", ""),
+                    kind=spread.get("kind", ""),
+                    card_count=int(spread.get("card_count") or 0),
+                    min_cards=int(spread.get("min_cards") or 1),
+                    max_cards=int(spread.get("max_cards") or 1),
+                    purpose=spread.get("purpose", ""),
+                    required_tickets=int(spread.get("required_tickets") or 0),
+                    allowed_plans=list(spread.get("allowed_plans", [])),
+                    sort_order=int(spread.get("sort_order") or 0),
+                    available=available,
+                    unavailable_reason=reason,
+                )
+            )
+        return responses
+
     @app.get("/themes", response_model=list[ThemeResponse])
     def list_themes() -> list[ThemeResponse]:
         return [
@@ -398,6 +521,9 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
                 keywords_en=card.keywords_en,
                 name_zh=card.name_zh,
                 keywords_zh=card.keywords_zh,
+                reading=card.reading,
+                attribute=card.attribute,
+                element=card.element,
             )
             for card in cards
         ]
@@ -430,6 +556,8 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
                 theme_id=req.theme_id,
                 deck_id=req.deck_id,
                 draw_count=req.draw_count,
+                spread_id=req.spread_id,
+                question_text=req.question_text,
             )
             _track_event(
                 container,
@@ -487,13 +615,16 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
         except Exception as exc:  # noqa: BLE001
             raise _convert_error(exc) from exc
 
-    @app.post("/reading/select-card", response_model=ReadingResultResponse)
-    def select_card(req: SelectCardRequest) -> ReadingResultResponse:
+    @app.post("/reading/select-card", response_model=ReadingResultResponse | None)
+    def select_card(req: SelectCardRequest) -> ReadingResultResponse | None:
+        # 複数枚リーディングでは必要枚数に達するまで None（204相当の空応答）を返す。
         try:
             result = container.reading_service.select_card(
                 session_id=req.session_id,
                 card_index=req.card_index,
             )
+            if result is None:
+                return None
             _track_event(
                 container,
                 "card_selected",
