@@ -69,6 +69,7 @@ class ReadingService:
         draw_count: int,
         spread_id: str = "daily",
         question_text: str = "",
+        origin_session_id: str | None = None,
     ) -> ReadingSession:
         spread = self.spread_or_raise(spread_id)
         draw_count = self.resolve_draw_count(spread, draw_count)
@@ -100,12 +101,22 @@ class ReadingService:
         if len(cards) < draw_count * 3:
             raise ValueError("デッキ内のカード数が不足しています。")
 
+        # ★消費より先に起点を確かめる。順序を違えると、起点が不正でも
+        # チケットだけ引かれる（テストで実際に 20→15 と減っていた）。
+        carried = self._carried_card_id(user_id, origin_session_id)
+
         self._billing_service.consume_for_spread(user, spread)
 
         ordered_ids = [card.card_id for card in cards]
         rng = random.Random()
         rng.seed(f"{user_id}:{theme_id}:{deck_id}:{uuid4().hex}")
         rng.shuffle(ordered_ids)
+
+        # 深掘り: 起点の託宣で出たカードを**1枚目として引き継ぐ**。
+        # 引き直しにしないための要。引き継いだ1枚は**山から取り除く**ので、
+        # 利用者は残りの枚数だけを選ぶ（同じカードを二度引かせない）。
+        if carried is not None:
+            ordered_ids.remove(carried)
 
         session = ReadingSession(
             session_id=f"ses_{uuid4().hex}",
@@ -118,7 +129,12 @@ class ReadingService:
             precomputed_card_ids=ordered_ids,
             spread_id=spread_id,
             question_text=question_text,
+            origin_session_id=origin_session_id if carried else None,
+            # 引き継いだ1枚は確定済みとして持つ（選ばせない）。
+            selected_card_ids=[carried] if carried else [],
         )
+        if carried:
+            session.selected_card_id = carried
         self._store.create_session(session)
         self._logger.info(
             "セッション開始: session_id=%s user_id=%s theme=%s deck=%s "
@@ -175,6 +191,23 @@ class ReadingService:
         session.status = SessionStatus.PILE_SELECTED
         self._logger.debug("山選択: session_id=%s pile=%s", session_id, pile_index)
         return session
+
+    def _carried_card_id(
+        self, user_id: str, origin_session_id: str | None
+    ) -> str | None:
+        """深掘りの起点から引き継ぐカード。起点が無ければ None。
+
+        ★他人の結果や、まだ結果の出ていないセッションを起点にできない。
+        引き継ぎはアカウントをまたがない（結果の持ち主だけが深掘りできる）。
+        """
+        if not origin_session_id:
+            return None
+        origin = self._store.get_result(origin_session_id)
+        if origin is None:
+            raise ValueError("深掘りの起点になる結果が見つかりません。")
+        if origin.user_id != user_id:
+            raise PermissionError("他の利用者の結果は深掘りできません。")
+        return origin.card_id
 
     def select_card(self, session_id: str, card_index: int) -> ReadingResult | None:
         """カードを1枚確定する。
@@ -264,6 +297,7 @@ class ReadingService:
             spread_id=session.spread_id,
             question_text=session.question_text,
             cards=self._build_result_cards(session),
+            origin_session_id=session.origin_session_id,
             combination_text=(
                 self._interpretation_engine.compose_combination(
                     session.selected_card_ids[0], session.selected_card_ids[-1]
@@ -334,6 +368,11 @@ class ReadingService:
             raise ValueError("保存対象の結果がありません。")
 
         user = self._store.get_or_create_user(user_id)
+        # 深掘りは託宣の続きなので、履歴は**1件にまとめる**（2026-09-11 承認④）。
+        # 託宣の結果で「履歴に保存」を押してから深掘りする人がいるため、
+        # 単に足すと2件になる。起点の履歴があれば取り除いてから入れ直す。
+        if result.origin_session_id:
+            self._store.delete_history_by_session(user_id, result.origin_session_id)
         summary = result.interpretation_text[:60]
         item = HistoryItem(
             history_id=f"his_{uuid4().hex}",

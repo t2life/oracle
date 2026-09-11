@@ -146,6 +146,10 @@ class ReadingSession:
     question_text: str = ""
     # 複数枚リーディングで確定した順のカード。1枚目は selected_card_id と一致する。
     selected_card_ids: list[str] = field(default_factory=list)
+    # 2026-09-11 深掘りリーディング。託宣の結果を起点にする場合、その session_id。
+    # 起点のカードを**1枚目として引き継ぐ**ことで「引き直し」にしない
+    # （同じ問いを引き直すのは読みが成立しない、という占いの作法）。
+    origin_session_id: str | None = None
 
 
 @dataclass(slots=True)
@@ -194,6 +198,8 @@ class ReadingResult:
     spread_id: str = "daily"
     question_text: str = ""
     cards: list[ResultCard] = field(default_factory=list)
+    # 深掘りの起点になった託宣のセッション（履歴を1件にまとめるために使う）
+    origin_session_id: str | None = None
 
 
 @dataclass(slots=True)

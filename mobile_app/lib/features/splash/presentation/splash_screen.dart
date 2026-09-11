@@ -90,6 +90,21 @@ class _SplashScreenState extends State<SplashScreen>
           final fadeOut = 1.0 - _phase(0.90, 1.0, curve: Curves.easeIn);
           final pulse = 0.5 + 0.5 * math.sin(_twinkle.value * 2 * math.pi);
 
+          // 中央の札をめくる → 画面いっぱいへ → 元の大きさへ戻る
+          // （2026-09-11 ご指摘）。扇が開き切ってから始める。
+          final flip = _phase(0.46, 0.58, curve: Curves.easeInOut);
+          final grow = _phase(0.58, 0.68, curve: Curves.easeOutCubic);
+          final shrink = _phase(0.76, 0.86, curve: Curves.easeInCubic);
+          // 拡大中は扇の中央札を隠し、全画面のほうに見せ場を渡す。
+          final zooming = flip > 0 && shrink < 1;
+          final cardWidth = size.width * 0.24;
+          // 画面を覆う倍率。縦横のうち大きいほうに合わせる。
+          final fullScale = math.max(
+            size.width / cardWidth,
+            size.height / (cardWidth * kOracleCardAspect),
+          );
+          final zoomScale = 1 + (fullScale - 1) * (grow - shrink).clamp(0.0, 1.0);
+
           return Opacity(
             opacity: fadeOut,
             child: Stack(
@@ -151,9 +166,13 @@ class _SplashScreenState extends State<SplashScreen>
                                   angle: spec.$1 * fan,
                                   child: Transform.scale(
                                     scale: 0.9 + 0.14 * fan,
-                                    child: OracleCardBack(
-                                      width: size.width * 0.24,
-                                      glow: spec.$3 && fan > 0.95,
+                                    child: Opacity(
+                                      // 中央札は拡大演出へ見せ場を渡す
+                                      opacity: (spec.$3 && zooming) ? 0 : 1,
+                                      child: OracleCardBack(
+                                        width: cardWidth,
+                                        glow: spec.$3 && fan > 0.95,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -195,6 +214,36 @@ class _SplashScreenState extends State<SplashScreen>
                     ],
                   ),
                 ),
+                // めくって画面いっぱいに開き、また小さく戻る一連の演出。
+                // 扇や文字の上に重ねる（位置合わせに悩まず、確実に主役になる）。
+                if (zooming)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: Center(
+                        child: Transform.scale(
+                          scale: zoomScale,
+                          child: Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()
+                              ..setEntry(3, 2, 0.0012)
+                              ..rotateY(flip * math.pi),
+                            child: flip < 0.5
+                                ? OracleCardBack(width: cardWidth)
+                                : Transform(
+                                    // 半分を過ぎたら表。鏡像にならないよう戻す。
+                                    alignment: Alignment.center,
+                                    transform: Matrix4.identity()
+                                      ..rotateY(math.pi),
+                                    child: OracleCardFace(
+                                      cardName: l10n.appTitle,
+                                      width: cardWidth,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 Positioned(
                   right: 16,
                   bottom: 24,

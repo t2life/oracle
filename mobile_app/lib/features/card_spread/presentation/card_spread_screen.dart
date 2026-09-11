@@ -84,7 +84,12 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
     if (!mounted) {
       return;
     }
-    Navigator.of(context).pushReplacementNamed('/reading-result');
+    // 複数枚は、選んだ札を横一列で見せてから結果へ送る（2026-09-11 ご指摘）。
+    // 1枚引きは並べる意味が無く、このめくり演出で足りるため直接結果へ。
+    final revealed = state.latestResult?.cards ?? const [];
+    Navigator.of(context).pushReplacementNamed(
+      revealed.length > 1 ? '/card-reveal' : '/reading-result',
+    );
   }
 
   @override
@@ -245,6 +250,7 @@ class _CardSpreadScreenState extends State<CardSpreadScreen>
                                         transform: Matrix4.identity()
                                           ..rotateY(math.pi),
                                         child: OracleCardFace(
+                                          cardId: result.cardId,
                                           cardName: result.cardNameFor(lang),
                                           reading: lang == 'ja'
                                               ? (result.cards.isNotEmpty

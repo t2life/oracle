@@ -27,6 +27,49 @@ final RouteObserver<PageRoute<dynamic>> shellRouteObserver =
 /// 下部ナビの「選択中セル」。タップ領域が失われる退行をテストで検出するための目印。
 const Key dashboardNavSelectedKey = Key('dashboard-nav-selected');
 
+/// 占いフローの画面（2026-09-11）。
+///
+/// ★この間は**下部ナビと戻るキーで黙って抜けさせない**。
+/// 手がダッシュボードや戻るボタンに触れただけで、選び直しからやり直しになる
+/// 事故が実機で起きていた。フローは一方通行で途中状態を戻せないため、
+/// 抜けるときは必ず確認を挟む（意図しての離脱は各画面の「やめる」が担う）。
+const Set<String> kReadingFlowRoutes = {
+  '/reading-kind',
+  '/deck-selection',
+  '/spread-selection',
+  '/theme-selection',
+  '/shuffle',
+  '/pile-selection',
+  '/card-spread',
+  '/card-reveal',
+};
+
+/// いま最前面にあるシェル内のルート名を覚えるオブザーバ。
+/// フロー中かどうかの判定に使う。
+class _RouteNameTracker extends NavigatorObserver {
+  _RouteNameTracker(this.onChanged);
+
+  final ValueChanged<String?> onChanged;
+
+  void _notify(Route<dynamic>? route) => onChanged(route?.settings.name);
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _notify(route);
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _notify(previousRoute);
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) =>
+      _notify(newRoute);
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _notify(previousRoute);
+}
+
 /// ホームタブの位置（戻るキーの寄せ先）。
 const int _kHomeTabIndex = 0;
 
@@ -77,6 +120,41 @@ class _MainShellState extends State<MainShell> {
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
   int _index = _kHomeTabIndex;
 
+  /// 最前面のルート名。占いフロー中かの判定に使う。
+  ///
+  /// ★`setState` しない。この値を読むのは戻るキーとタブ切替の**操作時だけ**で、
+  /// 描画には使わないため。遷移の最中に `setState` すると Navigator が
+  /// ロック中に再構築されて落ちる（実際に3件のテストが落ちた）。
+  String? _currentRoute;
+  late final _RouteNameTracker _tracker =
+      _RouteNameTracker((name) => _currentRoute = name);
+
+  /// 占いフローの途中か。
+  bool get _inReadingFlow => kReadingFlowRoutes.contains(_currentRoute);
+
+  /// フローから抜けてよいか確認する。「やめる」を押したときと同じ扱い。
+  Future<bool> _confirmLeaveFlow() async {
+    final l10n = AppLocalizations.of(context)!;
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.leaveFlowTitle),
+        content: Text(l10n.leaveFlowBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.leaveFlowStay),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.leaveFlowLeave),
+          ),
+        ],
+      ),
+    );
+    return leave ?? false;
+  }
+
   /// 直近に戻るキーを押した時刻（ホームでの2回押し終了の判定用）。
   DateTime? _lastBackAt;
 
@@ -102,8 +180,15 @@ class _MainShellState extends State<MainShell> {
     return MaterialPageRoute<void>(settings: settings, builder: builder);
   }
 
-  void _onSelectTab(int value) {
+  Future<void> _onSelectTab(int value) async {
     SoundService.instance.play(OracleSound.tap);
+    // 占いの途中なら、触れただけで流れが消えないよう確認を挟む。
+    if (_inReadingFlow && !await _confirmLeaveFlow()) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
     if (value == _index) {
       // 同じタブ再タップ＝そのタブのルートまで戻す（≡から開いた画面等を離脱）
       final navigator = _navKey.currentState;
@@ -118,8 +203,15 @@ class _MainShellState extends State<MainShell> {
   /// ①ネスト内に戻り先があれば戻す →②ホーム以外のタブならホームタブへ →
   /// ③ホームでは「もう一度押すと終了」を出し、2秒以内の再押下でアプリを終了する。
   /// （従来は③が無く、戻るキーが何も起こさずアプリも終了できなかった）
-  void _handleSystemBack(BuildContext context) {
+  Future<void> _handleSystemBack(BuildContext context) async {
     final navigator = _navKey.currentState;
+    // 占いの途中は戻るキーでも黙って抜けさせない（前の手順へは戻せないため）。
+    if (_inReadingFlow) {
+      if (await _confirmLeaveFlow() && mounted) {
+        _switchTo(_kHomeTabIndex);
+      }
+      return;
+    }
     if (navigator != null && navigator.canPop()) {
       navigator.pop();
       return;
@@ -159,7 +251,7 @@ class _MainShellState extends State<MainShell> {
           selectTab: _switchTo,
           child: Navigator(
             key: _navKey,
-            observers: <NavigatorObserver>[shellRouteObserver],
+            observers: <NavigatorObserver>[shellRouteObserver, _tracker],
             initialRoute: _tabRoots[0],
             // 既定の初期ルート生成は '/home' をパス分割して '/' も積むため、
             // 最下段が既定分岐（デッキ選択）になり、同一タブ再タップやAndroidの戻るで

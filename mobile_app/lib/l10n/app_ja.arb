@@ -476,5 +476,16 @@
   "commercialTransactions": "特定商取引法に基づく表記",
   "comingSoon": "準備中",
   "appProviderLabel": "提供元",
-  "supportContactLabel": "お問い合わせ窓口"
+  "supportContactLabel": "お問い合わせ窓口",
+  "cardRevealTitle": "引いたカード",
+  "cardRevealPrompt": "選ばれたカードです",
+  "cardRevealSkip": "結果を見る",
+  "leaveFlowTitle": "占いを中断しますか？",
+  "leaveFlowBody": "途中でやめると、選んだ内容は残りません。最初からやり直しになります。",
+  "leaveFlowStay": "続ける",
+  "leaveFlowLeave": "中断する",
+  "cardRevealNext": "結果を見る",
+  "cardZoomClose": "閉じる",
+  "deepDivePrompt": "何枚で深く読みますか？",
+  "deepDiveCarryOver": "本日の託宣で引いたカードを1枚目として引き継ぎ、残りを引きます。"
 }

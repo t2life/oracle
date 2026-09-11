@@ -284,5 +284,16 @@
   "commercialTransactions": "特定商业交易法标示",
   "comingSoon": "准备中",
   "appProviderLabel": "提供方",
-  "supportContactLabel": "咨询窗口"
+  "supportContactLabel": "咨询窗口",
+  "cardRevealTitle": "抽到的牌",
+  "cardRevealPrompt": "这是您抽到的牌",
+  "cardRevealSkip": "查看结果",
+  "leaveFlowTitle": "要中断占卜吗？",
+  "leaveFlowBody": "中途停止后，已选内容不会保留，需要从头开始。",
+  "leaveFlowStay": "继续",
+  "leaveFlowLeave": "中断",
+  "cardRevealNext": "查看结果",
+  "cardZoomClose": "关闭",
+  "deepDivePrompt": "要用几张牌深入解读？",
+  "deepDiveCarryOver": "今日神谕抽到的牌会作为第一张延续，其余由您抽取。"
 }

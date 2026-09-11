@@ -36,7 +36,13 @@ class SpreadSelectionScreen extends StatelessWidget {
           extraActions: const [FlowExitAction()]),
       body: OracleStateBuilder(
         builder: (context, state) {
-          final spreads = state.readingSpreads;
+          // 深掘りでは 3／5／7 のみ。フリーは起点と枚数の整合が取りにくいため外す
+          // （2026-09-11 承認）。
+          final spreads = state.isDeepDive
+              ? state.readingSpreads
+                  .where((spread) => !spread.isVariable)
+                  .toList()
+              : state.readingSpreads;
           if (spreads.isEmpty) {
             return Center(
               child: state.loading
@@ -58,9 +64,16 @@ class SpreadSelectionScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             children: [
               Text(
-                l10n.spreadPrompt,
+                state.isDeepDive ? l10n.deepDivePrompt : l10n.spreadPrompt,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
+              if (state.isDeepDive) ...[
+                const SizedBox(height: 6),
+                Text(
+                  l10n.deepDiveCarryOver,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
               const SizedBox(height: 12),
               if (state.errorMessage != null)
                 Padding(

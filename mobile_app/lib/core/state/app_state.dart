@@ -99,6 +99,10 @@ class OracleAppState extends ChangeNotifier {
   /// 相談内容（リーディングのみ。託宣では常に空）。
   String _questionText = '';
 
+  /// 深掘りの起点になる託宣のセッション。
+  /// 結果画面の「ディープリーディング」から入ったときだけ入る。
+  String? _originSessionId;
+
   String? _sessionId;
   Map<String, int> _pileSizes = const {};
   int? _selectedPile;
@@ -175,6 +179,10 @@ class OracleAppState extends ChangeNotifier {
   }
 
   String get selectedSpreadId => _selectedSpreadId;
+
+  /// 深掘りの最中か（起点の託宣がある）。画面の文言の出し分けに使う。
+  bool get isDeepDive => _originSessionId != null;
+  String? get originSessionId => _originSessionId;
   int get freeDrawCount => _freeDrawCount;
   String get questionText => _questionText;
 
@@ -544,6 +552,35 @@ class OracleAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 託宣の結果から深掘りを始める。
+  ///
+  /// 起点のカードは**サーバー側で1枚目として引き継がれる**ため、
+  /// 利用者は残りの枚数だけを選ぶ。テーマは託宣のものをそのまま使う
+  /// （2026-09-11 承認イ）。
+  void startDeepDive() {
+    final result = _latestResult;
+    if (result == null) {
+      return;
+    }
+    _originSessionId = result.sessionId;
+    _selectedThemeId = result.themeId;
+    _selectedDeckId = result.deckId;
+    // 枚数は次の画面（スプレッド選択）で選ぶ。既定は3枚。
+    _selectedSpreadId = 'three';
+    _questionText = '';
+    notifyListeners();
+  }
+
+  /// 通常のリーディング／託宣を始める前に、深掘りの起点を捨てる。
+  /// 残したままだと、次の占いが前回の託宣を引き継いでしまう。
+  void clearDeepDive() {
+    if (_originSessionId == null) {
+      return;
+    }
+    _originSessionId = null;
+    notifyListeners();
+  }
+
   void selectDeck(String deckId) {
     _selectedDeckId = deckId;
     notifyListeners();
@@ -574,6 +611,7 @@ class OracleAppState extends ChangeNotifier {
         drawCount: plannedDrawCount,
         spreadId: _selectedSpreadId,
         questionText: isOracleFlow ? '' : _questionText,
+        originSessionId: _originSessionId,
       );
 
       _sessionId = started['session_id'] as String;

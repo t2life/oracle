@@ -578,6 +578,21 @@ class InMemoryStore:
 					return True
 			return False
 
+	def delete_history_by_session(self, user_id: str, session_id: str) -> int:
+		"""本人の履歴のうち、指定セッションのものを取り除く。削除件数を返す。
+
+		深掘りは託宣の続きなので履歴を1件にまとめる（2026-09-11 承認④）。
+		起点の託宣を先に保存していた場合に、二重に並ばないようにする。
+		"""
+		with self._lock:
+			before = len(self._history)
+			self._history = [
+				item
+				for item in self._history
+				if not (item.user_id == user_id and item.session_id == session_id)
+			]
+			return before - len(self._history)
+
 	# ---- announcements / inquiries ----
 	def list_announcements(self) -> list[Announcement]:
 		now = now_jst()

@@ -64,6 +64,26 @@ class InterpretationEngine:
             item["tone"]: item for item in content.get("connectors", [])
         }
         self._theme_genres: dict[str, str] = content.get("theme_genres", {})
+        # 2026-09-11 託宣文に現れてはならない表現（マスタ「禁止表現マスタ」）。
+        # 出所は先行アプリ（吉凶羅針盤）が生成AIを採らない代わりに置いた
+        # `FORTUNE_FORBIDDEN_ASSERTIONS`。本アプリも同じ判断をしたため規律も揃える。
+        # 無い環境でも従来どおり動く（fail-soft）。
+        self._forbidden_expressions: list[dict[str, Any]] = content.get(
+            "forbidden_expressions", []
+        )
+        # 2026-09-11 番号解釈（エレメント→時間の単位、番号→数量）。
+        self._number_readings: dict[str, dict[str, Any]] = {
+            str(item["element"]): item
+            for item in content.get("number_readings", [])
+        }
+        self._number_question_keywords: list[dict[str, Any]] = content.get(
+            "number_question_keywords", []
+        )
+        # 2026-09-11 位置ごとの語り口。全位置で同じ文末だと「一覧を読み上げた」
+        # 印象になるため、位置（時制）ごとに言い方を変える。
+        self._position_voices: dict[str, list[str]] = content.get(
+            "position_voices", {}
+        )
 
     # ------------------------------------------------------------------ 参照系
     def card_for(self, card_id: str) -> dict[str, Any] | None:
@@ -210,6 +230,21 @@ class InterpretationEngine:
         )
         phrase = self._as_phrase(meaning)
         name = card.get("name_ja", "")
+        position_name = "本日の一枚" if position is None else str(
+            position.get("name", "")
+        )
+        voices = self._position_voices.get(position_name) or []
+        if voices:
+            # 同じ位置でもカードごとに言い方が変わるよう決定的に選ぶ
+            # （同じ引きなら何度でも同じ文になる）。
+            voice = voices[_stable_hash(card.get("card_id", ""), position_name)
+                           % len(voices)]
+            return (
+                voice.replace("{name}", name)
+                .replace("{phrase}", phrase)
+                .replace("{meaning}", str((position or {}).get("meaning", "")))
+            )
+        # 語り口が未整備の位置は従来の言い方へ落ちる（fail-soft）。
         # 素材は体言止めと動詞句が混在するため、どちらでも収まる受け皿にする。
         if single or position is None:
             return f"{name}は、{phrase}、といった意味を帯びています。"
@@ -219,6 +254,111 @@ class InterpretationEngine:
         )
 
     # ------------------------------------------------------------------ 合成
+    # -------------------------------------------------------------- 番号の読み
+    def number_question_kind(self, question_text: str | None) -> str | None:
+        """相談内容が期日・数量を問うているか。問うていなければ None。
+
+        ★オラクルは自由解釈が基本で、**常に数字を語るのはデッキの性格に合わない**
+        （WEB調査・2026-09-11）。問われたときだけ答える。
+        判定語はマスタ「番号解釈キーワード」が単一真実源。
+        """
+        question = (question_text or "").strip()
+        if not question:
+            return None
+        # 「時期」を先に見る。「何日で終わりますか」のように両方に触れる問いは
+        # 時期として読むほうが自然なため（順序そのものが仕様）。
+        for kind in ("時期", "数量"):
+            for entry in self._number_question_keywords:
+                if entry.get("kind") != kind:
+                    continue
+                keyword = str(entry.get("keyword", "")).strip()
+                if keyword and keyword in question:
+                    return kind
+        return None
+
+    def compose_number_reading(
+        self, cards: list[dict[str, Any]], question_text: str | None
+    ) -> str | None:
+        """番号から時期・数量の一文を作る。問われていなければ None。
+
+        単位はエレメントが決め、数は番号が決める（タロットの確立した手順を移植）。
+        複数枚では**エレメントの最頻**で単位を決め、同数なら遅いほうを採る
+        （外して落胆させるより、遅めに言う）。
+        """
+        kind = self.number_question_kind(question_text)
+        if kind is None or not cards or not self._number_readings:
+            return None
+
+        reading = self._number_readings.get(self._dominant_element(cards))
+        if reading is None:
+            return None
+
+        # 数は「そのポジションの主役」＝最後に引いた札（未来を指す位置）を使う。
+        number = int(cards[-1].get("no") or 0)
+        if number <= 0:
+            return None
+
+        if kind == "数量":
+            template = str(reading.get("quantity_template", ""))
+            return template.replace("{n}", str(number)) if template else None
+
+        unit = str(reading.get("unit", ""))
+        limit = int(reading.get("max_value") or 0)
+        # 単位が無い（エーテル）＝期日を定めない。上限超えも幅のある言い方へ。
+        if not unit or (limit > 0 and number > limit):
+            template = str(reading.get("over_template", ""))
+            return template or None
+        template = str(reading.get("template", ""))
+        if not template:
+            return None
+        return template.replace("{n}", str(number)).replace("{unit}", unit)
+
+    # 遅い単位ほど後ろ。最頻が割れたときはより遅いほうを採る。
+    _ELEMENT_ORDER = ("火", "風", "水", "地", "エーテル")
+
+    def _dominant_element(self, cards: list[dict[str, Any]]) -> str:
+        counts: dict[str, int] = {}
+        for card in cards:
+            element = str(card.get("element") or "")
+            if element:
+                counts[element] = counts.get(element, 0) + 1
+        if not counts:
+            return ""
+        best = max(counts.values())
+        tied = [element for element, count in counts.items() if count == best]
+        # 同数なら遅いほう（_ELEMENT_ORDER の後ろ）を採る
+        tied.sort(key=lambda element: self._ELEMENT_ORDER.index(element)
+                  if element in self._ELEMENT_ORDER else -1)
+        return tied[-1]
+
+    # ------------------------------------------------------------ 表現の検査
+    def forbidden_expressions(self) -> list[dict[str, Any]]:
+        """託宣文に現れてはならない表現（マスタ由来）。"""
+        return list(self._forbidden_expressions)
+
+    def find_forbidden(self, text: str, tone_name: str | None = None) -> list[str]:
+        """禁止表現の検査。触れた表現を全て返す（空リスト＝問題なし）。
+
+        ★人のレビューに頼らない。語はマスタが単一真実源で、コードに直書きしない。
+        健康の治癒・金銭の増減・恐怖訴求・保証と読める語を機械で止めるための検査で、
+        素材（44柱.xlsx）へ不用意な語が入ったときにテストが落ちる。
+
+        [tone_name] を渡すと、そのトーンの「避けるべき表現」も併せて見る。
+        """
+        hits: list[str] = []
+        for entry in self.forbidden_expressions():
+            expression = str(entry.get("expression", "")).strip()
+            if expression and expression in text:
+                hits.append(expression)
+        if tone_name:
+            tone = self._tones_by_name.get(tone_name)
+            for avoid in (tone or {}).get("avoid", []):
+                # マスタの「避けるべき表現」は「〜できません」の形で波ダッシュを含む
+                needle = str(avoid).lstrip("〜～").strip()
+                if needle and needle in text and needle not in hits:
+                    hits.append(needle)
+        return hits
+
     def compose_reading(
         self,
         card_ids: list[str],
@@ -292,6 +432,11 @@ class InterpretationEngine:
                 ]
                 paragraphs.append(self._fill_placeholders(template, cards[0]))
 
+        # 4.5 番号の読み（期日・数量を問われたときだけ）
+        number_reading = self.compose_number_reading(cards, question_text)
+        if number_reading:
+            paragraphs.append(number_reading)
+
         # 5. 行動提案 → 6. 締め
         action = self._action_sentence(
             cards[-1], tone, _stable_hash(date_key, cards[-1]["card_id"])
@@ -357,13 +502,19 @@ class InterpretationEngine:
                 (key_b, key_a)
             )
             if rule:
+                # ★素材の欄名をそのまま文章へ出さない（2026-09-11）。
+                # 「（鍵となる言葉: …）」は表の見出しであって、占い師の言葉ではない。
+                # 位置別の語り口と同じ理由で、読み手に地の文として届く形へ直す。
+                direction = str(rule.get("direction", "")).strip()
+                if direction and not direction.endswith(("。", "．", "！", "？")):
+                    direction += "。"
                 keywords = "・".join(rule.get("keywords", [])[:3])
                 text = (
-                    f"{card_a['name_ja']}と{card_b['name_ja']}の組み合わせは"
-                    f"「{rule.get('interaction', '')}」の関係です。"
-                    f"{rule.get('direction', '')}"
+                    f"{card_a['name_ja']}と{card_b['name_ja']}は"
+                    f"「{rule.get('interaction', '')}」の関係にあります。"
+                    f"{direction}"
                 )
                 if keywords:
-                    text += f"（鍵となる言葉: {keywords}）"
+                    text += f"この巡り合わせを言葉にするなら、{keywords}です。"
                 return text
         return None

@@ -33,8 +33,12 @@ class _ReadingKindScreenState extends State<ReadingKindScreen> {
       return;
     }
     _requested = true;
+    final state = OracleAppStateScope.of(context);
+    // 前回の深掘りの起点を捨てる。残したままだと、新しい占いが
+    // 前の託宣を引き継いでしまう。
+    state.clearDeepDive();
     // 残数は購入・消費で変わるため、この画面を開くたびに取り直す。
-    OracleAppStateScope.of(context).loadSpreads();
+    state.loadSpreads();
   }
 
   void _startOracle(BuildContext context, SpreadModel spread) {

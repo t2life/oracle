@@ -102,6 +102,9 @@ class StartReadingRequest(ApiModel):
     spread_id: str = Field(default="daily", max_length=32)
     # 相談内容（任意・3000文字まで）。質問タイプ分類と結果の導入文に使う。
     question_text: str = Field(default="", max_length=3000)
+    # 2026-09-11 深掘り。託宣の結果を起点にする場合、その session_id。
+    # 起点のカードが1枚目として引き継がれ、残りを引く。
+    origin_session_id: str | None = Field(default=None, max_length=128)
 
 
 class SpreadResponse(ApiModel):
@@ -188,6 +191,7 @@ class ReadingResultResponse(ApiModel):
     spread_id: str = "daily"
     question_text: str = ""
     cards: list[ResultCardResponse] = Field(default_factory=list)
+    origin_session_id: str | None = None
     combination_text: str | None = None
 
 

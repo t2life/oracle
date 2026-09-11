@@ -106,6 +106,7 @@ def _map_result(result) -> ReadingResultResponse:
         combination_text=result.combination_text,
         spread_id=getattr(result, "spread_id", "daily"),
         question_text=getattr(result, "question_text", ""),
+        origin_session_id=getattr(result, "origin_session_id", None),
         cards=[
             ResultCardResponse(
                 card_id=item.card_id,
@@ -558,6 +559,7 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
                 draw_count=req.draw_count,
                 spread_id=req.spread_id,
                 question_text=req.question_text,
+                origin_session_id=req.origin_session_id,
             )
             _track_event(
                 container,

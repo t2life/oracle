@@ -151,6 +151,8 @@ def test_reading_result_response_key_set_fixed(client):
         "spread_id",
         "question_text",
         "cards",
+        # 2026-09-11 深掘りリーディング（託宣を起点にした場合の元セッション）
+        "origin_session_id",
     }
     assert result["interpretation_text_en"]
     assert result["interpretation_text_zh"]

@@ -284,5 +284,16 @@
   "commercialTransactions": "Commercial transactions notice",
   "comingSoon": "Coming soon",
   "appProviderLabel": "Provider",
-  "supportContactLabel": "Support contact"
+  "supportContactLabel": "Support contact",
+  "cardRevealTitle": "Your cards",
+  "cardRevealPrompt": "These are the cards you drew",
+  "cardRevealSkip": "See the result",
+  "leaveFlowTitle": "Stop this reading?",
+  "leaveFlowBody": "If you stop now, your choices will not be kept. You will start over.",
+  "leaveFlowStay": "Continue",
+  "leaveFlowLeave": "Stop",
+  "cardRevealNext": "See the result",
+  "cardZoomClose": "Close",
+  "deepDivePrompt": "How many cards for the deeper reading?",
+  "deepDiveCarryOver": "The card from today's oracle is carried over as the first card; you draw the rest."
 }

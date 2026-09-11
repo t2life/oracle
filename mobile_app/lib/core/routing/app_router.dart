@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/announcements/presentation/announcements_screen.dart';
+import '../../features/card_reveal/presentation/card_reveal_screen.dart';
 import '../../features/card_spread/presentation/card_spread_screen.dart';
 import '../../features/consultation/presentation/consultation_screen.dart';
 import '../../features/deck_selection/presentation/deck_selection_screen.dart';
@@ -36,6 +37,7 @@ enum AppRoute {
   shuffle('/shuffle'),
   pileSelection('/pile-selection'),
   cardSpread('/card-spread'),
+  cardReveal('/card-reveal'),
   readingResult('/reading-result'),
   history('/history'),
   announcements('/announcements'),
@@ -87,6 +89,8 @@ Widget buildShellChild(BuildContext context) {
       return const PileSelectionScreen();
     case '/card-spread':
       return const CardSpreadScreen();
+    case '/card-reveal':
+      return const CardRevealScreen();
     case '/reading-result':
       return const ReadingResultScreen();
     case '/history':

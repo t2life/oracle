@@ -249,6 +249,7 @@ class ReadingResultModel {
     this.reading = '',
     this.attribute = '',
     this.element = '',
+    this.originSessionId,
   });
 
   factory ReadingResultModel.fromJson(Map<String, dynamic> json) {
@@ -281,6 +282,7 @@ class ReadingResultModel {
       reading: json['reading'] as String? ?? '',
       attribute: json['attribute'] as String? ?? '',
       element: json['element'] as String? ?? '',
+      originSessionId: json['origin_session_id'] as String?,
     );
   }
 
@@ -322,6 +324,9 @@ class ReadingResultModel {
   final String reading;
   final String attribute;
   final String element;
+
+  /// 深掘りの起点になった託宣のセッション。通常のリーディングでは null。
+  final String? originSessionId;
 
   /// 代表カードの「神名（ルビ）」。日本語以外はルビを付けない。
   String cardNameWithReadingFor(String languageCode) {

@@ -46,6 +46,20 @@ CASES: dict[str, dict] = {
         "spread_id": "daily",
         "question_text": "彼との関係が上手くいきません。別れるべきか悩んでいます。",
     },
+    # 2026-09-11 番号の読み（期日・数量）。エレメントが単位を、番号が数を決める。
+    # 片方の実装だけ直すとここが落ちる＝ずれに気づける。
+    "daily_timing_q": {
+        "card_ids": ["japanese_mythology_card_006"],
+        "theme_id": "work",
+        "spread_id": "daily",
+        "question_text": "いつごろ転職すべきですか。",
+    },
+    "daily_quantity_q": {
+        "card_ids": ["japanese_mythology_card_001"],
+        "theme_id": "love",
+        "spread_id": "daily",
+        "question_text": "何人くらいと出会えますか。",
+    },
     "three_work_q": {
         "card_ids": [
             "japanese_mythology_card_032",

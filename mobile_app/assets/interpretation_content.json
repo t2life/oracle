@@ -3432,5 +3432,320 @@
   "health": "健康",
   "subconscious": "精神",
   "higher_self": "精神"
- }
+ },
+ "forbidden_expressions": [
+  {
+   "expression": "治りま",
+   "category": "健康",
+   "reason": "治癒の断定は医療表現にあたる"
+  },
+  {
+   "expression": "治る",
+   "category": "健康",
+   "reason": "治癒の断定は医療表現にあたる"
+  },
+  {
+   "expression": "完治",
+   "category": "健康",
+   "reason": "治癒の断定は医療表現にあたる"
+  },
+  {
+   "expression": "病気が",
+   "category": "健康",
+   "reason": "症状・病名への言及は避ける"
+  },
+  {
+   "expression": "健康になり",
+   "category": "健康",
+   "reason": "効果の断定は医療表現にあたる"
+  },
+  {
+   "expression": "儲か",
+   "category": "金銭",
+   "reason": "収益の断定は投資助言にあたる"
+  },
+  {
+   "expression": "損をし",
+   "category": "金銭",
+   "reason": "損失の断定は投資助言にあたる"
+  },
+  {
+   "expression": "収入が増え",
+   "category": "金銭",
+   "reason": "収益の断定は投資助言にあたる"
+  },
+  {
+   "expression": "金運が上がり",
+   "category": "金銭",
+   "reason": "収益の断定は投資助言にあたる"
+  },
+  {
+   "expression": "必ず得",
+   "category": "金銭",
+   "reason": "利得の保証と読める"
+  },
+  {
+   "expression": "不幸",
+   "category": "恐怖訴求",
+   "reason": "不安を煽る表現"
+  },
+  {
+   "expression": "災い",
+   "category": "恐怖訴求",
+   "reason": "不安を煽る表現"
+  },
+  {
+   "expression": "祟",
+   "category": "恐怖訴求",
+   "reason": "不安を煽る表現"
+  },
+  {
+   "expression": "呪",
+   "category": "恐怖訴求",
+   "reason": "不安を煽る表現"
+  },
+  {
+   "expression": "必ず",
+   "category": "断定",
+   "reason": "結果の保証と読める"
+  },
+  {
+   "expression": "絶対",
+   "category": "断定",
+   "reason": "結果の保証と読める"
+  },
+  {
+   "expression": "危険です",
+   "category": "断定",
+   "reason": "警告として読まれる"
+  },
+  {
+   "expression": "警告",
+   "category": "断定",
+   "reason": "警告として読まれる"
+  }
+ ],
+ "position_voices": {
+  "本日の一枚": [
+   "今日のあなたへ、{name}が{phrase}という便りを届けています。",
+   "{name}が示すのは、{phrase}——そんな一日です。",
+   "今日は{name}とともに、{phrase}を心に置いて過ごしてみてください。"
+  ],
+  "過去": [
+   "【過去】{name}。ここまでのあなたは、{phrase}という流れの中にいました。",
+   "【過去】{name}。{meaning}には、{phrase}が横たわっていたようです。",
+   "【過去】{name}。{phrase}が、いまへ続く土台をつくってきました。"
+  ],
+  "現在": [
+   "【現在】{name}。いまは{phrase}が前に出てきています。",
+   "【現在】{name}。{meaning}は、{phrase}という局面にあると言えますね。",
+   "【現在】{name}。あなたのまわりで、{phrase}が動き始めています。"
+  ],
+  "現状": [
+   "【現状】{name}。いま置かれているのは、{phrase}という状況です。",
+   "【現状】{name}。{meaning}には、{phrase}が色濃く出ています。",
+   "【現状】{name}。{phrase}——それが、いまのあなたの立ち位置です。"
+  ],
+  "未来": [
+   "【未来】{name}。このまま進めば、{phrase}へ向かう可能性が高いでしょう。",
+   "【未来】{name}。やがて{phrase}が、あなたのもとへ巡ってきそうです。",
+   "【未来】{name}。この先には、{phrase}が待っているでしょう。"
+  ],
+  "近い未来": [
+   "【近い未来】{name}。ほどなく、{phrase}が形になってきそうです。",
+   "【近い未来】{name}。まもなく{phrase}の気配が濃くなるでしょう。",
+   "【近い未来】{name}。次に訪れるのは、{phrase}という場面です。"
+  ],
+  "原因": [
+   "【原因】{name}。ここに至った背景には、{phrase}がありました。",
+   "【原因】{name}。{meaning}をたどると、{phrase}に行き着きます。",
+   "【原因】{name}。{phrase}が、いまの流れを生んでいるようです。"
+  ],
+  "課題": [
+   "【課題】{name}。越えていきたいのは、{phrase}という一点です。",
+   "【課題】{name}。{meaning}として、{phrase}が問われています。",
+   "【課題】{name}。{phrase}と向き合うことが、次への鍵になりそうです。"
+  ],
+  "助言": [
+   "【助言】{name}。{phrase}に意識を向けてみてください。",
+   "【助言】{name}。{phrase}——そこに、進むための手がかりがあります。",
+   "【助言】{name}。いまは{phrase}を選ぶことが、あなたを助けてくれるでしょう。"
+  ],
+  "結果": [
+   "【結果】{name}。行き着く先には、{phrase}が見えています。",
+   "【結果】{name}。{meaning}として示されたのは、{phrase}です。",
+   "【結果】{name}。最後には、{phrase}という形に落ち着いていくでしょう。"
+  ],
+  "結末": [
+   "【結末】{name}。この流れの果てには、{phrase}が待っているでしょう。",
+   "【結末】{name}。{meaning}は、{phrase}という姿をしています。",
+   "【結末】{name}。たどり着くのは、{phrase}という場所です。"
+  ],
+  "本心": [
+   "【本心】{name}。心の奥では、{phrase}を求めているのかもしれません。",
+   "【本心】{name}。{meaning}に触れると、{phrase}が見えてきます。",
+   "【本心】{name}。口には出さずとも、{phrase}があなたの本当の願いのようです。"
+  ],
+  "周囲": [
+   "【周囲】{name}。まわりの人たちは、{phrase}という目であなたを見ています。",
+   "【周囲】{name}。{meaning}には、{phrase}が漂っています。",
+   "【周囲】{name}。あなたを取り巻く空気は、{phrase}に傾いているようです。"
+  ],
+  "障害": [
+   "【障害】{name}。歩みを鈍らせているのは、{phrase}のようです。",
+   "【障害】{name}。{meaning}として、{phrase}が立ちはだかっています。",
+   "【障害】{name}。{phrase}——ここが、いま引っかかっている点です。"
+  ],
+  "一枚目": [
+   "【一枚目】{name}。ここでは、{phrase}が語りかけています。",
+   "【一枚目】{name}。{phrase}——そんな響きが届いています。",
+   "【一枚目】{name}。{phrase}を、この流れの中に受け取ってください。"
+  ],
+  "二枚目": [
+   "【二枚目】{name}。ここでは、{phrase}が語りかけています。",
+   "【二枚目】{name}。{phrase}——そんな響きが届いています。",
+   "【二枚目】{name}。{phrase}を、この流れの中に受け取ってください。"
+  ],
+  "三枚目": [
+   "【三枚目】{name}。ここでは、{phrase}が語りかけています。",
+   "【三枚目】{name}。{phrase}——そんな響きが届いています。",
+   "【三枚目】{name}。{phrase}を、この流れの中に受け取ってください。"
+  ],
+  "四枚目": [
+   "【四枚目】{name}。ここでは、{phrase}が語りかけています。",
+   "【四枚目】{name}。{phrase}——そんな響きが届いています。",
+   "【四枚目】{name}。{phrase}を、この流れの中に受け取ってください。"
+  ],
+  "五枚目": [
+   "【五枚目】{name}。ここでは、{phrase}が語りかけています。",
+   "【五枚目】{name}。{phrase}——そんな響きが届いています。",
+   "【五枚目】{name}。{phrase}を、この流れの中に受け取ってください。"
+  ],
+  "六枚目": [
+   "【六枚目】{name}。ここでは、{phrase}が語りかけています。",
+   "【六枚目】{name}。{phrase}——そんな響きが届いています。",
+   "【六枚目】{name}。{phrase}を、この流れの中に受け取ってください。"
+  ],
+  "七枚目": [
+   "【七枚目】{name}。ここでは、{phrase}が語りかけています。",
+   "【七枚目】{name}。{phrase}——そんな響きが届いています。",
+   "【七枚目】{name}。{phrase}を、この流れの中に受け取ってください。"
+  ]
+ },
+ "number_readings": [
+  {
+   "element": "火",
+   "unit": "日",
+   "max_value": 30,
+   "template": "時期でいえば、およそ{n}{unit}のうちに動きが出てきます。",
+   "over_template": "時期でいえば、少し先になりますが、確かに巡ってきます。",
+   "quantity_template": "数にすれば{n}ほどが目安です。"
+  },
+  {
+   "element": "風",
+   "unit": "週",
+   "max_value": 12,
+   "template": "時期でいえば、およそ{n}{unit}のうちに風向きが変わります。",
+   "over_template": "時期でいえば、しばらく間がありますが、便りは届きます。",
+   "quantity_template": "数にすれば{n}ほどが目安です。"
+  },
+  {
+   "element": "水",
+   "unit": "月",
+   "max_value": 18,
+   "template": "時期でいえば、およそ{n}{unit}のうちに形になっていきます。",
+   "over_template": "時期でいえば、ゆっくりと、しかし確かに満ちていきます。",
+   "quantity_template": "数にすれば{n}ほどが目安です。"
+  },
+  {
+   "element": "地",
+   "unit": "年",
+   "max_value": 10,
+   "template": "時期でいえば、およそ{n}{unit}をかけて根づいていきます。",
+   "over_template": "時期でいえば、長い目で見る流れです。急がずに進めてください。",
+   "quantity_template": "数にすれば{n}ほどが目安です。"
+  },
+  {
+   "element": "エーテル",
+   "unit": "",
+   "max_value": 0,
+   "template": "時期は定まっていません。時が満ちたときに、自ずと動きます。",
+   "over_template": "時期は定まっていません。時が満ちたときに、自ずと動きます。",
+   "quantity_template": "数では測れない巡り合わせです。"
+  }
+ ],
+ "number_question_keywords": [
+  {
+   "kind": "時期",
+   "keyword": "いつ"
+  },
+  {
+   "kind": "時期",
+   "keyword": "時期"
+  },
+  {
+   "kind": "時期",
+   "keyword": "いつごろ"
+  },
+  {
+   "kind": "時期",
+   "keyword": "いつ頃"
+  },
+  {
+   "kind": "時期",
+   "keyword": "どのくらいで"
+  },
+  {
+   "kind": "時期",
+   "keyword": "どれくらいで"
+  },
+  {
+   "kind": "時期",
+   "keyword": "期限"
+  },
+  {
+   "kind": "時期",
+   "keyword": "締め切り"
+  },
+  {
+   "kind": "時期",
+   "keyword": "間に合"
+  },
+  {
+   "kind": "時期",
+   "keyword": "タイミング"
+  },
+  {
+   "kind": "数量",
+   "keyword": "何人"
+  },
+  {
+   "kind": "数量",
+   "keyword": "何回"
+  },
+  {
+   "kind": "数量",
+   "keyword": "何件"
+  },
+  {
+   "kind": "数量",
+   "keyword": "何個"
+  },
+  {
+   "kind": "数量",
+   "keyword": "いくつ"
+  },
+  {
+   "kind": "数量",
+   "keyword": "どれだけ"
+  },
+  {
+   "kind": "数量",
+   "keyword": "何日"
+  },
+  {
+   "kind": "数量",
+   "keyword": "何度"
+  }
+ ]
 }

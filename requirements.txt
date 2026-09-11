@@ -5,3 +5,7 @@ httpx
 sqlalchemy
 psycopg[binary]
 redis
+
+# scripts/ の取込・書き出しが使う（アプリ実行時には不要）
+openpyxl
+Pillow

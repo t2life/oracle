@@ -306,6 +306,7 @@ class OfflineBackend implements OracleBackend {
     int drawCount = 1,
     String spreadId = 'daily',
     String questionText = '',
+    String? originSessionId,
   }) async {
     final master = await _loadMaster();
     final prefs = await _loadPrefs();
@@ -380,6 +381,21 @@ class OfflineBackend implements OracleBackend {
         deckCards.map((card) => card['card_id'] as String).toList()
           ..shuffle(_random);
 
+    // 深掘り: 起点の託宣で出たカードを1枚目として引き継ぐ（サーバーと同じ手順）。
+    // 引き継いだ1枚は山から取り除き、同じカードを二度引かせない。
+    String? carried;
+    if (originSessionId != null && originSessionId.isNotEmpty) {
+      final origin = _results[originSessionId];
+      if (origin == null) {
+        _reject(400, '深掘りの起点になる結果が見つかりません。');
+      }
+      if (origin['user_id'] != userId) {
+        _reject(403, '他の利用者の結果は深掘りできません。');
+      }
+      carried = origin['card_id'] as String;
+      cardIds.remove(carried);
+    }
+
     final sessionId =
         'ses_offline_${DateTime.now().millisecondsSinceEpoch}_${_random.nextInt(0xffff)}';
     _sessions[sessionId] = _OfflineSession(
@@ -391,7 +407,11 @@ class OfflineBackend implements OracleBackend {
       cardIds: cardIds,
       spreadId: spreadId,
       questionText: questionText.trim(),
+      originSessionId: carried == null ? null : originSessionId,
     );
+    if (carried != null) {
+      _sessions[sessionId]!.selectedCardIds.add(carried);
+    }
 
     await prefs.setString(_keyDrawDate, today);
     await prefs.setInt(_keyDrawCount, todayCount + 1);
@@ -564,6 +584,7 @@ class OfflineBackend implements OracleBackend {
       'caution_text_zh': texts['caution_zh'],
       'spread_id': session.spreadId,
       'question_text': session.questionText,
+      'origin_session_id': session.originSessionId,
       'cards': resultCards,
       'combination_text': combination,
     };
@@ -759,6 +780,7 @@ class _OfflineSession {
     required this.cardIds,
     this.spreadId = 'daily',
     this.questionText = '',
+    this.originSessionId,
   });
 
   final String sessionId;
@@ -769,6 +791,9 @@ class _OfflineSession {
   final List<String> cardIds;
   final String spreadId;
   final String questionText;
+
+  /// 深掘りの起点になった託宣のセッション（履歴を1件にまとめるために使う）。
+  final String? originSessionId;
   final Map<int, List<String>> piles = {};
   int? chosenPile;
 

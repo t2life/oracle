@@ -71,7 +71,9 @@ def test_multi_card_reading_uses_positions_and_combination() -> None:
     for label in ("【過去】", "【現在】", "【未来】"):
         assert label in text
     # 組み合わせ解釈（従来latent）が本配線されている
-    assert "組み合わせは" in text
+    # 言い回しはマスタで変わるため、関係が述べられていることを見る（2026-09-11）
+    assert "の関係" in text
+    assert "鍵となる言葉:" not in text
     # 相談内容が導入で受け止められている
     assert "という問いに" in text
     assert "{" not in text and "}" not in text
@@ -106,7 +108,11 @@ def test_taigen_dome_material_is_smoothed() -> None:
         session_id="ses_smooth",
         fallback_text="fallback",
     )
-    assert "、といった意味を帯びています。" in text
+    # 体言止めの列挙（「A。B。C。」）が読点で繋がれて文へ収まっていること。
+    # 文末の言い回しは「位置別語り口マスタ」で変わるため、ここでは見ない。
+    card = engine.card_for("japanese_mythology_card_032")
+    first_word = card["theme_meanings"]["work"].split("。")[0]
+    assert f"{first_word}、" in text, text
     for paragraph in text.split("\n\n"):
         assert "。。" not in paragraph
         assert paragraph.endswith(("。", "！", "？")), paragraph

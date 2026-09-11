@@ -35,3 +35,4 @@ flutter:
     - assets/interpretation_content.json
     - assets/sounds/
     - assets/home/
+    - assets/cards/

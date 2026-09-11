@@ -248,6 +248,108 @@ class InterpretationComposer {
     return text;
   }
 
+  // ------------------------------------------------------------ 番号の読み
+  // サーバーの `InterpretationEngine.compose_number_reading` と同じ手順。
+  // 片方だけ直すと同じ引きで文章が変わるため、必ず両方を直す。
+
+  /// 遅い単位ほど後ろ。最頻が割れたときはより遅いほうを採る。
+  static const List<String> _elementOrder = ['火', '風', '水', '地', 'エーテル'];
+
+  /// 相談内容が期日・数量を問うているか。問うていなければ null。
+  String? numberQuestionKind(String? questionText) {
+    final question = (questionText ?? '').trim();
+    if (question.isEmpty) {
+      return null;
+    }
+    final entries = (_content['number_question_keywords'] as List<dynamic>? ??
+            const [])
+        .cast<Map<String, dynamic>>();
+    // 「時期」を先に見る（両方に触れる問いは時期として読む）。
+    for (final kind in const ['時期', '数量']) {
+      for (final entry in entries) {
+        if (entry['kind'] != kind) {
+          continue;
+        }
+        final keyword = (entry['keyword'] as String? ?? '').trim();
+        if (keyword.isNotEmpty && question.contains(keyword)) {
+          return kind;
+        }
+      }
+    }
+    return null;
+  }
+
+  String? _composeNumberReading(
+    List<Map<String, dynamic>> cards,
+    String? questionText,
+  ) {
+    final kind = numberQuestionKind(questionText);
+    if (kind == null || cards.isEmpty) {
+      return null;
+    }
+    final readings = (_content['number_readings'] as List<dynamic>? ?? const [])
+        .cast<Map<String, dynamic>>();
+    if (readings.isEmpty) {
+      return null;
+    }
+    final element = _dominantElement(cards);
+    Map<String, dynamic>? reading;
+    for (final item in readings) {
+      if (item['element'] == element) {
+        reading = item;
+        break;
+      }
+    }
+    if (reading == null) {
+      return null;
+    }
+
+    // 数は最後に引いた札（未来を指す位置）を使う。
+    final number = (cards.last['no'] as num?)?.toInt() ?? 0;
+    if (number <= 0) {
+      return null;
+    }
+
+    if (kind == '数量') {
+      final template = reading['quantity_template'] as String? ?? '';
+      return template.isEmpty ? null : template.replaceAll('{n}', '$number');
+    }
+
+    final unit = reading['unit'] as String? ?? '';
+    final limit = (reading['max_value'] as num?)?.toInt() ?? 0;
+    if (unit.isEmpty || (limit > 0 && number > limit)) {
+      final over = reading['over_template'] as String? ?? '';
+      return over.isEmpty ? null : over;
+    }
+    final template = reading['template'] as String? ?? '';
+    if (template.isEmpty) {
+      return null;
+    }
+    return template.replaceAll('{n}', '$number').replaceAll('{unit}', unit);
+  }
+
+  String _dominantElement(List<Map<String, dynamic>> cards) {
+    final counts = <String, int>{};
+    for (final card in cards) {
+      final element = card['element'] as String? ?? '';
+      if (element.isNotEmpty) {
+        counts[element] = (counts[element] ?? 0) + 1;
+      }
+    }
+    if (counts.isEmpty) {
+      return '';
+    }
+    final best = counts.values.reduce((a, b) => a > b ? a : b);
+    final tied = counts.entries
+        .where((entry) => entry.value == best)
+        .map((entry) => entry.key)
+        .toList();
+    tied.sort(
+      (a, b) => _elementOrder.indexOf(a).compareTo(_elementOrder.indexOf(b)),
+    );
+    return tied.last;
+  }
+
   String _actionSentence(Map<String, dynamic> card, int seed) {
     final dictionary = card['keyword_dict'] as Map<String, dynamic>? ?? const {};
     final actions =
@@ -269,6 +371,25 @@ class InterpretationComposer {
         (card['basic_meaning'] as String? ?? '');
     final phrase = asPhrase(meaning);
     final name = card['name_ja'] as String? ?? '';
+    // 位置ごとの語り口（サーバーの `_card_paragraph` と同じ手順）。
+    // 全位置で同じ文末だと「一覧を読み上げた」印象になるため位置で変える。
+    final positionName =
+        position == null ? '本日の一枚' : (position['name'] as String? ?? '');
+    final voices = ((_content['position_voices']
+                as Map<String, dynamic>? ??
+            const {})[positionName] as List<dynamic>? ??
+        const []).cast<String>();
+    if (voices.isNotEmpty) {
+      // 同じ位置でもカードごとに言い方が変わるよう決定的に選ぶ。
+      final voice = voices[
+          _stableHash([card['card_id'] as String? ?? '', positionName]) %
+              voices.length];
+      return voice
+          .replaceAll('{name}', name)
+          .replaceAll('{phrase}', phrase)
+          .replaceAll('{meaning}', (position?['meaning'] as String?) ?? '');
+    }
+    // 語り口が未整備の位置は従来の言い方へ落ちる（fail-soft）。
     if (single || position == null) {
       return '$nameは、$phrase、といった意味を帯びています。';
     }
@@ -363,6 +484,12 @@ class InterpretationComposer {
       }
     }
 
+    // 4.5 番号の読み（期日・数量を問われたときだけ）
+    final numberReading = _composeNumberReading(cards, questionText);
+    if (numberReading != null) {
+      paragraphs.add(numberReading);
+    }
+
     final action = _actionSentence(
       cards.last,
       _stableHash([dateKey, cards.last['card_id'] as String]),
@@ -403,11 +530,20 @@ class InterpretationComposer {
         }
         final keywords =
             (rule['keywords'] as List<dynamic>? ?? const []).cast<String>();
-        var text = '${cardA['name_ja']}と${cardB['name_ja']}の組み合わせは'
-            '「${rule['interaction'] ?? ''}」の関係です。'
-            '${rule['direction'] ?? ''}';
+        // ★素材の欄名をそのまま文章へ出さない（サーバーと同じ手順）。
+        var direction = (rule['direction'] as String? ?? '').trim();
+        if (direction.isNotEmpty &&
+            !const ['。', '．', '！', '？'].contains(
+              direction.substring(direction.length - 1),
+            )) {
+          direction = '$direction。';
+        }
+        var text = '${cardA['name_ja']}と${cardB['name_ja']}は'
+            '「${rule['interaction'] ?? ''}」の関係にあります。'
+            '$direction';
         if (keywords.isNotEmpty) {
-          text += '（鍵となる言葉: ${keywords.take(3).join('・')}）';
+          text += 'この巡り合わせを言葉にするなら、'
+              '${keywords.take(3).join('・')}です。';
         }
         return text;
       }

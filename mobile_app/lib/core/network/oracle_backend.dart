@@ -51,6 +51,7 @@ abstract interface class OracleBackend {
     int drawCount = 1,
     String spreadId = 'daily',
     String questionText = '',
+    String? originSessionId,
   });
 
   Future<Map<String, dynamic>> completeShuffle({

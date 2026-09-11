@@ -163,6 +163,7 @@ class ApiClient implements OracleBackend {
     int drawCount = 1,
     String spreadId = 'daily',
     String questionText = '',
+    String? originSessionId,
   }) async {
     return await _postJson('/reading/start', {
       'user_id': userId,
@@ -171,6 +172,7 @@ class ApiClient implements OracleBackend {
       'draw_count': drawCount,
       'spread_id': spreadId,
       'question_text': questionText,
+      if (originSessionId != null) 'origin_session_id': originSessionId,
     }) as Map<String, dynamic>;
   }
 

@@ -168,4 +168,9 @@ def test_interpretation_engine_combination_latent():
     assert len(fire_cards) >= 2
     text = engine.compose_combination(fire_cards[0], fire_cards[1])
     assert text is not None
-    assert "組み合わせ" in text
+    # 文面は「位置別語り口マスタ」等で変わり得るため、言い回しではなく
+    # **両方の神名と関係の記述が入ること**を固定する（2026-09-11）。
+    assert all(engine.card_for(cid)["name_ja"] in text for cid in fire_cards[:2])
+    assert "の関係" in text
+    # 素材の欄名（「鍵となる言葉:」）が地の文へ漏れない
+    assert "鍵となる言葉:" not in text

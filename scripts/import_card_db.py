@@ -114,6 +114,46 @@ def main() -> None:
             }
         )
 
+    # 禁止表現（2026-09-11）。生成文の検査に使う。区分は理由の分類で、判定は表現の部分一致。
+    forbidden_expressions = [
+        {
+            "expression": str(row[0]).strip(),
+            "category": str(row[1] or "").strip(),
+            "reason": str(row[2] or "").strip(),
+        }
+        for row in _rows(wbdb["禁止表現マスタ"])
+        if str(row[0] or "").strip()
+    ]
+
+    # 位置別の語り口（2026-09-11）。位置名 → 語り口の候補（決定的に選び分ける）。
+    position_voices = {}
+    for row in _rows(wbdb["位置別語り口マスタ"]):
+        name = str(row[0] or "").strip()
+        if not name:
+            continue
+        position_voices[name] = [
+            str(cell).strip() for cell in row[1:4] if str(cell or "").strip()
+        ]
+
+    # 番号解釈（2026-09-11）。エレメント→時間の単位、番号→数量。
+    number_readings = [
+        {
+            "element": str(row[0]).strip(),
+            "unit": str(row[1] or "").strip(),
+            "max_value": int(row[2] or 0),
+            "template": str(row[3] or "").strip(),
+            "over_template": str(row[4] or "").strip(),
+            "quantity_template": str(row[5] or "").strip(),
+        }
+        for row in _rows(wbdb["番号解釈マスタ"])
+        if str(row[0] or "").strip()
+    ]
+    number_question_keywords = [
+        {"kind": str(row[0]).strip(), "keyword": str(row[1]).strip()}
+        for row in _rows(wbdb["番号解釈キーワード"])
+        if str(row[1] or "").strip()
+    ]
+
     context_patterns = [
         {
             "genre": str(row[0]).strip(),
@@ -228,6 +268,10 @@ def main() -> None:
         "positions": positions,
         "connectors": connectors,
         "theme_genres": theme_genres,
+        "forbidden_expressions": forbidden_expressions,
+        "position_voices": position_voices,
+        "number_readings": number_readings,
+        "number_question_keywords": number_question_keywords,
     }
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -240,7 +284,9 @@ def main() -> None:
         f"カード{len(cards)}件 / 文脈{len(context_patterns)}件 / トーン{len(tones)}件 / "
         f"質問タイプ{len(question_types)}件 / 組み合わせ{len(combination_rules)}件 / "
         f"スプレッド{len(spreads)}件 / ポジション{sum(len(v) for v in positions.values())}件 / "
-        f"接続表現{len(connectors)}件 / テーマ対応{len(theme_genres)}件"
+        f"接続表現{len(connectors)}件 / テーマ対応{len(theme_genres)}件 / "
+        f"禁止表現{len(forbidden_expressions)}件 / 番号解釈{len(number_readings)}件 / "
+        f"語り口{len(position_voices)}件"
     )
 
 

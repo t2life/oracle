@@ -54,6 +54,16 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
     ).value;
   }
 
+  /// 託宣の結果から深掘りへ進む。
+  ///
+  /// 引いたカードは1枚目として引き継がれる（引き直しにしない）。
+  /// テーマは託宣のものを使い、枚数の選択から始める。
+  void _startDeepDive(BuildContext context) {
+    SoundService.instance.play(OracleSound.tap);
+    OracleAppStateScope.of(context).startDeepDive();
+    Navigator.of(context).pushNamed('/spread-selection');
+  }
+
   Future<void> _saveHistory(BuildContext context) async {
     final state = OracleAppStateScope.of(context);
     SoundService.instance.play(OracleSound.tap);
@@ -137,21 +147,15 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                   return ListView(
                     padding: const EdgeInsets.fromLTRB(20, 22, 20, 30),
                     children: [
-                      Center(
-                        child: Opacity(
-                          opacity: cardIn,
-                          child: Transform.scale(
-                            scale: 0.85 + 0.15 * cardIn,
-                            child: OracleCardFace(
-                              cardName: result.cardNameFor(lang),
-                              // ルビは日本語表示のときだけ（読み仮名は日本語話者向け）
-                              reading: lang == 'ja'
-                                  ? (result.cards.isNotEmpty
-                                      ? result.cards.first.reading
-                                      : result.reading)
-                                  : '',
-                              width: 196,
-                            ),
+                      // 複数枚は横スライドで全部見られるようにする（ご指摘③）。
+                      // 1枚引きは従来どおり中央に1枚。
+                      Opacity(
+                        opacity: cardIn,
+                        child: Transform.scale(
+                          scale: 0.85 + 0.15 * cardIn,
+                          child: _TopCards(
+                            result: result,
+                            lang: lang,
                           ),
                         ),
                       ),
@@ -299,11 +303,18 @@ class _ReadingResultScreenState extends State<ReadingResultScreen>
                               label: Text(l10n.saveToHistory),
                             ),
                             const SizedBox(height: 8),
-                            OutlinedButton(
-                              onPressed: () =>
-                                  Navigator.of(context).pushNamed('/paywall'),
-                              child: Text(l10n.deepReading),
-                            ),
+                            // 深掘りリーディング（2026-09-11）。
+                            // 託宣の結果からのみ入れる。既に複数枚のリーディングを
+                            // さらに深掘りすると「引き直し」に近づくため出さない。
+                            if (result.cards.length <= 1) ...[
+                              OutlinedButton(
+                                onPressed: state.loading
+                                    ? null
+                                    : () => _startDeepDive(context),
+                                child: Text(l10n.deepReading),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
                             const SizedBox(height: 8),
                             OutlinedButton(
                               onPressed: () {
@@ -390,7 +401,37 @@ class _PositionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: scheme.primary.withValues(alpha: 0.3)),
       ),
-      child: Column(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 縮小したカード図柄。文字だけで読ませない（2026-09-11 ご指摘）。
+          // 小さすぎて絵柄が読めないため、タップで画面いっぱいに開く（ご指摘④）。
+          GestureDetector(
+            onTap: () => showOracleCardZoom(
+              context,
+              cardId: card.cardId,
+              cardName: card.cardName,
+              reading: card.reading,
+            ),
+            child: OracleCardFace(
+              cardId: card.cardId,
+              cardName: card.cardName,
+              width: 56,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: _positionBody(context, l10n, scheme)),
+        ],
+      ),
+    );
+  }
+
+  Widget _positionBody(
+    BuildContext context,
+    AppLocalizations l10n,
+    ColorScheme scheme,
+  ) {
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -435,6 +476,77 @@ class _PositionCard extends StatelessWidget {
             ),
           ],
         ],
+    );
+  }
+}
+
+/// 結果の上部に置く札。複数枚は横スライドで全部見られる（ご指摘③）。
+///
+/// ★横スクロールできることが見た目で分かるよう、両隣の札を少し覗かせる。
+/// 1枚引きでは並べる意味が無いため、中央に1枚だけ置く。
+class _TopCards extends StatelessWidget {
+  const _TopCards({required this.result, required this.lang});
+
+  final ReadingResultModel result;
+  final String lang;
+
+  static const double _width = 196;
+
+  @override
+  Widget build(BuildContext context) {
+    final cards = result.cards;
+    // ルビは日本語表示のときだけ（読み仮名は日本語話者向け）
+    String rubyOf(int index) {
+      if (lang != 'ja') {
+        return '';
+      }
+      return index < cards.length ? cards[index].reading : result.reading;
+    }
+
+    if (cards.length <= 1) {
+      return Center(
+        child: GestureDetector(
+          onTap: () => showOracleCardZoom(
+            context,
+            cardId: result.cardId,
+            cardName: result.cardNameFor(lang),
+            reading: rubyOf(0),
+          ),
+          child: OracleCardFace(
+            cardId: result.cardId,
+            cardName: result.cardNameFor(lang),
+            reading: rubyOf(0),
+            width: _width,
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: _width * kOracleCardAspect,
+      child: PageView.builder(
+        controller: PageController(viewportFraction: 0.66),
+        itemCount: cards.length,
+        itemBuilder: (context, index) {
+          final card = cards[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: GestureDetector(
+              onTap: () => showOracleCardZoom(
+                context,
+                cardId: card.cardId,
+                cardName: card.cardName,
+                reading: rubyOf(index),
+              ),
+              child: OracleCardFace(
+                cardId: card.cardId,
+                cardName: card.cardName,
+                reading: rubyOf(index),
+                width: _width,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
