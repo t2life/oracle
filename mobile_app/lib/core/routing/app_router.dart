@@ -5,6 +5,7 @@ import '../../features/card_reveal/presentation/card_reveal_screen.dart';
 import '../../features/card_spread/presentation/card_spread_screen.dart';
 import '../../features/consultation/presentation/consultation_screen.dart';
 import '../../features/deck_selection/presentation/deck_selection_screen.dart';
+import '../../features/history/presentation/history_detail_screen.dart';
 import '../../features/history/presentation/history_screen.dart';
 import '../../features/info/presentation/legal_info_screen.dart';
 import '../../features/info/presentation/static_info_screen.dart';
@@ -95,6 +96,9 @@ Widget buildShellChild(BuildContext context) {
       return const ReadingResultScreen();
     case '/history':
       return const HistoryScreen();
+    // 履歴の詳細（2026-09-12）。一覧から履歴そのものを引数で受け取る。
+    case '/history-detail':
+      return const HistoryDetailScreen();
     case '/announcements':
       return const AnnouncementsScreen();
     case '/consultation':

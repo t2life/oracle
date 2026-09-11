@@ -487,5 +487,8 @@
   "cardRevealNext": "結果を見る",
   "cardZoomClose": "閉じる",
   "deepDivePrompt": "何枚で深く読みますか？",
-  "deepDiveCarryOver": "本日の託宣で引いたカードを1枚目として引き継ぎ、残りを引きます。"
+  "deepDiveCarryOver": "本日の託宣で引いたカードを1枚目として引き継ぎ、残りを引きます。",
+  "historyKindOracle": "託宣",
+  "historyKindReading": "リーディング",
+  "historyDetailTitle": "履歴の詳細"
 }

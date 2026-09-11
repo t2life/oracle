@@ -154,6 +154,17 @@ def main() -> None:
         if str(row[1] or "").strip()
     ]
 
+    # 問いの型（2026-09-12）。区分 → 判定語と結論文の型。
+    question_forms = [
+        {
+            "kind": str(row[0]).strip(),
+            "keywords": _split_words(row[1]),
+            "template": str(row[2] or "").strip(),
+        }
+        for row in _rows(wbdb["問いの型マスタ"])
+        if str(row[0] or "").strip()
+    ]
+
     # 問いの扱い（2026-09-12）。区分 → 判定語と、語り口・助言の**型**。
     # ★型に差し込む語は全てカード側から取る（`_fill_placeholders`）。
     #   このシートはカードの中身を一切持たない（オーナー指示）。
@@ -292,6 +303,7 @@ def main() -> None:
         "number_readings": number_readings,
         "number_question_keywords": number_question_keywords,
         "question_stances": list(question_stances.values()),
+        "question_forms": question_forms,
     }
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -306,7 +318,8 @@ def main() -> None:
         f"スプレッド{len(spreads)}件 / ポジション{sum(len(v) for v in positions.values())}件 / "
         f"接続表現{len(connectors)}件 / テーマ対応{len(theme_genres)}件 / "
         f"禁止表現{len(forbidden_expressions)}件 / 番号解釈{len(number_readings)}件 / "
-        f"語り口{len(position_voices)}件 / 問いの扱い{len(question_stances)}件"
+        f"語り口{len(position_voices)}件 / 問いの扱い{len(question_stances)}件 / "
+        f"問いの型{len(question_forms)}件"
     )
 
 

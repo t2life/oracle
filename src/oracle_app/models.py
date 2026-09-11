@@ -214,6 +214,10 @@ class HistoryItem:
     summary: str
     full_text: str
     plan_at_creation: PlanType
+    # 一覧に「託宣／リーディング」を出すための種別（2026-09-12 承認オ）。
+    # 新しい概念を作らず既存のスプレッドIDを使う（daily＝託宣／それ以外＝リーディング）。
+    # 既存データには無いため既定は daily（欠損で画面が壊れない）。
+    spread_id: str = "daily"
 
 
 @dataclass(slots=True)

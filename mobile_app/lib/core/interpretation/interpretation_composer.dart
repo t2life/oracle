@@ -184,6 +184,151 @@ class InterpretationComposer {
     return (themeGenre, null, _toneForGenre(themeGenre), false);
   }
 
+  /// 神名にルビを添える（例: 須佐之男命（スサノオノミコト））。
+  /// 本文は日本語専用のため括弧書きでよい。ルビが無ければ括弧を出さない。
+  static String _withRuby(Map<String, dynamic> card) {
+    final name = card['name_ja'] as String? ?? '';
+    final reading = (card['reading'] as String? ?? '').trim();
+    return (name.isNotEmpty && reading.isNotEmpty) ? '$name（$reading）' : name;
+  }
+
+  /// テーマ別の意味を1文ずつに割る（マスタは「A。B。C。」の列挙）。
+  static List<String> _meaningItems(Map<String, dynamic> card, String themeId) {
+    final meanings = card['theme_meanings'] as Map<String, dynamic>? ?? const {};
+    final text = (meanings[themeId] as String?) ??
+        (card['basic_meaning'] as String? ?? '');
+    final items = text
+        .split(RegExp(r'[。．]'))
+        .map((part) => part.trim())
+        .where((part) => part.isNotEmpty)
+        .toList();
+    return items.isEmpty ? [text.trim()] : items;
+  }
+
+  /// 意味を**1つだけ**選ぶ。[avoid] は結論文で既に使った番号。
+  (String, int) _pickMeaning(
+    Map<String, dynamic> card,
+    String themeId,
+    String seedKey, {
+    int? avoid,
+  }) {
+    final items = _meaningItems(card, themeId);
+    if (items.isEmpty) {
+      return ('', -1);
+    }
+    var index =
+        _stableHash([seedKey, card['card_id'] as String? ?? '']) % items.length;
+    if (avoid != null && items.length > 1 && index == avoid) {
+      index = (index + 1) % items.length;
+    }
+    return (asPhrase(items[index]), index);
+  }
+
+  static final RegExp _subjectPattern = RegExp(
+    r'[一-龥々〆ヵヶ]{1,12}|[ァ-ヴー]{2,12}[0-9０-９]{0,3}|[A-Za-z]{2,12}[0-9０-９]{0,3}',
+  );
+  static const Set<String> _subjectStopwords = {
+    '私', '僕', '俺', '自分', '今', '今後', '今回', '最近', '今年', '来年',
+    '今月', '来月', '本当', '一番', '事', '物', '人', '方', '為', '時',
+    '知', '教', '占', '聞', '思', '感', '見',
+  };
+
+  List<Map<String, dynamic>> get _questionForms =>
+      ((_content['question_forms'] as List<dynamic>? ?? const [])
+          .cast<Map<String, dynamic>>());
+
+  /// 問いの主題語。名詞らしい塊のうち**最も長いもの**（同長は先に出たほう）。
+  String? questionSubject(String? questionText) {
+    final question = (questionText ?? '').trim();
+    if (question.isEmpty) {
+      return null;
+    }
+    final formWords = <String>{};
+    for (final entry in _questionForms) {
+      formWords.addAll(
+        (entry['keywords'] as List<dynamic>? ?? const []).cast<String>(),
+      );
+    }
+    String? best;
+    var bestLength = 0;
+    for (final match in _subjectPattern.allMatches(question)) {
+      final word = match.group(0)!;
+      if (_subjectStopwords.contains(word)) {
+        continue;
+      }
+      if (formWords.any(
+        (formWord) =>
+            formWord.isNotEmpty &&
+            (word.contains(formWord) || formWord.contains(word)),
+      )) {
+        continue;
+      }
+      if (word.length > bestLength) {
+        best = word;
+        bestLength = word.length;
+      }
+    }
+    return best;
+  }
+
+  /// 問いの型（可否・時期・方法・選択・気持ち・原因／既定）。
+  Map<String, dynamic>? questionForm(String? questionText) {
+    final question = (questionText ?? '').trim();
+    final forms = _questionForms;
+    if (question.isEmpty || forms.isEmpty) {
+      return null;
+    }
+    Map<String, dynamic>? fallback;
+    Map<String, dynamic>? best;
+    var bestHits = 0;
+    for (final entry in forms) {
+      final keywords =
+          (entry['keywords'] as List<dynamic>? ?? const []).cast<String>();
+      if (keywords.isEmpty) {
+        fallback ??= entry;
+        continue;
+      }
+      var hits = 0;
+      for (final keyword in keywords) {
+        if (keyword.isNotEmpty && question.contains(keyword)) {
+          hits += 1;
+        }
+      }
+      if (hits > 0 && hits > bestHits) {
+        bestHits = hits;
+        best = entry;
+      }
+    }
+    return best ?? fallback;
+  }
+
+  /// 結論を先に述べる一文と、そこで使った意味の番号。
+  (String, int) _composeConclusion(
+    List<Map<String, dynamic>> cards,
+    String themeId,
+    String? questionText,
+    String seedKey,
+  ) {
+    final subject = questionSubject(questionText);
+    final form = questionForm(questionText);
+    if (subject == null || form == null || cards.isEmpty) {
+      return ('', -1);
+    }
+    final template = form['template'] as String? ?? '';
+    if (template.isEmpty) {
+      return ('', -1);
+    }
+    final (meaning, index) =
+        _pickMeaning(cards.last, themeId, '$seedKey|結論');
+    if (meaning.isEmpty) {
+      return ('', -1);
+    }
+    return (
+      template.replaceAll('{主題}', subject).replaceAll('{意味}', meaning),
+      index,
+    );
+  }
+
   static const String _stanceLuck = '運任せ';
   static const String _stanceUnmatched = '分類外';
 
@@ -303,7 +448,7 @@ class InterpretationComposer {
         (dictionary[key] as List<dynamic>? ?? const []).cast<String>();
     final keywords = (card['keywords'] as List<dynamic>? ?? const []).cast<String>();
     final values = <String, String>{
-      '神名': card['name_ja'] as String? ?? '',
+      '神名': _withRuby(card),
       // 2026-09-12 追加。問いの扱いの型が属性・エレメントを語るため。
       '属性': card['attribute'] as String? ?? '',
       'エレメント': card['element'] as String? ?? '',
@@ -439,17 +584,18 @@ class InterpretationComposer {
     Map<String, dynamic> card,
     String themeId,
     Map<String, dynamic>? position,
-    bool single,
-  ) {
-    final meanings = card['theme_meanings'] as Map<String, dynamic>? ?? const {};
-    final meaning = (meanings[themeId] as String?) ??
-        (card['basic_meaning'] as String? ?? '');
-    final phrase = asPhrase(meaning);
-    final name = card['name_ja'] as String? ?? '';
+    bool single, {
+    String seedKey = '',
+    int? avoid,
+  }) {
     // 位置ごとの語り口（サーバーの `_card_paragraph` と同じ手順）。
     // 全位置で同じ文末だと「一覧を読み上げた」印象になるため位置で変える。
     final positionName =
         position == null ? '本日の一枚' : (position['name'] as String? ?? '');
+    // 意味は**1つだけ**選ぶ（マスタの列挙を全部並べると羅列に見えるため）。
+    final (phrase, _) =
+        _pickMeaning(card, themeId, '$seedKey|$positionName', avoid: avoid);
+    final name = _withRuby(card);
     final voices = ((_content['position_voices']
                 as Map<String, dynamic>? ??
             const {})[positionName] as List<dynamic>? ??
@@ -513,9 +659,28 @@ class InterpretationComposer {
       }
     }
 
+    // 1.5 結論（2026-09-12）。**問いがあるときだけ**先に答えを置く。
+    final (conclusion, usedMeaning) =
+        _composeConclusion(cards, themeId, questionText, sessionId);
+    if (conclusion.isNotEmpty) {
+      paragraphs.add(conclusion);
+    }
+
+    // 最後の1枚は結論で使った意味を外す（同じ文を二度言わない）。
     for (var index = 0; index < cards.length; index++) {
       final position = index < positions.length ? positions[index] : null;
-      paragraphs.add(_cardParagraph(cards[index], themeId, position, single));
+      final avoid =
+          (index == cards.length - 1 && conclusion.isNotEmpty) ? usedMeaning : null;
+      paragraphs.add(
+        _cardParagraph(
+          cards[index],
+          themeId,
+          position,
+          single,
+          seedKey: sessionId,
+          avoid: avoid,
+        ),
+      );
     }
 
     if (cards.length >= 2) {
@@ -634,7 +799,7 @@ class InterpretationComposer {
             )) {
           direction = '$direction。';
         }
-        var text = '${cardA['name_ja']}と${cardB['name_ja']}は'
+        var text = '${_withRuby(cardA)}と${_withRuby(cardB)}は'
             '「${rule['interaction'] ?? ''}」の関係にあります。'
             '$direction';
         if (keywords.isNotEmpty) {

@@ -86,6 +86,8 @@ class InterpretationEngine:
         )
         # 2026-09-12 問いの扱い。区分 → 判定語と、語り口・助言の**型**。
         # 型に差し込む語は全てカード側から取るため、ここにカードの中身は無い。
+        # 2026-09-12 問いの型。区分 → 判定語と結論文。結論を先に置くために使う。
+        self._question_forms: list[dict[str, Any]] = content.get("question_forms", [])
         self._question_stances: dict[str, dict[str, Any]] = {
             str(entry.get("kind", "")): entry
             for entry in content.get("question_stances", [])
@@ -239,6 +241,136 @@ class InterpretationEngine:
         cleaned = re.sub(r"[。．]\s*$", "", (text or "").strip())
         return re.sub(r"[。．]\s*", "、", cleaned).rstrip("、")
 
+    @staticmethod
+    def _with_ruby(card: dict[str, Any]) -> str:
+        """神名にルビを添える（例: 須佐之男命（スサノオノミコト））。
+
+        本文は日本語専用（en/zh はカードマスタの訳文を使う）ため、
+        ここで括弧書きにしてよい。ルビが無いカードは括弧を出さない（fail-soft）。
+        """
+        name = card.get("name_ja", "")
+        reading = str(card.get("reading", "") or "").strip()
+        return f"{name}（{reading}）" if name and reading else name
+
+    @staticmethod
+    def _meaning_items(card: dict[str, Any], theme_id: str) -> list[str]:
+        """テーマ別の意味を**1文ずつ**に割る。
+
+        マスタは「A。B。C。」の体言止めの列挙で、従来はこれを「A、B、C」と
+        繋いでそのまま本文へ流していた（＝羅列に見えた直接の原因）。
+        """
+        text = card.get("theme_meanings", {}).get(theme_id) or card.get(
+            "basic_meaning", ""
+        )
+        items = [part.strip() for part in re.split(r"[。．]", text or "") if part.strip()]
+        return items or [str(text or "").strip()]
+
+    def _pick_meaning(
+        self,
+        card: dict[str, Any],
+        theme_id: str,
+        seed_key: str,
+        avoid: int | None = None,
+    ) -> tuple[str, int]:
+        """意味を**1つだけ**選ぶ。同じ引きなら何度でも同じものになる。
+
+        [avoid] は結論文で既に使った番号。同じ文を二度言わないために外す。
+        """
+        items = self._meaning_items(card, theme_id)
+        if not items:
+            return "", -1
+        index = _stable_hash(seed_key, card.get("card_id", "")) % len(items)
+        if avoid is not None and len(items) > 1 and index == avoid:
+            index = (index + 1) % len(items)
+        return self._as_phrase(items[index]), index
+
+    _SUBJECT_PATTERN = re.compile(
+        r"[一-龥々〆ヵヶ]{1,12}|[ァ-ヴー]{2,12}[0-9０-９]{0,3}|[A-Za-z]{2,12}[0-9０-９]{0,3}"
+    )
+    # 主題になり得ない語（問いの言い回し・話者自身を指す語）。
+    _SUBJECT_STOPWORDS = frozenset(
+        {
+            "私", "僕", "俺", "自分", "今", "今後", "今回", "最近", "今年", "来年",
+            "今月", "来月", "本当", "一番", "事", "物", "人", "方", "為", "時",
+            "知", "教", "占", "聞", "思", "感", "見",
+        }
+    )
+
+    def question_subject(self, question_text: str | None) -> str | None:
+        """問いの主題語を1つ取り出す（例:「宝くじのロト7で1等を当てたい」→ ロト7）。
+
+        **自由文の読解はしない。** 名詞らしい塊（漢字・カタカナ・英字の連なり）を
+        すべて拾い、**最も長いもの**を主題とみなす。長さが同じなら先に出たほうを採る。
+        問いの型の判定語（「気持ち」「どちら」等）は言い回しであって主題ではないため外す。
+
+        取り出せなければ None を返し、呼び出し側は結論文を出さない（fail-soft）。
+        一般論を語るより、何も言わないほうが害が小さい。
+        """
+        question = (question_text or "").strip()
+        if not question:
+            return None
+        form_words = {
+            keyword
+            for entry in self._question_forms
+            for keyword in entry.get("keywords", [])
+            if keyword
+        }
+        best: tuple[int, int, str] | None = None
+        for order, match in enumerate(self._SUBJECT_PATTERN.finditer(question)):
+            word = match.group()
+            if word in self._SUBJECT_STOPWORDS:
+                continue
+            if any(word in form_word or form_word in word for form_word in form_words):
+                continue
+            candidate = (len(word), -order, word)
+            if best is None or candidate > best:
+                best = candidate
+        return best[2] if best else None
+
+    def question_form(self, question_text: str | None) -> dict[str, Any] | None:
+        """問いの型（可否・時期・方法・選択・気持ち・原因／既定）を返す。"""
+        question = (question_text or "").strip()
+        if not question or not self._question_forms:
+            return None
+        # 当たった語の数で選ぶ（「いつごろ結婚できますか」は
+        # 可否1件より時期2件が勝つ＝より具体的な型を採る）。同点は行の順。
+        default = None
+        best: tuple[int, dict[str, Any]] | None = None
+        for entry in self._question_forms:
+            keywords = entry.get("keywords", [])
+            if not keywords:
+                default = default or entry
+                continue
+            hits = sum(1 for keyword in keywords if keyword and keyword in question)
+            if hits and (best is None or hits > best[0]):
+                best = (hits, entry)
+        return best[1] if best else default
+
+    def compose_conclusion(
+        self,
+        cards: list[dict[str, Any]],
+        theme_id: str,
+        question_text: str | None,
+        seed_key: str,
+    ) -> tuple[str, int]:
+        """結論を先に述べる一文と、そこで使った意味の番号を返す。
+
+        **問いがあるときだけ**出す（本日の託宣は問いを持たないため従来どおり）。
+        結論は最後のカード（未来・結果の位置）から作る。
+        """
+        subject = self.question_subject(question_text)
+        form = self.question_form(question_text)
+        if not subject or not form or not cards:
+            return "", -1
+        template = str(form.get("template", ""))
+        if not template:
+            return "", -1
+        meaning, index = self._pick_meaning(cards[-1], theme_id, f"{seed_key}|結論")
+        if not meaning:
+            return "", -1
+        text = template.replace("{主題}", subject).replace("{意味}", meaning)
+        return text, index
+
     def _connector(self, tone: dict[str, Any] | None) -> dict[str, Any]:
         name = (tone or {}).get("name", self._FALLBACK_TONE)
         return self._connectors.get(name) or self._connectors.get(
@@ -249,7 +381,7 @@ class InterpretationEngine:
         dictionary = card.get("keyword_dict", {})
         keywords = card.get("keywords", [])
         values = {
-            "神名": card.get("name_ja", ""),
+            "神名": self._with_ruby(card),
             # 2026-09-12 追加。問いの扱いの型が属性・エレメントを語るため
             # （文面の実体はカードから引く、というオーナー指示）。
             "属性": card.get("attribute", ""),
@@ -289,16 +421,22 @@ class InterpretationEngine:
         theme_id: str,
         position: dict[str, Any] | None,
         single: bool,
+        seed_key: str = "",
+        avoid: int | None = None,
     ) -> str:
-        """1枚ぶんの段落。位置がある場合は位置名と位置の意味を織り込む。"""
-        meaning = card.get("theme_meanings", {}).get(theme_id) or card.get(
-            "basic_meaning", ""
+        """1枚ぶんの段落。位置がある場合は位置名と位置の意味を織り込む。
+
+        意味は**1つだけ**選ぶ（2026-09-12）。マスタの列挙を全部並べると
+        「一覧を読み上げた」印象になるため。段落ごとに違う1つが当たるので、
+        3枚引きなら結果として3つとも読み手に届く。
+        """
+        position_name = (
+            "本日の一枚" if position is None else str(position.get("name", ""))
         )
-        phrase = self._as_phrase(meaning)
-        name = card.get("name_ja", "")
-        position_name = "本日の一枚" if position is None else str(
-            position.get("name", "")
+        phrase, _ = self._pick_meaning(
+            card, theme_id, f"{seed_key}|{position_name}", avoid=avoid
         )
+        name = self._with_ruby(card)
         voices = self._position_voices.get(position_name) or []
         if voices:
             # 同じ位置でもカードごとに言い方が変わるよう決定的に選ぶ
@@ -462,10 +600,25 @@ class InterpretationEngine:
             else:
                 paragraphs.append(f"{opening}、次の流れです。")
 
+        # 1.5 結論（2026-09-12）。**問いがあるときだけ**先に答えを置く。
+        # 従来は並べるだけで問いの中身を一度も使っていなかった。
+        conclusion, used_meaning = self.compose_conclusion(
+            cards, theme_id, question_text, session_id
+        )
+        if conclusion:
+            paragraphs.append(conclusion)
+
         # 2. 各カード（位置の意味に沿って述べる）
+        # 最後の1枚は結論で使った意味を外す（同じ文を二度言わない）。
         for index, card in enumerate(cards):
             position = positions[index] if index < len(positions) else None
-            paragraphs.append(self._card_paragraph(card, theme_id, position, single))
+            avoid = used_meaning if (index == len(cards) - 1 and conclusion) else None
+            paragraphs.append(
+                self._card_paragraph(
+                    card, theme_id, position, single,
+                    seed_key=session_id, avoid=avoid,
+                )
+            )
 
         # 3. 組み合わせ解釈（2枚以上のときだけ。従来latentだった素材の本配線）
         if len(cards) >= 2:
@@ -597,7 +750,7 @@ class InterpretationEngine:
                     direction += "。"
                 keywords = "・".join(rule.get("keywords", [])[:3])
                 text = (
-                    f"{card_a['name_ja']}と{card_b['name_ja']}は"
+                    f"{self._with_ruby(card_a)}と{self._with_ruby(card_b)}は"
                     f"「{rule.get('interaction', '')}」の関係にあります。"
                     f"{direction}"
                 )

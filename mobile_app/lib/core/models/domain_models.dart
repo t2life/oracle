@@ -452,6 +452,7 @@ class HistoryItemModel {
     required this.summary,
     required this.fullText,
     required this.planAtCreation,
+    this.spreadId = 'daily',
   });
 
   factory HistoryItemModel.fromJson(Map<String, dynamic> json) {
@@ -465,6 +466,7 @@ class HistoryItemModel {
       summary: json['summary'] as String,
       fullText: json['full_text'] as String,
       planAtCreation: json['plan_at_creation'] as String,
+      spreadId: json['spread_id'] as String? ?? 'daily',
     );
   }
 
@@ -477,6 +479,13 @@ class HistoryItemModel {
   final String summary;
   final String fullText;
   final String planAtCreation;
+
+  /// 引いた形（daily＝本日の託宣／それ以外＝リーディング）。
+  /// 履歴一覧の種別表示に使う。古い履歴には無いため既定は daily。
+  final String spreadId;
+
+  /// 一覧に出す種別が「託宣」か否か。
+  bool get isDaily => spreadId.isEmpty || spreadId == 'daily';
 }
 
 class UserProfileModel {

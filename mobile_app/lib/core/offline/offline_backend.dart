@@ -627,6 +627,8 @@ class OfflineBackend implements OracleBackend {
           : interpretation,
       'full_text': interpretation,
       'plan_at_creation': plan,
+      // 履歴一覧の「託宣／リーディング」に使う（2026-09-12）。
+      'spread_id': result['spread_id'] ?? 'daily',
     };
 
     final raw = prefs.getString(_keyHistory);

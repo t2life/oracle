@@ -75,6 +75,13 @@ class PostgresPersistence:
             sa.Column("summary", sa.Text(), nullable=False),
             sa.Column("full_text", sa.Text(), nullable=False),
             sa.Column("plan_at_creation", sa.String(32), nullable=False),
+            # 2026-09-12 追加。既存行のために server_default を置く（移行 002）。
+            sa.Column(
+                "spread_id",
+                sa.String(64),
+                nullable=False,
+                server_default="daily",
+            ),
         )
 
         self._announcements = sa.Table(
@@ -447,6 +454,7 @@ class PostgresPersistence:
             summary=item.summary,
             full_text=item.full_text,
             plan_at_creation=item.plan_at_creation.value,
+            spread_id=item.spread_id,
         )
         statement = statement.on_conflict_do_nothing(index_elements=["history_id"])
 
@@ -487,6 +495,7 @@ class PostgresPersistence:
                     summary=row["summary"],
                     full_text=row["full_text"],
                     plan_at_creation=PlanType(row["plan_at_creation"]),
+                    spread_id=row["spread_id"] or "daily",
                 )
             )
         return items

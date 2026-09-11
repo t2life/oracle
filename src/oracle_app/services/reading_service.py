@@ -385,6 +385,7 @@ class ReadingService:
             summary=summary,
             full_text=result.interpretation_text,
             plan_at_creation=user.plan,
+            spread_id=session.spread_id,
         )
         self._store.add_history_item(item)
 

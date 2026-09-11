@@ -681,6 +681,7 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
                 summary=item.summary,
                 full_text=item.full_text,
                 plan_at_creation=item.plan_at_creation.value,
+                spread_id=item.spread_id,
             )
             for item in items
         ]

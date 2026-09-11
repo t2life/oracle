@@ -1,43 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/models/domain_models.dart';
-import '../../../core/state/app_state.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared/plan_l10n.dart';
 import '../../shared/speaker_toggle.dart';
 import '../../shared/state_message_l10n.dart';
+import 'history_labels.dart';
 
+/// 履歴の一覧（U-12）。
+///
+/// ★2026-09-12 変更（承認済）: 以前は `subtitle` に**全文**を出していた。
+/// 3枚引きは1件で800字を超えるため、件数が増えると読めなくなる。
+/// ∴ 一覧は **種別（託宣／リーディング）＋日時の1行**だけにし、
+/// 全文・削除は詳細画面（`/history-detail`）へ寄せた。
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
-
-  Future<void> _confirmDelete(
-    BuildContext context,
-    OracleAppState state,
-    HistoryItemModel item,
-  ) async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.historyDeleteTitle),
-        content: Text(l10n.historyDeleteConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancelLabel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.historyDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      await state.deleteHistoryItem(item.historyId);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,15 +50,23 @@ class HistoryScreen extends StatelessWidget {
                 ...state.history.map(
                   (item) => Card(
                     child: ListTile(
-                      title: Text(item.summary),
-                      subtitle: Text('${item.createdAt}\n${item.fullText}'),
-                      isThreeLine: true,
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        tooltip: l10n.historyDelete,
-                        onPressed: state.loading
-                            ? null
-                            : () => _confirmDelete(context, state, item),
+                      title: Row(
+                        children: [
+                          HistoryKindChip(item: item),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              formatHistoryTimestamp(item.createdAt),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).pushNamed(
+                        '/history-detail',
+                        arguments: item,
                       ),
                     ),
                   ),

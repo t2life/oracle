@@ -209,6 +209,7 @@ class HistoryItemResponse(ApiModel):
     summary: str
     full_text: str
     plan_at_creation: str
+    spread_id: str = "daily"
 
 
 class ProductResponse(ApiModel):

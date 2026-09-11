@@ -295,5 +295,8 @@
   "cardRevealNext": "查看结果",
   "cardZoomClose": "关闭",
   "deepDivePrompt": "要用几张牌深入解读？",
-  "deepDiveCarryOver": "今日神谕抽到的牌会作为第一张延续，其余由您抽取。"
+  "deepDiveCarryOver": "今日神谕抽到的牌会作为第一张延续，其余由您抽取。",
+  "historyKindOracle": "神谕",
+  "historyKindReading": "占卜",
+  "historyDetailTitle": "历史详情"
 }

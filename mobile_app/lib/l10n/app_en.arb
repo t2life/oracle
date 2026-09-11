@@ -295,5 +295,8 @@
   "cardRevealNext": "See the result",
   "cardZoomClose": "Close",
   "deepDivePrompt": "How many cards for the deeper reading?",
-  "deepDiveCarryOver": "The card from today's oracle is carried over as the first card; you draw the rest."
+  "deepDiveCarryOver": "The card from today's oracle is carried over as the first card; you draw the rest.",
+  "historyKindOracle": "Oracle",
+  "historyKindReading": "Reading",
+  "historyDetailTitle": "Saved reading"
 }

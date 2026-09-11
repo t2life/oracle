@@ -499,6 +499,7 @@ def _history_to_dict(item: HistoryItem) -> dict[str, Any]:
         "summary": item.summary,
         "full_text": item.full_text,
         "plan_at_creation": item.plan_at_creation.value,
+        "spread_id": item.spread_id,
     }
 
 
@@ -515,6 +516,7 @@ def _history_from_dict(data: dict[str, Any]) -> HistoryItem:
         summary=str(data["summary"]),
         full_text=str(data["full_text"]),
         plan_at_creation=PlanType(str(data.get("plan_at_creation", PlanType.FREE.value))),
+        spread_id=str(data.get("spread_id") or "daily"),
     )
 
 

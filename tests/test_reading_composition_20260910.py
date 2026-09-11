@@ -99,7 +99,12 @@ def test_question_text_switches_tone() -> None:
 
 
 def test_taigen_dome_material_is_smoothed() -> None:
-    """体言止めの列挙が文へ埋め込まれ、句点の連続が残らない。"""
+    """体言止めの素材が文へ収まり、句点の連続が残らない。
+
+    ★2026-09-12 変更: 以前は列挙（「A。B。C。」）を読点で**全部**繋いでいたが、
+    「一覧を読み上げた」印象になるため **1つだけ**選ぶようにした。
+    ∴ ここで見るのは「文として収まっているか」と「羅列していないか」である。
+    """
     engine = _engine()
     text = engine.compose_ja(
         card_id="japanese_mythology_card_032",
@@ -108,11 +113,15 @@ def test_taigen_dome_material_is_smoothed() -> None:
         session_id="ses_smooth",
         fallback_text="fallback",
     )
-    # 体言止めの列挙（「A。B。C。」）が読点で繋がれて文へ収まっていること。
-    # 文末の言い回しは「位置別語り口マスタ」で変わるため、ここでは見ない。
     card = engine.card_for("japanese_mythology_card_032")
-    first_word = card["theme_meanings"]["work"].split("。")[0]
-    assert f"{first_word}、" in text, text
+    items = [
+        part.strip()
+        for part in card["theme_meanings"]["work"].split("。")
+        if part.strip()
+    ]
+    assert len(items) >= 2, "列挙でない素材では、この観点を確かめられない"
+    used = [item for item in items if item in text]
+    assert len(used) == 1, f"意味は1つだけ出ること（出た数={len(used)}）: {text}"
     for paragraph in text.split("\n\n"):
         assert "。。" not in paragraph
         assert paragraph.endswith(("。", "！", "？")), paragraph
