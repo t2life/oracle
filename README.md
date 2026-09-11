@@ -27,11 +27,12 @@
 2. 依存関係をインストール（`requirements.txt`）
 3. APIを起動
 
-主な実行コマンド:
+主な実行コマンド（**仮想環境を有効化した状態**で実行する。
+Windows は `.venv\Scripts\Activate.ps1`、macOS は `source .venv/bin/activate`）:
 
-- 開発サーバー: `c:/Users/81907/Desktop/オラクルカード/system/.venv/Scripts/python.exe scripts/run_dev_server.py`
-- スモークテスト: `c:/Users/81907/Desktop/オラクルカード/system/.venv/Scripts/python.exe scripts/smoke_test.py`
-- テスト実行: `c:/Users/81907/Desktop/オラクルカード/system/.venv/Scripts/python.exe -m pytest -q`
+- 開発サーバー: `python scripts/run_dev_server.py`
+- スモークテスト: `python scripts/smoke_test.py`
+- テスト実行: `python -m pytest -q`
 
 ### PostgreSQL / Redis 段階導入
 
@@ -48,9 +49,9 @@
 
 初期接続・スキーマ作成確認:
 
-- `c:/Users/81907/Desktop/オラクルカード/system/.venv/Scripts/python.exe scripts/init_persistence.py`
-- `c:/Users/81907/Desktop/オラクルカード/system/.venv/Scripts/python.exe scripts/run_migration.py up`
-- ロールバック: `c:/Users/81907/Desktop/オラクルカード/system/.venv/Scripts/python.exe scripts/run_migration.py down`
+- `python scripts/init_persistence.py`
+- `python scripts/run_migration.py up`
+- ロールバック: `python scripts/run_migration.py down`
 
 接続失敗時は自動的にInMemoryへフォールバックします。
 ただし `ORACLE_RUNTIME_MODE=staging|production` の場合はフォールバックせず起動失敗とします。
