@@ -70,6 +70,25 @@ CASES: dict[str, dict] = {
         "spread_id": "three",
         "question_text": "転職すべきか迷っています。",
     },
+    # 2026-09-12 問いの扱い。当人の行動では動かせない問い（運任せ）と、
+    # どの質問タイプにも当たらない問い（分類外）。文面はカードの
+    # 属性・エレメント・キーワードから作るため、両実装で一致しなければ落ちる。
+    "three_luck_q": {
+        "card_ids": [
+            "japanese_mythology_card_001",
+            "japanese_mythology_card_002",
+            "japanese_mythology_card_003",
+        ],
+        "theme_id": "money",
+        "spread_id": "three",
+        "question_text": "宝くじで1等を当てたい。",
+    },
+    "daily_unmatched_q": {
+        "card_ids": ["japanese_mythology_card_021"],
+        "theme_id": "money",
+        "spread_id": "daily",
+        "question_text": "猫を飼おうか考えています。",
+    },
 }
 
 

@@ -84,6 +84,13 @@ class InterpretationEngine:
         self._position_voices: dict[str, list[str]] = content.get(
             "position_voices", {}
         )
+        # 2026-09-12 問いの扱い。区分 → 判定語と、語り口・助言の**型**。
+        # 型に差し込む語は全てカード側から取るため、ここにカードの中身は無い。
+        self._question_stances: dict[str, dict[str, Any]] = {
+            str(entry.get("kind", "")): entry
+            for entry in content.get("question_stances", [])
+            if entry.get("kind")
+        }
 
     # ------------------------------------------------------------------ 参照系
     def card_for(self, card_id: str) -> dict[str, Any] | None:
@@ -122,11 +129,15 @@ class InterpretationEngine:
 
     def _classify(
         self, question_text: str | None, theme_id: str
-    ) -> tuple[str, str | None, dict[str, Any] | None]:
-        """相談内容からジャンル・状況・トーンを判定する。
+    ) -> tuple[str, str | None, dict[str, Any] | None, bool]:
+        """相談内容からジャンル・状況・トーン・**一致したか**を判定する。
 
         相談内容が無い場合は従来どおりテーマ→ジャンルのみで、状況はNone
         （呼び出し側が日替わりで選ぶ）。
+
+        第4要素は「質問タイプ分類のどれかに当たったか」。2026-09-12 追加。
+        当たらないまま日付でテンプレを選ぶと**問いと無関係な段落**になるため、
+        呼び出し側がこれを見て出し分ける。
         """
         theme_genre = self._genre_for_theme(theme_id)
         question = (question_text or "").strip()
@@ -152,8 +163,59 @@ class InterpretationEngine:
                     entry.get("genre") or theme_genre,
                     situation or None,
                     self._tone_by_label(entry.get("tone", "")),
+                    True,
                 )
-        return theme_genre, None, self._tone_for_genre(theme_genre)
+        return theme_genre, None, self._tone_for_genre(theme_genre), False
+
+    _STANCE_LUCK = "運任せ"
+    _STANCE_UNMATCHED = "分類外"
+
+    def question_stance(self, question_text: str | None, matched: bool) -> str | None:
+        """問いの扱いを返す（`運任せ` / `分類外` / なし）。
+
+        - `運任せ` … 抽選・確率など、当人の行動では動かせない問い。
+          当否は語らず、カードそのものを語って直感へ委ねる。
+        - `分類外` … どの `質問タイプ分類` にも当たらなかった問い。
+          **従来はここで文脈テンプレを日付で選んでいた**（＝問いを読まずに語る）。
+
+        相談内容が無いとき（本日の託宣）は None。問いが無ければ無関係にならないため、
+        従来どおり日替わりのテンプレでよい。
+        """
+        question = (question_text or "").strip()
+        if not question:
+            return None
+        luck = self._question_stances.get(self._STANCE_LUCK)
+        if luck and any(
+            keyword and keyword in question for keyword in luck.get("keywords", [])
+        ):
+            return self._STANCE_LUCK
+        if not matched and self._STANCE_UNMATCHED in self._question_stances:
+            return self._STANCE_UNMATCHED
+        return None
+
+    def compose_stance_paragraphs(
+        self, stance: str, cards: list[dict[str, Any]], seed_key: str
+    ) -> tuple[str, str]:
+        """問いの扱いに沿った「語り口」「助言」を返す（素材が無ければ空文字）。
+
+        語り口は1枚目、助言は最後の1枚から作る（置き換える段落と同じ出どころ）。
+        同じ引きなら何度でも同じ文になるよう決定的に選ぶ。
+        """
+        entry = self._question_stances.get(stance)
+        if not entry or not cards:
+            return "", ""
+        voices = entry.get("voices", [])
+        advices = entry.get("advices", [])
+        first, last = cards[0], cards[-1]
+        voice = ""
+        advice = ""
+        if voices:
+            index = _stable_hash(seed_key, first.get("card_id", "")) % len(voices)
+            voice = self._fill_placeholders(voices[index], first)
+        if advices:
+            index = _stable_hash(seed_key, last.get("card_id", "")) % len(advices)
+            advice = self._fill_placeholders(advices[index], last)
+        return voice, advice
 
     def _tone_by_label(self, label: str) -> dict[str, Any] | None:
         """「励まし+神秘的」のような推奨トーン表記から先頭のトーンを引く。"""
@@ -188,6 +250,10 @@ class InterpretationEngine:
         keywords = card.get("keywords", [])
         values = {
             "神名": card.get("name_ja", ""),
+            # 2026-09-12 追加。問いの扱いの型が属性・エレメントを語るため
+            # （文面の実体はカードから引く、というオーナー指示）。
+            "属性": card.get("attribute", ""),
+            "エレメント": card.get("element", ""),
             "基本的意味": self._as_phrase(card.get("basic_meaning", "")),
             "キーワード": "・".join(keywords[:2]) if keywords else card.get("basic_meaning", ""),
             "肯定的キーワード": "・".join(dictionary.get("positive", [])[:2]),
@@ -378,7 +444,8 @@ class InterpretationEngine:
         if not cards:
             return fallback_text
 
-        genre, situation, tone = self._classify(question_text, theme_id)
+        genre, situation, tone, matched = self._classify(question_text, theme_id)
+        stance = self.question_stance(question_text, matched)
         connector = self._connector(tone)
         positions = self.positions_for(spread_id, len(cards))
         single = len(cards) == 1
@@ -411,26 +478,44 @@ class InterpretationEngine:
                     f"{linking}、{combination}" if linking else combination
                 )
 
-        # 4. 文脈テンプレ（状況は相談内容から、無ければ日替わりで決定的に選ぶ）
-        patterns = self._patterns_by_genre.get(genre) or self._patterns_by_genre.get(
-            self._FALLBACK_GENRE, []
+        # 4. 文脈テンプレ／問いの扱い
+        #
+        # 相談内容が `質問タイプ分類` のどれにも当たらないと、従来はここで
+        # **日付でテンプレを選んで**いた（宝くじの問いに節約の話が出た原因）。
+        # 問いを読まずに語るくらいなら、カードそのものを語って直感へ委ねる。
+        stance_voice, stance_advice = (
+            self.compose_stance_paragraphs(stance, cards, session_id)
+            if stance
+            else ("", "")
         )
-        pattern = None
-        if patterns:
-            if situation:
-                pattern = next(
-                    (item for item in patterns if item.get("situation") == situation),
-                    None,
-                )
-            if pattern is None:
-                pattern = patterns[_stable_hash(date_key, theme_id) % len(patterns)]
-        if pattern:
-            templates = pattern.get("templates", [])
-            if templates:
-                template = templates[
-                    _stable_hash(session_id, cards[0]["card_id"]) % len(templates)
-                ]
-                paragraphs.append(self._fill_placeholders(template, cards[0]))
+        if stance_voice:
+            paragraphs.append(stance_voice)
+        else:
+            patterns = self._patterns_by_genre.get(
+                genre
+            ) or self._patterns_by_genre.get(self._FALLBACK_GENRE, [])
+            pattern = None
+            if patterns:
+                if situation:
+                    pattern = next(
+                        (
+                            item
+                            for item in patterns
+                            if item.get("situation") == situation
+                        ),
+                        None,
+                    )
+                if pattern is None and not stance:
+                    # 問いが無い（本日の託宣）ときだけ日替わりで選ぶ。
+                    # 問いがあるのに無関係な段落を出さないための条件。
+                    pattern = patterns[_stable_hash(date_key, theme_id) % len(patterns)]
+            if pattern:
+                templates = pattern.get("templates", [])
+                if templates:
+                    template = templates[
+                        _stable_hash(session_id, cards[0]["card_id"]) % len(templates)
+                    ]
+                    paragraphs.append(self._fill_placeholders(template, cards[0]))
 
         # 4.5 番号の読み（期日・数量を問われたときだけ）
         number_reading = self.compose_number_reading(cards, question_text)
@@ -438,7 +523,8 @@ class InterpretationEngine:
             paragraphs.append(number_reading)
 
         # 5. 行動提案 → 6. 締め
-        action = self._action_sentence(
+        # 問いの扱いがある場合、助言も同じ型から作る（同じ語を二度言わない）。
+        action = stance_advice or self._action_sentence(
             cards[-1], tone, _stable_hash(date_key, cards[-1]["card_id"])
         )
         if action:
@@ -450,12 +536,13 @@ class InterpretationEngine:
         if not paragraphs:
             return fallback_text
         self._logger.debug(
-            "託宣文を合成: 枚数=%s spread=%s genre=%s 状況=%s トーン=%s",
+            "託宣文を合成: 枚数=%s spread=%s genre=%s 状況=%s トーン=%s 扱い=%s",
             len(cards),
             spread_id,
             genre,
             situation,
             (tone or {}).get("name"),
+            stance,
         )
         return "\n\n".join(paragraphs)
 

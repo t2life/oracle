@@ -134,8 +134,12 @@ class InterpretationComposer {
     return _toneByLabel('');
   }
 
-  /// (ジャンル, 状況, トーン)。相談内容が無ければ状況はnull（呼び出し側が日替わりで選ぶ）。
-  (String, String?, Map<String, dynamic>?) _classify(
+  /// (ジャンル, 状況, トーン, 一致したか)。
+  /// 相談内容が無ければ状況はnull（呼び出し側が日替わりで選ぶ）。
+  ///
+  /// 第4要素は「質問タイプ分類のどれかに当たったか」。2026-09-12 追加。
+  /// 当たらないまま日付でテンプレを選ぶと**問いと無関係な段落**になる。
+  (String, String?, Map<String, dynamic>?, bool) _classify(
     String? questionText,
     String themeId,
   ) {
@@ -173,10 +177,78 @@ class InterpretationComposer {
           (genre == null || genre.isEmpty) ? themeGenre : genre,
           (situation == null || situation.isEmpty) ? null : situation,
           _toneByLabel(best['tone'] as String? ?? ''),
+          true,
         );
       }
     }
-    return (themeGenre, null, _toneForGenre(themeGenre));
+    return (themeGenre, null, _toneForGenre(themeGenre), false);
+  }
+
+  static const String _stanceLuck = '運任せ';
+  static const String _stanceUnmatched = '分類外';
+
+  Map<String, dynamic>? _stanceEntry(String kind) {
+    for (final raw
+        in (_content['question_stances'] as List<dynamic>? ?? const [])) {
+      final entry = raw as Map<String, dynamic>;
+      if (entry['kind'] == kind) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  /// 問いの扱い（`運任せ` / `分類外` / null）。サーバーの `question_stance` と同じ手順。
+  String? _questionStance(String? questionText, bool matched) {
+    final question = (questionText ?? '').trim();
+    if (question.isEmpty) {
+      return null;
+    }
+    final luck = _stanceEntry(_stanceLuck);
+    if (luck != null) {
+      final keywords =
+          (luck['keywords'] as List<dynamic>? ?? const []).cast<String>();
+      for (final keyword in keywords) {
+        if (keyword.isNotEmpty && question.contains(keyword)) {
+          return _stanceLuck;
+        }
+      }
+    }
+    if (!matched && _stanceEntry(_stanceUnmatched) != null) {
+      return _stanceUnmatched;
+    }
+    return null;
+  }
+
+  /// 問いの扱いに沿った (語り口, 助言)。素材が無ければ空文字。
+  (String, String) _stanceParagraphs(
+    String stance,
+    List<Map<String, dynamic>> cards,
+    String seedKey,
+  ) {
+    final entry = _stanceEntry(stance);
+    if (entry == null || cards.isEmpty) {
+      return ('', '');
+    }
+    final voices =
+        (entry['voices'] as List<dynamic>? ?? const []).cast<String>();
+    final advices =
+        (entry['advices'] as List<dynamic>? ?? const []).cast<String>();
+    final first = cards.first;
+    final last = cards.last;
+    var voice = '';
+    var advice = '';
+    if (voices.isNotEmpty) {
+      final index =
+          _stableHash([seedKey, first['card_id'] as String]) % voices.length;
+      voice = _fillPlaceholders(voices[index], first);
+    }
+    if (advices.isNotEmpty) {
+      final index =
+          _stableHash([seedKey, last['card_id'] as String]) % advices.length;
+      advice = _fillPlaceholders(advices[index], last);
+    }
+    return (voice, advice);
   }
 
   List<Map<String, dynamic>> positionsFor(String spreadId, int cardCount) {
@@ -232,6 +304,9 @@ class InterpretationComposer {
     final keywords = (card['keywords'] as List<dynamic>? ?? const []).cast<String>();
     final values = <String, String>{
       '神名': card['name_ja'] as String? ?? '',
+      // 2026-09-12 追加。問いの扱いの型が属性・エレメントを語るため。
+      '属性': card['attribute'] as String? ?? '',
+      'エレメント': card['element'] as String? ?? '',
       '基本的意味': asPhrase(card['basic_meaning'] as String? ?? ''),
       'キーワード': keywords.isNotEmpty
           ? keywords.take(2).join('・')
@@ -419,7 +494,8 @@ class InterpretationComposer {
       return fallbackText;
     }
 
-    final (genre, situation, tone) = _classify(questionText, themeId);
+    final (genre, situation, tone, matched) = _classify(questionText, themeId);
+    final stance = _questionStance(questionText, matched);
     final connector = _connector(tone);
     final positions = positionsFor(spreadId, cards.length);
     final single = cards.length == 1;
@@ -453,34 +529,51 @@ class InterpretationComposer {
       }
     }
 
-    final patternsByGenre = <String, List<Map<String, dynamic>>>{};
-    for (final raw in (_content['context_patterns'] as List<dynamic>? ?? const [])) {
-      final pattern = raw as Map<String, dynamic>;
-      patternsByGenre
-          .putIfAbsent(pattern['genre'] as String? ?? '', () => [])
-          .add(pattern);
-    }
-    final patterns = patternsByGenre[genre] ?? patternsByGenre[_fallbackGenre] ?? const [];
-    Map<String, dynamic>? pattern;
-    if (patterns.isNotEmpty) {
-      if (situation != null) {
-        for (final item in patterns) {
-          if (item['situation'] == situation) {
-            pattern = item;
-            break;
+    // 4. 文脈テンプレ／問いの扱い
+    //
+    // 相談内容がどの質問タイプにも当たらないと、従来はここで**日付でテンプレを
+    // 選んで**いた（宝くじの問いに節約の話が出た原因）。問いを読まずに語るくらいなら、
+    // カードそのものを語って直感へ委ねる。
+    final (stanceVoice, stanceAdvice) = stance == null
+        ? ('', '')
+        : _stanceParagraphs(stance, cards, sessionId);
+    if (stanceVoice.isNotEmpty) {
+      paragraphs.add(stanceVoice);
+    } else {
+      final patternsByGenre = <String, List<Map<String, dynamic>>>{};
+      for (final raw
+          in (_content['context_patterns'] as List<dynamic>? ?? const [])) {
+        final pattern = raw as Map<String, dynamic>;
+        patternsByGenre
+            .putIfAbsent(pattern['genre'] as String? ?? '', () => [])
+            .add(pattern);
+      }
+      final patterns =
+          patternsByGenre[genre] ?? patternsByGenre[_fallbackGenre] ?? const [];
+      Map<String, dynamic>? pattern;
+      if (patterns.isNotEmpty) {
+        if (situation != null) {
+          for (final item in patterns) {
+            if (item['situation'] == situation) {
+              pattern = item;
+              break;
+            }
           }
         }
+        if (pattern == null && stance == null) {
+          // 問いが無い（本日の託宣）ときだけ日替わりで選ぶ。
+          pattern = patterns[_stableHash([dateKey, themeId]) % patterns.length];
+        }
       }
-      pattern ??= patterns[_stableHash([dateKey, themeId]) % patterns.length];
-    }
-    if (pattern != null) {
-      final templates =
-          (pattern['templates'] as List<dynamic>? ?? const []).cast<String>();
-      if (templates.isNotEmpty) {
-        final template = templates[
-            _stableHash([sessionId, cards.first['card_id'] as String]) %
-                templates.length];
-        paragraphs.add(_fillPlaceholders(template, cards.first));
+      if (pattern != null) {
+        final templates =
+            (pattern['templates'] as List<dynamic>? ?? const []).cast<String>();
+        if (templates.isNotEmpty) {
+          final template = templates[
+              _stableHash([sessionId, cards.first['card_id'] as String]) %
+                  templates.length];
+          paragraphs.add(_fillPlaceholders(template, cards.first));
+        }
       }
     }
 
@@ -490,10 +583,13 @@ class InterpretationComposer {
       paragraphs.add(numberReading);
     }
 
-    final action = _actionSentence(
-      cards.last,
-      _stableHash([dateKey, cards.last['card_id'] as String]),
-    );
+    // 問いの扱いがある場合、助言も同じ型から作る（同じ語を二度言わない）。
+    final action = stanceAdvice.isNotEmpty
+        ? stanceAdvice
+        : _actionSentence(
+            cards.last,
+            _stableHash([dateKey, cards.last['card_id'] as String]),
+          );
     if (action.isNotEmpty) {
       paragraphs.add(action);
     }
