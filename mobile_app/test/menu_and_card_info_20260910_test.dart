@@ -124,7 +124,7 @@ void main() {
       expect(find.text('アプリを評価'), findsOneWidget);
       expect(find.text('アプリを共有'), findsOneWidget);
       expect(find.text('機種引継ぎコード'), findsOneWidget);
-      expect(find.text('App2Craftのアプリ'), findsOneWidget);
+      expect(find.text('Apps2Craftのアプリ'), findsOneWidget);
       expect(find.text('規約・情報'), findsOneWidget);
     });
   });
@@ -144,7 +144,7 @@ void main() {
       expect(find.text('日本神話オラクルロンカード'), findsNothing);
       expect(find.text('アプリを評価'), findsOneWidget);
       expect(find.text('アプリを共有'), findsOneWidget);
-      expect(find.text('App2Craftのアプリ'), findsOneWidget);
+      expect(find.text('Apps2Craftのアプリ'), findsOneWidget);
       // 既存の導線は残っている
       expect(find.text('お問い合わせ'), findsOneWidget);
     });

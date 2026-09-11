@@ -31,7 +31,7 @@ Future<void> openAppUrl(BuildContext context, String url) async {
 Future<void> openStoreListing(BuildContext context) =>
     openAppUrl(context, AppLinks.storeListingUrl);
 
-/// 提供元の他アプリを開く（「App2Craftのアプリ」）。
+/// 提供元の他アプリを開く（「Apps2Craftのアプリ」）。
 Future<void> openDeveloperApps(BuildContext context) =>
     openAppUrl(context, AppLinks.developerAppsUrl);
 

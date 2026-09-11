@@ -469,11 +469,12 @@
   "transferCodeSingleUseNote": "コードは1回だけ使えます。",
   "rateApp": "アプリを評価",
   "shareApp": "アプリを共有",
-  "developerApps": "App2Craftのアプリ",
+  "developerApps": "Apps2Craftのアプリ",
   "legalInfoTitle": "規約・情報",
   "termsOfService": "利用規約",
   "privacyPolicy": "プライバシーポリシー",
   "commercialTransactions": "特定商取引法に基づく表記",
   "comingSoon": "準備中",
-  "appProviderLabel": "提供元"
+  "appProviderLabel": "提供元",
+  "supportContactLabel": "お問い合わせ窓口"
 }

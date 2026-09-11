@@ -277,11 +277,12 @@
   "transferCodeSingleUseNote": "每个代码只能使用一次。",
   "rateApp": "为应用评分",
   "shareApp": "分享应用",
-  "developerApps": "App2Craft 的应用",
+  "developerApps": "Apps2Craft 的应用",
   "legalInfoTitle": "条款与信息",
   "termsOfService": "使用条款",
   "privacyPolicy": "隐私政策",
   "commercialTransactions": "特定商业交易法标示",
   "comingSoon": "准备中",
-  "appProviderLabel": "提供方"
+  "appProviderLabel": "提供方",
+  "supportContactLabel": "咨询窗口"
 }

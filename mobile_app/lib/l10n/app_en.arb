@@ -277,11 +277,12 @@
   "transferCodeSingleUseNote": "Each code can be used only once.",
   "rateApp": "Rate this app",
   "shareApp": "Share this app",
-  "developerApps": "Apps by App2Craft",
+  "developerApps": "Apps by Apps2Craft",
   "legalInfoTitle": "Terms and information",
   "termsOfService": "Terms of service",
   "privacyPolicy": "Privacy policy",
   "commercialTransactions": "Commercial transactions notice",
   "comingSoon": "Coming soon",
-  "appProviderLabel": "Provider"
+  "appProviderLabel": "Provider",
+  "supportContactLabel": "Support contact"
 }

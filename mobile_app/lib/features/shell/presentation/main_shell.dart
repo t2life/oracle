@@ -13,6 +13,7 @@ import '../../my_page/presentation/my_page_screen.dart';
 import '../../shared/flow_exit_action.dart';
 import '../../shared/oracle_card_visuals.dart';
 import '../../shared/speaker_toggle.dart';
+import '../../../core/config/app_links.dart';
 import '../../shared/app_actions.dart';
 import '../../shop/presentation/shop_screen.dart';
 
@@ -411,12 +412,19 @@ class SecondaryMenuDrawer extends StatelessWidget {
             const Divider(),
             // 2026-09-10 承認: 「プラン購入」を外し、アプリ本体まわりの導線を置く。
             ListTile(
+              // ストア未公開のあいだは押せない（掲載前のURLは開けない）
+              enabled: AppLinks.storeListingUrl.isNotEmpty,
               leading: const Icon(Icons.star_outline),
               title: Text(l10n.rateApp),
-              onTap: () {
-                Navigator.of(context).pop();
-                openStoreListing(context);
-              },
+              subtitle: AppLinks.storeListingUrl.isEmpty
+                  ? Text(l10n.comingSoon)
+                  : null,
+              onTap: AppLinks.storeListingUrl.isEmpty
+                  ? null
+                  : () {
+                      Navigator.of(context).pop();
+                      openStoreListing(context);
+                    },
             ),
             ListTile(
               leading: const Icon(Icons.ios_share),

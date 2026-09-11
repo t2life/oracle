@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../../core/config/app_links.dart';
 import '../../../core/state/app_state.dart';
 import '../../../core/state/app_state_scope.dart';
 import '../../../core/theme/app_theme.dart';
@@ -121,10 +122,19 @@ class MyPageTab extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
+                    // ストア未公開のあいだは押せない（掲載前のURLは開けない）
+                    enabled: AppLinks.storeListingUrl.isNotEmpty,
                     leading: const Icon(Icons.star_outline),
                     title: Text(l10n.rateApp),
-                    trailing: const Icon(Icons.open_in_new),
-                    onTap: () => openStoreListing(context),
+                    subtitle: AppLinks.storeListingUrl.isEmpty
+                        ? Text(l10n.comingSoon)
+                        : null,
+                    trailing: AppLinks.storeListingUrl.isEmpty
+                        ? null
+                        : const Icon(Icons.open_in_new),
+                    onTap: AppLinks.storeListingUrl.isEmpty
+                        ? null
+                        : () => openStoreListing(context),
                   ),
                   ListTile(
                     leading: const Icon(Icons.ios_share),

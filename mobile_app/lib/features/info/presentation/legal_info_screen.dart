@@ -47,11 +47,21 @@ class LegalInfoScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Card(
-            child: ListTile(
-              leading: const Icon(Icons.info_outline),
-              // 提供元は固定値（AppLinks）だが、見出しは表示言語に従う
-              title: Text(l10n.appProviderLabel),
-              subtitle: const Text(AppLinks.developerName),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  // 提供元は固定値（AppLinks）だが、見出しは表示言語に従う
+                  title: Text(l10n.appProviderLabel),
+                  subtitle: const Text(AppLinks.developerName),
+                ),
+                ListTile(
+                  // アプリ内フォームが使えないとき（オフライン等）の控えとして出す。
+                  leading: const Icon(Icons.alternate_email),
+                  title: Text(l10n.supportContactLabel),
+                  subtitle: const SelectableText(AppLinks.supportEmail),
+                ),
+              ],
             ),
           ),
         ],

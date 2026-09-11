@@ -36,3 +36,10 @@ db/*.db
 
 # Flutter 生成ローカライズ（lib/l10n/*.arb から gen-l10n で生成）
 mobile_app/lib/l10n/app_localizations*.dart
+
+# 事業者情報（氏名・住所・電話番号）。本リポジトリは公開のため、
+# 実値をコミットしない。生成器がこのファイルを読んで公開ページへ差し込む。
+scripts/business_info.local.json
+
+# 規約類の公開ページ（build_legal_site.py の生成物。実値を含む）
+site/
