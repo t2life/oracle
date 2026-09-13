@@ -538,11 +538,16 @@ class _TopCards extends StatelessWidget {
                 cardName: card.cardName,
                 reading: rubyOf(index),
               ),
-              child: OracleCardFace(
-                cardId: card.cardId,
-                cardName: card.cardName,
-                reading: rubyOf(index),
-                width: _width,
+              // PageView は各ページに「表示幅×0.66 × 高さ」を強制するため、
+              // そのままでは札の縦横比が画面幅で崩れ、図柄の上下が切れる
+              // （2026-09-12 iOS実機）。FittedBox で札本来の比率のまま枠へ収める。
+              child: FittedBox(
+                child: OracleCardFace(
+                  cardId: card.cardId,
+                  cardName: card.cardName,
+                  reading: rubyOf(index),
+                  width: _width,
+                ),
               ),
             ),
           );
