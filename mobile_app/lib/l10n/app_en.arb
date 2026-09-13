@@ -298,5 +298,14 @@
   "deepDiveCarryOver": "The card from today's oracle is carried over as the first card; you draw the rest.",
   "historyKindOracle": "Oracle",
   "historyKindReading": "Reading",
-  "historyDetailTitle": "Saved reading"
+  "historyDetailTitle": "Saved reading",
+  "inquiryMailIntro": "Tapping send opens your mail app. Review the message and send it. We will reply to the address you send from.",
+  "inquiryExampleGeneral": "e.g. I would like to know more about what the cards mean.",
+  "inquiryExampleBilling": "e.g. I bought tickets but my balance did not increase. I purchased on September 10.",
+  "inquiryExampleBug": "e.g. On the result screen, closing the enlarged card does not return me to the previous screen.",
+  "inquiryRemaining": "{count} characters left",
+  "inquiryTooLong": "{count} characters over the limit. Please shorten it.",
+  "inquiryOpenMail": "Send with mail app",
+  "inquiryEnvironmentNote": "The following is added automatically to help us diagnose the issue.",
+  "inquiryMailFailed": "Could not open a mail app. Please write to {email} instead."
 }

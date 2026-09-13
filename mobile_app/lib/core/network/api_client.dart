@@ -254,21 +254,6 @@ class ApiClient implements OracleBackend {
   }
 
   @override
-  Future<Map<String, dynamic>> submitInquiry({
-    required String userId,
-    required String category,
-    required String body,
-    String? email,
-  }) async {
-    return await _postJson('/inquiries', {
-      'user_id': userId,
-      'category': category,
-      'body': body,
-      'email': email,
-    }) as Map<String, dynamic>;
-  }
-
-  @override
   Future<List<dynamic>> getShopLinks() async {
     return await _getJson('/links/shop') as List<dynamic>;
   }

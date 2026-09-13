@@ -490,5 +490,35 @@
   "deepDiveCarryOver": "本日の託宣で引いたカードを1枚目として引き継ぎ、残りを引きます。",
   "historyKindOracle": "託宣",
   "historyKindReading": "リーディング",
-  "historyDetailTitle": "履歴の詳細"
+  "historyDetailTitle": "履歴の詳細",
+  "inquiryMailIntro": "送信ボタンを押すと、お使いのメールアプリが開きます。内容を確認して送信してください。ご返信は、その送信元のアドレスへお送りします。",
+  "inquiryExampleGeneral": "例）カードの意味についてもっと詳しく知りたいです。",
+  "inquiryExampleBilling": "例）チケットを購入しましたが残数が増えません。購入日は9月10日です。",
+  "inquiryExampleBug": "例）結果画面でカードを拡大すると、閉じても元の画面に戻りません。",
+  "inquiryRemaining": "残り {count} 文字",
+  "inquiryTooLong": "{count} 文字超えています。短くしてください。",
+  "inquiryOpenMail": "メールアプリで送る",
+  "inquiryEnvironmentNote": "以下は不具合の切り分けのため自動で付記しています。",
+  "inquiryMailFailed": "メールアプリを開けませんでした。お手数ですが {email} 宛にお送りください。",
+  "@inquiryRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@inquiryTooLong": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@inquiryMailFailed": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  }
 }

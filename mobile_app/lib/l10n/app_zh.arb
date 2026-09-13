@@ -298,5 +298,14 @@
   "deepDiveCarryOver": "今日神谕抽到的牌会作为第一张延续，其余由您抽取。",
   "historyKindOracle": "神谕",
   "historyKindReading": "占卜",
-  "historyDetailTitle": "历史详情"
+  "historyDetailTitle": "历史详情",
+  "inquiryMailIntro": "点击发送后会打开您的邮件应用。请确认内容后发送。我们会回复到您的发件地址。",
+  "inquiryExampleGeneral": "例）想更详细地了解卡片的含义。",
+  "inquiryExampleBilling": "例）已购买点券但余额没有增加。购买日期为9月10日。",
+  "inquiryExampleBug": "例）在结果页面放大卡片后，关闭时无法返回原页面。",
+  "inquiryRemaining": "还可输入 {count} 字",
+  "inquiryTooLong": "超出 {count} 字，请缩短。",
+  "inquiryOpenMail": "用邮件应用发送",
+  "inquiryEnvironmentNote": "以下内容为便于排查问题而自动附加。",
+  "inquiryMailFailed": "无法打开邮件应用。请发送至 {email}。"
 }

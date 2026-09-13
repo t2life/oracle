@@ -776,22 +776,6 @@ class OracleAppState extends ChangeNotifier {
     });
   }
 
-  Future<void> submitInquiry({
-    required String category,
-    required String body,
-    String? email,
-  }) async {
-    await _runOperation(() async {
-      final result = await _backend.submitInquiry(
-        userId: _userId,
-        category: category,
-        body: body,
-        email: email,
-      );
-      _infoMessage = result['message'] as String;
-    });
-  }
-
   Future<void> _loadInitialData() async {
     final themesRaw = await _backend.getThemes();
     final decksRaw = await _backend.getDecks();

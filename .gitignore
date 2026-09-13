@@ -19,6 +19,10 @@ node_modules/
 .flutter-plugins-dependencies
 **/mobile_app/android/.gradle/
 **/mobile_app/android/local.properties
+# リリース署名の鍵と認証情報。**公開リポジトリに絶対に入れない**（2026-09-13）。
+# 紛失すると同一署名での上書き更新ができなくなるため、別途バックアップすること。
+**/mobile_app/android/upload-keystore.jks
+**/mobile_app/android/keystore.properties
 *.iml
 
 # エディタ

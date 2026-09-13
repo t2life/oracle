@@ -90,13 +90,6 @@ abstract interface class OracleBackend {
     required String token,
   });
 
-  Future<Map<String, dynamic>> submitInquiry({
-    required String userId,
-    required String category,
-    required String body,
-    String? email,
-  });
-
   Future<List<dynamic>> getShopLinks();
 
   Future<List<dynamic>> getConsultationLinks();

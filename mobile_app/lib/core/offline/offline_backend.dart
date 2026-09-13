@@ -721,16 +721,6 @@ class OfflineBackend implements OracleBackend {
   }
 
   @override
-  Future<Map<String, dynamic>> submitInquiry({
-    required String userId,
-    required String category,
-    required String body,
-    String? email,
-  }) async {
-    _reject(400, StateMessages.offlineFeatureUnavailable);
-  }
-
-  @override
   Future<List<dynamic>> getShopLinks() async => _links('shop');
 
   @override

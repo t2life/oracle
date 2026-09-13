@@ -61,6 +61,14 @@ class AppLinks {
   static const String commercialTransactionsUrl =
       'https://apps2craft.com/oracle/tokushoho.html';
 
-  /// 問い合わせ窓口（先行アプリと共通）。アプリ内フォームが使えないときの控え。
+  /// 問い合わせ窓口（先行アプリと共通）。
+  /// お問い合わせは**利用者のメールアプリ**からここへ送られる（2026-09-13）。
   static const String supportEmail = 'support@apps2craft.com';
+
+  /// アプリの版数。お問い合わせの本文へ自動で付記し、不具合の切り分けに使う。
+  ///
+  /// ★`pubspec.yaml` の `version:` と**必ず一致させる**。
+  /// 依存を増やさずに版数を知るための写しであり、ずれると問い合わせの
+  /// 版数が嘘になる。`test/inquiry_mail_20260913_test.dart` が機械的に照合する。
+  static const String appVersion = '0.1.0+1';
 }
